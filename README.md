@@ -139,3 +139,4 @@ AnimatedScreensContainer(firstMenuRouter)
 + backToChild
 + replaceChild
 + addChild
++ cleanRouter
