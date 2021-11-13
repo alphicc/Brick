@@ -6,9 +6,19 @@ interface ThreeRouter {
 
     val currentNodeFlow: StateFlow<Node?>
 
-    fun back()
-    fun backTo(key: String)
-    fun replace(screen: Screen)
+    //common
+    fun back(): Boolean
+
+    //container navigation
+    fun backScreen()
+    fun backToScreen(key: String)
+    fun replaceScreen(screen: Screen)
     fun branch(screen: Screen)
-    fun new(screen: Screen)
+    fun addScreen(screen: Screen)
+
+    //child navigation
+    fun backChild()
+    fun backToChild(key: String)
+    fun replaceChild(screen: Screen)
+    fun addChild(screen: Screen)
 }

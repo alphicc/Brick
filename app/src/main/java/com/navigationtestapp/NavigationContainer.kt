@@ -1,9 +1,11 @@
 package com.navigationtestapp
 
 import androidx.activity.ComponentActivity
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import kotlin.system.exitProcess
 
 class NavigationContainer(
     container: ComponentActivity,
@@ -12,6 +14,11 @@ class NavigationContainer(
 
     init {
         container.setContent {
+            BackHandler {
+                val isLast = threeRouter.back()
+                if (isLast) container.finish()
+            }
+
             val screenNode = threeRouter.currentNodeFlow.collectAsState(initial = null)
 
             screenNode.value?.let { node ->
