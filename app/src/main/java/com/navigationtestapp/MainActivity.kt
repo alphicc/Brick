@@ -16,7 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
-val router: ThreeRouter = ThreeRouterImpl()
+val router: TreeRouter = TreeRouterImpl()
 
 val screen1 = Screen(
     key = "1",

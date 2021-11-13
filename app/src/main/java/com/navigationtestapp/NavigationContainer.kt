@@ -9,7 +9,7 @@ import kotlin.system.exitProcess
 
 class NavigationContainer(
     container: ComponentActivity,
-    private val threeRouter: ThreeRouter
+    private val threeRouter: TreeRouter
 ) {
 
     init {
@@ -19,7 +19,7 @@ class NavigationContainer(
                 if (isLast) container.finish()
             }
 
-            val screenNode = threeRouter.currentNodeFlow.collectAsState(initial = null)
+            val screenNode = threeRouter.currentNode.collectAsState(initial = null)
 
             screenNode.value?.let { node ->
                 ComposeContainer(screen = node.screen, childScreenList = node.childScreens)
