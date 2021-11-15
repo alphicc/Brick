@@ -5,33 +5,50 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
-import kotlin.system.exitProcess
 
 class NavigationContainer(
     container: ComponentActivity,
-    private val threeRouter: TreeRouter
+    private val treeRouter: TreeRouter
 ) {
 
     init {
         container.setContent {
             BackHandler {
-                val isLast = threeRouter.back()
+                val isLast = treeRouter.back()
                 if (isLast) container.finish()
             }
 
-            val screenNode = threeRouter.currentNode.collectAsState(initial = null)
+            val screenNode = treeRouter.currentNode.collectAsState(initial = null)
 
             screenNode.value?.let { node ->
-                ComposeContainer(screen = node.screen, childScreenList = node.childScreens)
+                ComposeContainer(node)
             }
         }
     }
 
     @Composable
-    private fun ComposeContainer(screen: Screen, childScreenList: List<Screen>) {
-        screen.content.invoke()
-        childScreenList.forEach {
+    private fun ComposeContainer(node: Node) {
+        if (node.router != null) {
+            val innerNode = node.router.currentNode.collectAsState(initial = null)
+            innerNode.value?.let { ComposeContainer(node = it) }
+        }
+
+        node.screen.content.invoke()
+        node.childScreens.forEach {
             it.content.invoke()
         }
     }
 }
+
+//@Composable
+//fun NavigationContainer(treeRouter: TreeRouter) {
+//
+//    val screenNode = treeRouter.currentNode.collectAsState(initial = null)
+//
+//    screenNode.value?.let { node ->
+//        node.screen.content.invoke()
+//        node.childScreens.forEach {
+//            it.content.invoke()
+//        }
+//    }
+//}

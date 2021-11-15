@@ -6,4 +6,5 @@ interface ScreenRouter {
     fun backToScreen(key: String)
     fun replaceScreen(screen: Screen)
     fun addScreen(screen: Screen)
+    //fun addContainerScreen(containerScreen: ContainerScreen)
 }

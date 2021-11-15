@@ -11,42 +11,82 @@ class GraphController {
 
     private var currentNode: Node? = null
 
+    fun branch(screen: Screen) {
+        //currentNode?.neighbors?.forEach {
+        //    if (it.screen.key == screen.key) {
+//
+        //    }
+        //}
+        //currentNode?.neighbors?.add()
+    }
+
     fun backScreen() {
+        currentNode?.router?.let {
+            it.backScreen()
+            return
+        }
+
         currentNode?.isActive = false
-        updateCurrentNode(currentNode?.parent)
+        currentNode?.bottom?.top = null
+
+        updateCurrentNode(currentNode?.bottom)
         cleanGraph(tree)
     }
 
     fun backToScreen(key: String) {
+        currentNode?.router?.let {
+            it.backToScreen(key)
+            return
+        }
+
         dropUntil(currentNode, key)
-        updateCurrentNode(currentNode?.parent)
+
+        updateCurrentNode(currentNode?.bottom)
         cleanGraph(tree)
     }
 
     fun replaceScreen(screen: Screen) {
+        currentNode?.router?.let {
+            it.replaceScreen(screen)
+            return
+        }
+
         currentNode?.let { node -> keyManager.remove(node.screen.key) }
         keyManager.add(screen.key)
 
         currentNode?.screen = screen
+
         updateCurrentNode(currentNode)
     }
 
-    fun addScreen(screen: Screen) {
-        val weight = (currentNode?.weight ?: 0) + 1
+    fun addScreen(screen: Screen, treeRouter: TreeRouter?) {
+        currentNode?.router?.let {
+            it.addScreen(screen)
+            return
+        }
+
+        keyManager.add(screen.key)
+
         val node = Node(
             isActive = true,
             screen = screen,
             childScreens = ArrayList(),
             neighbors = ArrayList(),
-            weight = weight,
-            parent = currentNode
+            bottom = currentNode,
+            router = treeRouter
         )
+        currentNode?.top = node
         tree.add(node)
-        keyManager.add(screen.key)
+
         updateCurrentNode(node)
     }
 
     fun backChild() {
+        currentNode?.router?.let {
+            it.backChild()
+            return
+        }
+
         currentNode?.run {
             if (childScreens.size >= 1) {
                 val element = childScreens.removeAt(childScreens.size - 1)
@@ -57,6 +97,11 @@ class GraphController {
     }
 
     fun backToChild(key: String) {
+        currentNode?.router?.let {
+            it.backToChild(key)
+            return
+        }
+
         currentNode?.run {
             dropChildUntil(childScreens, key)
             updateCurrentNode(this)
@@ -64,6 +109,11 @@ class GraphController {
     }
 
     fun replaceChild(screen: Screen) {
+        currentNode?.router?.let {
+            it.replaceChild(screen)
+            return
+        }
+
         currentNode?.run {
             if (childScreens.size >= 1) {
                 keyManager.replaceKey(childScreens.last().key, screen.key)
@@ -75,14 +125,21 @@ class GraphController {
     }
 
     fun addChild(screen: Screen) {
+        currentNode?.router?.let {
+            it.addChild(screen)
+            return
+        }
+
         currentNode?.run {
-            childScreens.add(screen)
             keyManager.add(screen.key)
+
+            childScreens.add(screen)
+
             updateCurrentNode(this)
         }
     }
 
-    fun isLastNode(): Boolean = currentNode?.parent == null
+    fun isLastNode(): Boolean = currentNode?.bottom == null
 
     fun closeGraph() {
         currentNode = null
@@ -93,7 +150,8 @@ class GraphController {
     private fun dropUntil(node: Node?, screenKey: String) {
         if (node?.screen?.key != screenKey) {
             node?.isActive = false
-            dropUntil(node?.parent, screenKey)
+            node?.bottom?.top = null
+            dropUntil(node?.bottom, screenKey)
         }
     }
 

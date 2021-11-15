@@ -3,10 +3,8 @@ package com.navigationtestapp
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -25,7 +23,8 @@ val screen1 = Screen(
 
 val screen2 = Screen(
     key = "2",
-    content = { Container(2, "new") { router.addScreen(screen3) } }
+    isContainer = true,
+    content = { BottomMenu { router.addScreen(screen3) } }
 )
 
 val screen3 = Screen(
@@ -77,6 +76,30 @@ class MainActivity : ComponentActivity() {
 
         if (savedInstanceState == null) {
             router.addScreen(screen1)
+        }
+    }
+}
+
+@Composable
+fun BottomMenu(action: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+    ) {
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .background(Color.Green)
+                .fillMaxWidth()
+                .height(50.dp)
+        ) {
+
+            Text(
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .clickable { action.invoke() },
+                text = "BOTTOM_MENU"
+            )
         }
     }
 }

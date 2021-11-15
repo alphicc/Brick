@@ -2,7 +2,7 @@ package com.navigationtestapp
 
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class TreeRouterImpl : TreeRouter {
+class TreeRouterImpl(override val parentRouter: TreeRouter? = null) : TreeRouter {
 
     private val graphController: GraphController = GraphController()
 
@@ -27,13 +27,27 @@ class TreeRouterImpl : TreeRouter {
         TODO("Not yet implemented")
     }
 
-    override fun backScreen() = graphController.backScreen()
+    override fun backScreen() {
+        if (currentNode.value?.router != null) {
+
+        }
+        graphController.backScreen()
+    }
 
     override fun backToScreen(key: String) = graphController.backToScreen(key)
 
     override fun replaceScreen(screen: Screen) = graphController.replaceScreen(screen)
 
-    override fun addScreen(screen: Screen) = graphController.addScreen(screen)
+    override fun addScreen(screen: Screen) {
+        val childRouter = if (screen.isContainer) TreeRouterImpl(this)
+        else null
+        graphController.addScreen(screen, childRouter)
+    }
+
+    // override fun addContainerScreen(containerScreen: ContainerScreen) {
+    //     val screen = Screen(containerScreen.key, containerScreen.content)
+    //     graphController.addScreen(screen, TreeRouterImpl())
+    // }
 
     override fun backChild() = graphController.backChild()
 
