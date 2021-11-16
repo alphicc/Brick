@@ -1,54 +1,49 @@
 package com.navigationtestapp
 
-import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
-import androidx.activity.compose.setContent
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 
-class NavigationContainer(
-    container: ComponentActivity,
-    private val treeRouter: TreeRouter
-) {
+@Composable
+fun ScreensContainer(containerConnector: ContainerConnector, onScreensEmpty: () -> Unit = {}) {
 
-    init {
-        container.setContent {
-            BackHandler {
-                val isLast = treeRouter.back()
-                if (isLast) container.finish()
-            }
+    val screenNode = containerConnector.currentNode.collectAsState()
 
-            val screenNode = treeRouter.currentNode.collectAsState(initial = null)
-
-            screenNode.value?.let { node ->
-                ComposeContainer(node)
-            }
-        }
-    }
-
-    @Composable
-    private fun ComposeContainer(node: Node) {
-        if (node.router != null) {
-            val innerNode = node.router.currentNode.collectAsState(initial = null)
-            innerNode.value?.let { ComposeContainer(node = it) }
-        }
-
+    screenNode.value?.let { node ->
         node.screen.content.invoke()
         node.childScreens.forEach {
             it.content.invoke()
         }
-    }
+    } ?: onScreensEmpty.invoke()
 }
 
+@Composable
+fun InnerScreensContainer(
+    containerConnector: ContainerConnector,
+    onScreensEmpty: () -> Unit = {}
+) {
+
+    val innerNodeConnector = containerConnector.innerNodeConnector.collectAsState()
+    val screenNode = innerNodeConnector.value?.currentNode?.collectAsState()
+
+    screenNode?.value?.let { node ->
+        node.screen.content.invoke()
+        node.childScreens.forEach {
+            it.content.invoke()
+        }
+    } ?: onScreensEmpty.invoke()
+}
+
+
 //@Composable
-//fun NavigationContainer(treeRouter: TreeRouter) {
+//fun NestedContainer(treeRouter: TreeRouter, startNavigation: () -> Unit = {}) {
 //
-//    val screenNode = treeRouter.currentNode.collectAsState(initial = null)
+//    val router = treeRouter.currentChildRouter.collectAsState()
+//    val screenNode = router.value?.currentNode?.collectAsState()
 //
-//    screenNode.value?.let { node ->
+//    screenNode?.value?.let { node ->
 //        node.screen.content.invoke()
 //        node.childScreens.forEach {
 //            it.content.invoke()
 //        }
-//    }
+//    } ?: startNavigation.invoke()
 //}

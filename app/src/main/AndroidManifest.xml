@@ -20,6 +20,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+
+        <activity android:name=".StackNavigationActivity" />
+
+        <activity android:name=".BottomMenuNavigationActivity" />
+
+        <activity android:name=".NestedNavigationActivity" />
     </application>
 
 </manifest>

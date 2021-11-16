@@ -3,11 +3,9 @@ package com.navigationtestapp
 data class Node(
     var isActive: Boolean,
     var screen: Screen,
-    var top: Node? = null,
-    var bottom: Node? = null,
+    val parent: Node? = null,
     val childScreens: ArrayList<Screen>,
-    val neighbors: ArrayList<Node>,
-    val router: TreeRouter?
+    val neighbors: ArrayList<Node>
 ) {
     override fun equals(other: Any?): Boolean = false
 

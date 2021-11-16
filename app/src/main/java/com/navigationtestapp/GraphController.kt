@@ -21,35 +21,34 @@ class GraphController {
     }
 
     fun backScreen() {
-        currentNode?.router?.let {
-            it.backScreen()
-            return
-        }
+        //currentNode?.router?.let {
+        //    it.backScreen()
+        //    return
+        //}
 
         currentNode?.isActive = false
-        currentNode?.bottom?.top = null
 
-        updateCurrentNode(currentNode?.bottom)
+        updateCurrentNode(currentNode?.parent)
         cleanGraph(tree)
     }
 
     fun backToScreen(key: String) {
-        currentNode?.router?.let {
-            it.backToScreen(key)
-            return
-        }
+        //currentNode?.router?.let {
+        //    it.backToScreen(key)
+        //    return
+        //}
 
         dropUntil(currentNode, key)
 
-        updateCurrentNode(currentNode?.bottom)
+        updateCurrentNode(currentNode?.parent)
         cleanGraph(tree)
     }
 
     fun replaceScreen(screen: Screen) {
-        currentNode?.router?.let {
-            it.replaceScreen(screen)
-            return
-        }
+        //currentNode?.router?.let {
+        //    it.replaceScreen(screen)
+        //    return
+        //}
 
         currentNode?.let { node -> keyManager.remove(node.screen.key) }
         keyManager.add(screen.key)
@@ -59,11 +58,11 @@ class GraphController {
         updateCurrentNode(currentNode)
     }
 
-    fun addScreen(screen: Screen, treeRouter: TreeRouter?) {
-        currentNode?.router?.let {
-            it.addScreen(screen)
-            return
-        }
+    fun addScreen(screen: Screen) {
+        //currentNode?.router?.let {
+        //    it.addScreen(screen)
+        //    return
+        //}
 
         keyManager.add(screen.key)
 
@@ -72,21 +71,19 @@ class GraphController {
             screen = screen,
             childScreens = ArrayList(),
             neighbors = ArrayList(),
-            bottom = currentNode,
-            router = treeRouter
+            parent = currentNode
         )
-        currentNode?.top = node
         tree.add(node)
 
         updateCurrentNode(node)
     }
 
     fun backChild() {
-        currentNode?.router?.let {
-            it.backChild()
-            return
-        }
-
+        //currentNode?.router?.let {
+        //    it.backChild()
+        //    return
+        //}
+//
         currentNode?.run {
             if (childScreens.size >= 1) {
                 val element = childScreens.removeAt(childScreens.size - 1)
@@ -97,10 +94,10 @@ class GraphController {
     }
 
     fun backToChild(key: String) {
-        currentNode?.router?.let {
-            it.backToChild(key)
-            return
-        }
+        //currentNode?.router?.let {
+        //    it.backToChild(key)
+        //    return
+        //}
 
         currentNode?.run {
             dropChildUntil(childScreens, key)
@@ -109,11 +106,11 @@ class GraphController {
     }
 
     fun replaceChild(screen: Screen) {
-        currentNode?.router?.let {
-            it.replaceChild(screen)
-            return
-        }
-
+        //currentNode?.router?.let {
+        //    it.replaceChild(screen)
+        //    return
+        //}
+//
         currentNode?.run {
             if (childScreens.size >= 1) {
                 keyManager.replaceKey(childScreens.last().key, screen.key)
@@ -125,10 +122,10 @@ class GraphController {
     }
 
     fun addChild(screen: Screen) {
-        currentNode?.router?.let {
-            it.addChild(screen)
-            return
-        }
+        //currentNode?.router?.let {
+        //    it.addChild(screen)
+        //    return
+        //}
 
         currentNode?.run {
             keyManager.add(screen.key)
@@ -139,7 +136,7 @@ class GraphController {
         }
     }
 
-    fun isLastNode(): Boolean = currentNode?.bottom == null
+    fun isLastNode(): Boolean = currentNode?.parent == null
 
     fun closeGraph() {
         currentNode = null
@@ -150,8 +147,7 @@ class GraphController {
     private fun dropUntil(node: Node?, screenKey: String) {
         if (node?.screen?.key != screenKey) {
             node?.isActive = false
-            node?.bottom?.top = null
-            dropUntil(node?.bottom, screenKey)
+            dropUntil(node?.parent, screenKey)
         }
     }
 
