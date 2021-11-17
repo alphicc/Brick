@@ -13,6 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+private val rootRouter: TreeRouter = TreeRouterImpl()
+
+private val bottomMenuScreen = Screen("BottomMenuScreen") {
+    BottomMenu()
+}
+
 private val menu1SubScreen = Screen(
     key = "1",
     content = { SimpleScreen("SubScreen Menu1") }
@@ -27,12 +33,6 @@ private val menu3SubScreen = Screen(
     key = "3",
     content = { SimpleScreen("SubScreen Menu3") }
 )
-
-private val rootRouter: TreeRouter = TreeRouterImpl()
-
-private val bottomMenuScreen = Screen("BottomMenuScreen") {
-    BottomMenu()
-}
 
 class BottomMenuNavigationActivity : ComponentActivity() {
 

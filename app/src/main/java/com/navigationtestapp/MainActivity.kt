@@ -44,7 +44,7 @@ class MainActivity : ComponentActivity() {
 
                 Button(modifier = Modifier.padding(top = 16.dp), onClick = {
                     context.startActivity(
-                        Intent(context, NestedNavigationActivity::class.java)
+                        Intent(context, ViewModelNavigationActivity::class.java)
                     )
                 }) {
                     Text(text = "Nested navigation")

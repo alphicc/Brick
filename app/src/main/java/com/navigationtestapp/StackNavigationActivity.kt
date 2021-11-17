@@ -1,6 +1,7 @@
 package com.navigationtestapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -22,51 +23,71 @@ private val router: TreeRouter = TreeRouterImpl()
 
 val screen1 = Screen(
     key = "1",
+    onCreate = { Log.d("Alpha", "onCreate 1") },
+    onDestroy = { Log.d("Alpha", "onDestroy 1") },
     content = { SimpleScreen(1, "new") { router.addScreen(screen2) } }
 )
 
 val screen2 = Screen(
     key = "2",
+    onCreate = { Log.d("Alpha", "onCreate 2") },
+    onDestroy = { Log.d("Alpha", "onDestroy 2") },
     content = { SimpleScreen(2, "new") { router.addScreen(screen3) } }
 )
 
 val screen3 = Screen(
     key = "3",
+    onCreate = { Log.d("Alpha", "onCreate 3") },
+    onDestroy = { Log.d("Alpha", "onDestroy 3") },
     content = { SimpleScreen(3, "new") { router.addScreen(screen4) } }
 )
 
 val screen4 = Screen(
     key = "4",
+    onCreate = { Log.d("Alpha", "onCreate 4") },
+    onDestroy = { Log.d("Alpha", "onDestroy 4") },
     content = { SimpleScreen(4, "replace") { router.replaceScreen(screen5) } }
 )
 
 val screen5 = Screen(
     key = "5",
+    onCreate = { Log.d("Alpha", "onCreate 5") },
+    onDestroy = { Log.d("Alpha", "onDestroy 5") },
     content = { SimpleScreen(5, "addChild") { router.addChild(screenChild1) } }
 )
 
 val screenChild1 = Screen(
     key = "C1",
+    onCreate = { Log.d("Alpha", "onCreate C1") },
+    onDestroy = { Log.d("Alpha", "onDestroy C1") },
     content = { Child(10, "newChild") { router.addChild(screenChild2) } }
 )
 
 val screenChild2 = Screen(
     key = "C2",
+    onCreate = { Log.d("Alpha", "onCreate C2") },
+    onDestroy = { Log.d("Alpha", "onDestroy C2") },
     content = { Child(20, "newChild") { router.addChild(screenChild3) } }
 )
 
 val screenChild3 = Screen(
     key = "C3",
+    onCreate = { Log.d("Alpha", "onCreate C3") },
+    onDestroy = { Log.d("Alpha", "onDestroy C3") },
     content = { Child(30, "newChild") { router.addChild(screenChild4) } }
 )
 
 val screenChild4 = Screen(
     key = "C4",
+    onCreate = { Log.d("Alpha", "onCreate C4") },
+    onDestroy = { Log.d("Alpha", "onDestroy C4") },
     content = { Child(40, "replaceChild") { router.replaceChild(screenChild5) } }
 )
 
 val screenChild5 = Screen(
     key = "C5",
+    onCreate = { Log.d("Alpha", "onCreate C5") },
+    onDestroy = { Log.d("Alpha", "onDestroy C5") },
     content = { ChildExt(50, "backToChild") { router.backToChild("C1") } }
 )
 

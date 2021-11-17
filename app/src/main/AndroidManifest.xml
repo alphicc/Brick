@@ -25,7 +25,7 @@
 
         <activity android:name=".BottomMenuNavigationActivity" />
 
-        <activity android:name=".NestedNavigationActivity" />
+        <activity android:name=".ViewModelNavigationActivity" />
     </application>
 
 </manifest>

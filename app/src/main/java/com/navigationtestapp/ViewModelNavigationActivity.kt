@@ -1,6 +1,7 @@
 package com.navigationtestapp
 
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.background
@@ -13,28 +14,37 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
+private val rootRouter: TreeRouter = TreeRouterImpl()
+
+private val bottomMenuScreen = Screen(
+    key = "BottomMenuScreen",
+    onCreate = { Log.d("Alpha", "onCreate bottomMenuScreen") },
+    onDestroy = { Log.d("Alpha", "onDestroy bottomMenuScreen") },
+    content = { BottomMenu() }
+)
+
 private val menu1SubScreen = Screen(
     key = "1",
+    onCreate = { Log.d("Alpha", "onCreate menu1SubScreen") },
+    onDestroy = { Log.d("Alpha", "onDestroy menu1SubScreen") },
     content = { SimpleScreen("SubScreen Menu1") }
 )
 
 private val menu2SubScreen = Screen(
     key = "2",
+    onCreate = { Log.d("Alpha", "onCreate menu2SubScreen") },
+    onDestroy = { Log.d("Alpha", "onDestroy menu2SubScreen") },
     content = { SimpleScreen("SubScreen Menu2") }
 )
 
 private val menu3SubScreen = Screen(
     key = "3",
+    onCreate = { Log.d("Alpha", "onCreate menu3SubScreen") },
+    onDestroy = { Log.d("Alpha", "onDestroy menu3SubScreen") },
     content = { SimpleScreen("SubScreen Menu3") }
 )
 
-private val rootRouter: TreeRouter = TreeRouterImpl()
-
-private val bottomMenuScreen = Screen("BottomMenuScreen") {
-    BottomMenu()
-}
-
-class NestedNavigationActivity : ComponentActivity() {
+class ViewModelNavigationActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
