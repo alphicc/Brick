@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 class TreeRouterImpl(
-    override val initialScreen: Screen? = null,
+    override val initialScreen: Screen<*>? = null,
     override val parentRouter: TreeRouter? = null
 ) : TreeRouter {
 
@@ -37,7 +37,7 @@ class TreeRouterImpl(
         return false
     }
 
-    override fun branch(key: String, initialScreen: Screen?): TreeRouter {
+    override fun branch(key: String, initialScreen: Screen<*>?): TreeRouter {
         val childRouter = childRouters.getOrPut(key) {
             TreeRouterImpl(initialScreen, this)
         }
@@ -54,9 +54,18 @@ class TreeRouterImpl(
 
     override fun backToScreen(key: String) = graphController.backToScreen(key)
 
-    override fun replaceScreen(screen: Screen) = graphController.replaceScreen(screen)
+    override fun replaceScreen(screen: Screen<*>) {
+        graphController.replaceScreen(screen)
+    }
 
-    override fun addScreen(screen: Screen) = graphController.addScreen(screen)
+   // override fun <A> replaceScreen(screen: Screen<*>, argument: A) {
+   //     graphController.replaceScreen(screen, argument)
+   // }
+
+    override fun addScreen(screen: Screen<*>) = graphController.addScreen(screen)
+
+   //override fun <A> addScreen(screen: Screen<A, *>, argument: A) {
+   //}
 
     // override fun addContainerScreen(containerScreen: ContainerScreen) {
     //     val screen = Screen(containerScreen.key, containerScreen.content)
@@ -67,7 +76,7 @@ class TreeRouterImpl(
 
     override fun backToChild(key: String) = graphController.backToChild(key)
 
-    override fun replaceChild(screen: Screen) = graphController.replaceChild(screen)
+    override fun replaceChild(screen: Screen<*>) = graphController.replaceChild(screen)
 
-    override fun addChild(screen: Screen) = graphController.addChild(screen)
+    override fun addChild(screen: Screen<*>) = graphController.addChild(screen)
 }

@@ -4,11 +4,11 @@ import kotlinx.coroutines.flow.StateFlow
 
 interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter {
 
-    val initialScreen: Screen?
+    val initialScreen: Screen<*>?
     val parentRouter: TreeRouter?
 
     val currentChildRouter: StateFlow<TreeRouter?>
 
     fun back(): Boolean
-    fun branch(key: String, initialScreen: Screen? = null): TreeRouter
+    fun branch(key: String, initialScreen: Screen<*>? = null): TreeRouter
 }

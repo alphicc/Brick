@@ -13,8 +13,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.flow.SharedFlow
 
 private val rootRouter: TreeRouter = TreeRouterImpl()
+
+//fun bottomScreen() = ScreenT<Nothing>(key = "BottomMenuScreen", content = { BottomMenu() })
+//private val bottomMenuScreenT = BottomScreen<Nothing>(
+//    key = "BottomMenuScreen",
+//    content = { BottomMenu() }
+//) {
+//}
+//
+
+//@JvmInline
+//value class BottomMenuScreen(): Screen<UnitDependency>(key = "BottomMenuScreen", content = { BottomMenu() }) {
+//
+//    override fun onCreate(channel: SharedFlow<ChannelArgument>): UnitDependency? {
+//        return super.onCreate(channel)
+//    }
+//}
 
 private val bottomMenuScreen = Screen(
     key = "BottomMenuScreen",
@@ -22,6 +39,10 @@ private val bottomMenuScreen = Screen(
     onDestroy = { Log.d("Alpha", "onDestroy bottomMenuScreen") },
     content = { BottomMenu() }
 )
+
+fun t() {
+    rootRouter.replaceScreen(bottomMenuScreen)
+}
 
 private val menu1SubScreen = Screen(
     key = "1",

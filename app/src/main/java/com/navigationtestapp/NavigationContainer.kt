@@ -9,9 +9,13 @@ fun ScreensContainer(containerConnector: ContainerConnector, onScreensEmpty: () 
     val screenNode = containerConnector.currentNode.collectAsState()
 
     screenNode.value?.let { node ->
-        node.screen.content.invoke()
+        node.screen.content.invoke(
+            node.screen.dependency ?: throw IllegalArgumentException("Dependency can not be null")
+        )
         node.childScreens.forEach {
-            it.content.invoke()
+            it.content.invoke(
+                it.dependency ?: throw IllegalArgumentException("Dependency can not be null")
+            )
         }
     } ?: onScreensEmpty.invoke()
 }
@@ -26,9 +30,13 @@ fun InnerScreensContainer(
     val screenNode = innerNodeConnector.value?.currentNode?.collectAsState()
 
     screenNode?.value?.let { node ->
-        node.screen.content.invoke()
+        node.screen.content.invoke(
+            node.screen.dependency ?: throw IllegalArgumentException("Dependency can not be null")
+        )
         node.childScreens.forEach {
-            it.content.invoke()
+            it.content.invoke(
+                it.dependency ?: throw IllegalArgumentException("Dependency can not be null")
+            )
         }
     } ?: onScreensEmpty.invoke()
 }

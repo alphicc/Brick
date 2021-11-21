@@ -11,14 +11,14 @@ class GraphController {
 
     private var currentNode: Node? = null
 
-    fun branch(screen: Screen) {
-        //currentNode?.neighbors?.forEach {
-        //    if (it.screen.key == screen.key) {
+    //fun branch(screen: Screen) {
+    //currentNode?.neighbors?.forEach {
+    //    if (it.screen.key == screen.key) {
 //
-        //    }
-        //}
-        //currentNode?.neighbors?.add()
-    }
+    //    }
+    //}
+    //currentNode?.neighbors?.add()
+    // }
 
     fun backScreen() {
         currentNode?.isActive = false
@@ -36,19 +36,19 @@ class GraphController {
         onDestroyNodes(droppedNodes)
     }
 
-    fun replaceScreen(screen: Screen) {
+    fun replaceScreen(screen: Screen<*>) {
         currentNode?.let { node -> keyManager.remove(node.screen.key) }
         keyManager.add(screen.key)
 
         val oldScreen = currentNode?.screen
         currentNode?.screen = screen
 
-        currentNode?.screen?.onCreate?.invoke()
+        currentNode?.run { screen.onCreate?.invoke(screen.channel) }
         updateCurrentNode(currentNode)
         oldScreen?.onDestroy?.invoke()
     }
 
-    fun addScreen(screen: Screen) {
+    fun addScreen(screen: Screen<*>) {
         keyManager.add(screen.key)
 
         val node = Node(
@@ -60,7 +60,8 @@ class GraphController {
         )
         tree.add(node)
 
-        node.screen.onCreate.invoke()
+        val dependencyProvider = DependencyProvider(node.screen.onCreate?.invoke(node.screen.channel))
+        node.screen.dependency = dependencyProvider
         updateCurrentNode(node)
     }
 
@@ -71,7 +72,7 @@ class GraphController {
                 keyManager.remove(element.key)
 
                 updateCurrentNode(this)
-                element.onDestroy.invoke()
+                element.onDestroy?.invoke()
             }
         }
     }
@@ -81,30 +82,30 @@ class GraphController {
             val droppedChildList = dropChildUntil(childScreens, key)
 
             updateCurrentNode(this)
-            droppedChildList.forEach { it.onDestroy.invoke() }
+            droppedChildList.forEach { it.onDestroy?.invoke() }
         }
     }
 
-    fun replaceChild(screen: Screen) {
+    fun replaceChild(screen: Screen<*>) {
         currentNode?.run {
             if (childScreens.size >= 1) {
                 keyManager.replaceKey(childScreens.last().key, screen.key)
                 val oldChildScreen = childScreens[childScreens.size - 1]
                 childScreens[childScreens.size - 1] = screen
 
-                childScreens[childScreens.size - 1].onCreate.invoke()
+                childScreens[childScreens.size - 1].run { onCreate?.invoke(channel) }
                 updateCurrentNode(this)
-                oldChildScreen.onDestroy.invoke()
+                oldChildScreen.onDestroy?.invoke()
             }
         }
     }
 
-    fun addChild(screen: Screen) {
+    fun addChild(screen: Screen<*>) {
         currentNode?.run {
             keyManager.add(screen.key)
             childScreens.add(screen)
 
-            screen.onCreate.invoke()
+            screen.onCreate?.invoke(screen.channel)
             updateCurrentNode(this)
         }
     }
@@ -121,8 +122,8 @@ class GraphController {
 
     private fun onDestroyNodes(nodeList: List<Node>) {
         nodeList.forEach { node ->
-            node.childScreens.forEach { it.onDestroy.invoke() }
-            node.screen.onDestroy.invoke()
+            node.childScreens.forEach { it.onDestroy?.invoke() }
+            node.screen.onDestroy?.invoke()
         }
     }
 
@@ -133,8 +134,11 @@ class GraphController {
         }
     }
 
-    private fun dropChildUntil(screens: ArrayList<Screen>, screenKey: String): List<Screen> {
-        val droppedChildList = ArrayList<Screen>()
+    private fun dropChildUntil(
+        screens: ArrayList<Screen<*>>,
+        screenKey: String
+    ): List<Screen<*>> {
+        val droppedChildList = ArrayList<Screen<*>>()
         screens.lastOrNull()?.let {
             if (it.key != screenKey) {
                 val element = screens.removeAt(screens.size - 1)
