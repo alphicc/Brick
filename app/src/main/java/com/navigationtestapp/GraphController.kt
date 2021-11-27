@@ -1,5 +1,6 @@
 package com.navigationtestapp
 
+import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class GraphController {
@@ -10,15 +11,6 @@ class GraphController {
     private val tree: ArrayList<Node> = ArrayList()
 
     private var currentNode: Node? = null
-
-    //fun branch(screen: Screen) {
-    //currentNode?.neighbors?.forEach {
-    //    if (it.screen.key == screen.key) {
-//
-    //    }
-    //}
-    //currentNode?.neighbors?.add()
-    // }
 
     fun backScreen() {
         currentNode?.isActive = false
@@ -43,12 +35,12 @@ class GraphController {
         val oldScreen = currentNode?.screen
         currentNode?.screen = screen
 
-        currentNode?.run { screen.onCreate?.invoke(screen.channel) }
+        currentNode?.run { screen.onCreate?.invoke(screen.channel, router) }
         updateCurrentNode(currentNode)
         oldScreen?.onDestroy?.invoke()
     }
 
-    fun addScreen(screen: Screen<*>) {
+    fun addScreen(screen: Screen<*>, treeRouter: TreeRouter) {
         keyManager.add(screen.key)
 
         val node = Node(
@@ -56,11 +48,14 @@ class GraphController {
             screen = screen,
             childScreens = ArrayList(),
             neighbors = ArrayList(),
-            parent = currentNode
+            parent = currentNode,
+            router = treeRouter
         )
         tree.add(node)
 
-        val dependencyProvider = DependencyProvider(node.screen.onCreate?.invoke(node.screen.channel))
+        val dependency = node.screen.onCreate?.invoke(node.screen.channel, node.router)
+        Log.d("Alpha", "addDep ${dependency}")
+        val dependencyProvider = DependencyProvider(dependency)
         node.screen.dependency = dependencyProvider
         updateCurrentNode(node)
     }
@@ -93,7 +88,7 @@ class GraphController {
                 val oldChildScreen = childScreens[childScreens.size - 1]
                 childScreens[childScreens.size - 1] = screen
 
-                childScreens[childScreens.size - 1].run { onCreate?.invoke(channel) }
+                childScreens[childScreens.size - 1].run { onCreate?.invoke(channel, router) }
                 updateCurrentNode(this)
                 oldChildScreen.onDestroy?.invoke()
             }
@@ -105,7 +100,9 @@ class GraphController {
             keyManager.add(screen.key)
             childScreens.add(screen)
 
-            screen.onCreate?.invoke(screen.channel)
+            val dependency = screen.onCreate?.invoke(screen.channel, router)
+            val dependencyProvider = DependencyProvider(dependency)
+            screen.dependency = dependencyProvider
             updateCurrentNode(this)
         }
     }

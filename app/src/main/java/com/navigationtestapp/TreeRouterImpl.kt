@@ -1,7 +1,6 @@
 package com.navigationtestapp
 
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 
 class TreeRouterImpl(
     override val initialScreen: Screen<*>? = null,
@@ -10,21 +9,20 @@ class TreeRouterImpl(
 
     private val graphController: GraphController = GraphController()
 
-    override val currentChildRouter: MutableStateFlow<TreeRouter?> = MutableStateFlow(null)
-    override val currentNode: MutableStateFlow<Node?> = graphController.currentNodeFlow
-    override val innerNodeConnector: StateFlow<ContainerConnector?> = currentChildRouter
+    override val childRouter: MutableStateFlow<TreeRouter?> = MutableStateFlow(null)
+    override val node: MutableStateFlow<Node?> = graphController.currentNodeFlow
 
     private val childRouters = HashMap<String, TreeRouter>()
 
     init {
         initialScreen?.let {
-            graphController.addScreen(it)
+            graphController.addScreen(it, this)
         }
     }
 
     override fun back(): Boolean {
         when {
-            currentNode.value?.childScreens?.isNotEmpty() == true -> {
+            node.value?.childScreens?.isNotEmpty() == true -> {
                 backChild()
             }
             graphController.isLastNode() -> {
@@ -41,7 +39,7 @@ class TreeRouterImpl(
         val childRouter = childRouters.getOrPut(key) {
             TreeRouterImpl(initialScreen, this)
         }
-        currentChildRouter.value = childRouter
+        this.childRouter.value = childRouter
         return childRouter
     }
 
@@ -49,7 +47,7 @@ class TreeRouterImpl(
         //if (currentNode.value?.router != null) {
 //
         //}
-        //graphController.backScreen()
+        graphController.backScreen()
     }
 
     override fun backToScreen(key: String) = graphController.backToScreen(key)
@@ -58,19 +56,7 @@ class TreeRouterImpl(
         graphController.replaceScreen(screen)
     }
 
-   // override fun <A> replaceScreen(screen: Screen<*>, argument: A) {
-   //     graphController.replaceScreen(screen, argument)
-   // }
-
-    override fun addScreen(screen: Screen<*>) = graphController.addScreen(screen)
-
-   //override fun <A> addScreen(screen: Screen<A, *>, argument: A) {
-   //}
-
-    // override fun addContainerScreen(containerScreen: ContainerScreen) {
-    //     val screen = Screen(containerScreen.key, containerScreen.content)
-    //     graphController.addScreen(screen, TreeRouterImpl())
-    // }
+    override fun addScreen(screen: Screen<*>) = graphController.addScreen(screen, this)
 
     override fun backChild() = graphController.backChild()
 

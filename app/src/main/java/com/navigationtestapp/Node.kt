@@ -5,7 +5,8 @@ data class Node(
     var screen: Screen<*>,
     val parent: Node? = null,
     val childScreens: ArrayList<Screen<*>>,
-    val neighbors: ArrayList<Node>
+    val neighbors: ArrayList<Node>,
+    val router: TreeRouter
 ) {
     override fun equals(other: Any?): Boolean = false
 
