@@ -1,6 +1,7 @@
 package com.navigationtestapp.viewModelSample.screens.someFirstDataDetailsTwo
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -17,11 +18,13 @@ fun SomeFirstDataDetailsTwo(viewModel: SomeFirstDataDetailsViewModelTwo) {
             Text(text = "GO BACK")
         }
 
-        Button(
-            modifier = Modifier.align(alignment = Alignment.Center),
-            onClick = viewModel::onForwardClicked
-        ) {
-            Text(text = "FORWARD CHILD")
+        Column(modifier = Modifier.align(alignment = Alignment.Center)) {
+            Button(onClick = viewModel::onForwardClicked) {
+                Text(text = "FORWARD CHILD")
+            }
+            Button(onClick = viewModel::onForwardTwoClicked) {
+                Text(text = "FORWARD CHILD TWO")
+            }
         }
     }
 }

@@ -1,11 +1,11 @@
 package com.navigationtestapp
 
-import android.util.Log
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class GraphController {
+class GraphControllerImpl {
 
-    val currentNodeFlow: MutableStateFlow<Node?> = MutableStateFlow(null)
+    val currentScreenFlow: MutableStateFlow<Screen<*>?> = MutableStateFlow(null)
+    val currentChildFlow: MutableStateFlow<List<Screen<*>>> = MutableStateFlow(emptyList())
 
     private val keyManager = KeyManager()
     private val tree: ArrayList<Node> = ArrayList()
@@ -35,7 +35,12 @@ class GraphController {
         val oldScreen = currentNode?.screen
         currentNode?.screen = screen
 
-        currentNode?.run { screen.onCreate?.invoke(screen.channel, router) }
+        currentNode?.run {
+            screen.onCreate?.invoke(screen.channel, router)
+            val dependency = screen.onCreate?.invoke(screen.channel, router)
+            val dependencyProvider = DataProvider(dependency)
+            screen.dependency = dependencyProvider
+        }
         updateCurrentNode(currentNode)
         oldScreen?.onDestroy?.invoke()
     }
@@ -54,8 +59,7 @@ class GraphController {
         tree.add(node)
 
         val dependency = node.screen.onCreate?.invoke(node.screen.channel, node.router)
-        Log.d("Alpha", "addDep ${dependency}")
-        val dependencyProvider = DependencyProvider(dependency)
+        val dependencyProvider = DataProvider(dependency)
         node.screen.dependency = dependencyProvider
         updateCurrentNode(node)
     }
@@ -88,7 +92,11 @@ class GraphController {
                 val oldChildScreen = childScreens[childScreens.size - 1]
                 childScreens[childScreens.size - 1] = screen
 
-                childScreens[childScreens.size - 1].run { onCreate?.invoke(channel, router) }
+                childScreens[childScreens.size - 1].run {
+                    val dependency = onCreate?.invoke(channel, router)
+                    val dependencyProvider = DataProvider(dependency)
+                    screen.dependency = dependencyProvider
+                }
                 updateCurrentNode(this)
                 oldChildScreen.onDestroy?.invoke()
             }
@@ -101,7 +109,7 @@ class GraphController {
             childScreens.add(screen)
 
             val dependency = screen.onCreate?.invoke(screen.channel, router)
-            val dependencyProvider = DependencyProvider(dependency)
+            val dependencyProvider = DataProvider(dependency)
             screen.dependency = dependencyProvider
             updateCurrentNode(this)
         }
@@ -150,7 +158,8 @@ class GraphController {
 
     private fun updateCurrentNode(node: Node?) {
         currentNode = node
-        currentNodeFlow.tryEmit(node)
+        currentScreenFlow.value = node?.screen
+        currentChildFlow.value = node?.childScreens?.toList() ?: emptyList()
     }
 
     private fun cleanGraph(three: ArrayList<Node>): List<Node> {

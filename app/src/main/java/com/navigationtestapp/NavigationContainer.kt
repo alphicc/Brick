@@ -1,21 +1,66 @@
 package com.navigationtestapp
 
+import androidx.compose.animation.*
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 
+@ExperimentalAnimationApi
 @Composable
-fun ScreensContainer(containerConnector: ContainerConnector, onScreensEmpty: () -> Unit = {}) {
+fun ScreensContainer(containerConnector: ContainerConnector) {
 
-    val screenNode = containerConnector.node.collectAsState()
+    val screen by containerConnector.screen.collectAsState()
+    val childList by containerConnector.childList.collectAsState()
 
-    screenNode.value?.let { node ->
-        node.screen.content.invoke(
-            node.screen.dependency ?: throw IllegalArgumentException("Dependency can not be null")
-        )
-        node.childScreens.forEach {
-            it.content.invoke(
-                it.dependency ?: throw IllegalArgumentException("Dependency can not be null")
+    AnimatedContent(
+        targetState = screen,
+        transitionSpec = {
+            fadeIn(animationSpec = tween(300)) with fadeOut(animationSpec = tween(300))
+        }
+    ) {
+
+        it?.run {
+            content.invoke(
+                dependency ?: throw IllegalArgumentException("Dependency can not be null")
             )
         }
-    } ?: onScreensEmpty.invoke()
+
+        if (this.transition.isRunning) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = {})
+            )
+        }
+    }
+
+    childList.forEach { childScreen ->
+        childScreen.content.invoke(
+            childScreen.dependency
+                ?: throw IllegalArgumentException("Dependency can not be null")
+        )
+    }
+    //childList.forEach { screen ->
+    //    AnimatedContent(
+    //        targetState = screen,
+    //        transitionSpec = {
+    //            fadeIn(animationSpec = tween(300)) with fadeOut(animationSpec = tween(300))
+    //        }
+    //    ) { childScreen ->
+    //        childScreen.content.invoke(
+    //            childScreen.dependency
+    //                ?: throw IllegalArgumentException("Dependency can not be null")
+    //        )
+    //    }
+    //}
 }

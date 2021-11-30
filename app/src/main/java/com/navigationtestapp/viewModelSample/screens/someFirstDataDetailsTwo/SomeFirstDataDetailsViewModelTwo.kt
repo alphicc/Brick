@@ -19,4 +19,9 @@ class SomeFirstDataDetailsViewModelTwo(private val router: TreeRouter) {
         Log.d("Alpha", "onForwardClicked")
         router.addChild(Screens.childInfoScreen)
     }
+
+    fun onForwardTwoClicked() {
+        Log.d("Alpha", "onForwardTwoClicked")
+        router.addChild(Screens.childInfoScreenTwo)
+    }
 }

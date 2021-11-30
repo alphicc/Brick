@@ -1,20 +1,23 @@
 package com.navigationtestapp
 
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 
-open class Screen<D>(
+data class Screen<D>(
     override val key: String,
-    val content: @Composable (DependencyProvider) -> Unit,
-    val onCreate: ((SharedFlow<ChannelArgument>, TreeRouter) -> D)? = null,
-    val onDestroy: (() -> Unit)? = null
-) : BaseScreen(key)
+    override val onCreate: ((SharedFlow<ChannelArgument>, DataProvider) -> D)? = null,
+    override val onDestroy: (() -> Unit)? = null,
+    val content: @Composable (DataProvider) -> Unit,
+) : BaseScreen<D>(key, onCreate, onDestroy)
 
-open class BaseScreen(
+open class BaseScreen<D>(
     internal open val key: String,
-    internal val channel: MutableStateFlow<ChannelArgument> = MutableStateFlow(ChannelArgument()),
-    internal var dependency: DependencyProvider? = null,
+    internal open val onCreate: ((SharedFlow<ChannelArgument>, DataProvider) -> D)?,
+    internal open val onDestroy: (() -> Unit)?,
+    internal val channel: MutableSharedFlow<ChannelArgument> = MutableStateFlow(ChannelArgument()),
+    internal var dependency: DataProvider? = null
 )
 
 open class ChannelArgument {
@@ -22,8 +25,7 @@ open class ChannelArgument {
     override fun hashCode(): Int = javaClass.hashCode()
 }
 
-class DependencyProvider(val rawData: Any?) {
-
+class DataProvider(val rawData: Any?) {
     inline fun <reified C> get(): C {
         if (rawData is C) return rawData
         else throw IllegalArgumentException("Argument type incorrect")

@@ -1,8 +1,9 @@
-package com.navigationtestapp.viewModelSample.screens.childInfo
+package com.navigationtestapp.viewModelSample.screens.childInfoTwo
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -12,16 +13,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ChildInfoScreen(viewModel: ChildInfoViewModel) {
+fun ChildInfoTwoScreen(oneViewModel: ChildInfoTwoViewModel) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
+                .padding(start = 16.dp, bottom = 48.dp)
                 .size(64.dp)
-                .background(Color.Red)
+                .background(Color.Blue)
         ) {
-            Text(modifier = Modifier.align(Alignment.Center), text = "Child Screen")
+            Text(modifier = Modifier.align(Alignment.Center), text = "Child Screen Two")
         }
     }
 }

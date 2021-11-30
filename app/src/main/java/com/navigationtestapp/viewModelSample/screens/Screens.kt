@@ -6,8 +6,10 @@ import androidx.compose.runtime.getValue
 import com.navigationtestapp.Screen
 import com.navigationtestapp.viewModelSample.screens.bottomMenu.BottomMenuScreen
 import com.navigationtestapp.viewModelSample.screens.bottomMenu.BottomMenuViewModel
-import com.navigationtestapp.viewModelSample.screens.childInfo.ChildInfoScreen
-import com.navigationtestapp.viewModelSample.screens.childInfo.ChildInfoViewModel
+import com.navigationtestapp.viewModelSample.screens.childInfoOne.ChildInfoOneScreen
+import com.navigationtestapp.viewModelSample.screens.childInfoOne.ChildInfoOneViewModel
+import com.navigationtestapp.viewModelSample.screens.childInfoTwo.ChildInfoTwoScreen
+import com.navigationtestapp.viewModelSample.screens.childInfoTwo.ChildInfoTwoViewModel
 import com.navigationtestapp.viewModelSample.screens.first.FirstContent
 import com.navigationtestapp.viewModelSample.screens.first.FirstContentViewModel
 import com.navigationtestapp.viewModelSample.screens.second.SecondContent
@@ -98,12 +100,25 @@ object Screens {
         key = "ChildInfoScreen",
         onCreate = { _, router ->
             Log.d("Alpha", "onCreate ChildInfoScreen")
-            ChildInfoViewModel(router)
+            ChildInfoOneViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy ChildInfoScreen") },
         content = {
-            val viewModel = it.get<ChildInfoViewModel>()
-            ChildInfoScreen(viewModel)
+            val viewModel = it.get<ChildInfoOneViewModel>()
+            ChildInfoOneScreen(viewModel)
+        }
+    )
+
+    val childInfoScreenTwo = Screen(
+        key = "ChildInfoScreenTwo",
+        onCreate = { _, router ->
+            Log.d("Alpha", "onCreate ChildInfoScreen")
+            ChildInfoTwoViewModel(router)
+        },
+        onDestroy = { Log.d("Alpha", "onDestroy ChildInfoScreen") },
+        content = {
+            val viewModel = it.get<ChildInfoTwoViewModel>()
+            ChildInfoTwoScreen(viewModel)
         }
     )
 }
