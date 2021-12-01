@@ -20,10 +20,26 @@ import com.navigationtestapp.viewModelSample.screens.someFirstDataDetails.SomeFi
 import com.navigationtestapp.viewModelSample.screens.someFirstDataDetailsTwo.SomeFirstDataDetailsTwo
 import com.navigationtestapp.viewModelSample.screens.someFirstDataDetailsTwo.SomeFirstDataDetailsViewModelTwo
 import com.navigationtestapp.viewModelSample.screens.third.ThirdContent
+import com.navigationtestapp.viewModelSample.screens.welcome.Welcome
+import com.navigationtestapp.viewModelSample.screens.welcome.WelcomeViewModel
 
+@OptIn(ExperimentalAnimationApi::class)
 object Screens {
 
-    @ExperimentalAnimationApi
+    val welcomeScreen = Screen(
+        key = "WelcomeScreen",
+        onCreate = { _, dataProvider ->
+            Log.d("Alpha", "onCreate WelcomeScreen")
+            val router = dataProvider.get<TreeRouter>()
+            return@Screen WelcomeViewModel(router)
+        },
+        onDestroy = { Log.d("Alpha", "onDestroy WelcomeScreen") },
+        content = {
+            val viewModel = it.get<WelcomeViewModel>()
+            Welcome(viewModel::onNextClicked)
+        }
+    )
+
     val bottomMenuScreen = Screen(
         key = "BottomMenuScreen",
         onCreate = { _, _ ->

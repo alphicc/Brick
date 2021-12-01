@@ -10,8 +10,25 @@ class GraphController {
 
     val currentScreenFlow: MutableStateFlow<Screen<*>?> = MutableStateFlow(null)
     val currentChildFlow: MutableStateFlow<List<Screen<*>>> = MutableStateFlow(emptyList())
+    val hasBackNavigationVariants: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     private var currentNode: Node? = null
+
+    //return "true" if has back navigation variants else false
+    fun back() {
+        val hasBackNavigationVariants = when {
+            currentNode?.childScreens?.isNotEmpty() == true -> {
+                backChild()
+                true
+            }
+            currentNode?.parent != null -> {
+                backScreen()
+                currentNode?.parent != null
+            }
+            else -> false
+        }
+        this.hasBackNavigationVariants.value = hasBackNavigationVariants
+    }
 
     fun backScreen() {
         tree.removeLastOrNull()?.let {
@@ -163,5 +180,7 @@ class GraphController {
         currentNode = node
         currentScreenFlow.value = node?.screen
         currentChildFlow.value = node?.childScreens?.toList() ?: emptyList()
+        hasBackNavigationVariants.value =
+            currentNode?.childScreens?.isNotEmpty() == true || currentNode?.parent != null
     }
 }

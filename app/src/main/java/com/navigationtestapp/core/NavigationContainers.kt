@@ -1,15 +1,14 @@
 package com.navigationtestapp.core
 
+import android.util.Log
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 
 @ExperimentalAnimationApi
@@ -18,6 +17,11 @@ fun AnimatedScreensContainer(containerConnector: ContainerConnector) {
 
     val screen by containerConnector.screen.collectAsState()
     val childList by containerConnector.childList.collectAsState()
+    val hasBackNavigationVariants by containerConnector.hasBackNavigationVariants.collectAsState()
+
+    BackHandler(hasBackNavigationVariants) {
+        containerConnector.back()
+    }
 
     AnimatedContent(
         targetState = screen,
@@ -57,6 +61,11 @@ fun ScreensContainer(containerConnector: ContainerConnector) {
 
     val screen by containerConnector.screen.collectAsState()
     val childList by containerConnector.childList.collectAsState()
+    val hasBackNavigationVariants by containerConnector.hasBackNavigationVariants.collectAsState()
+
+    BackHandler(hasBackNavigationVariants) {
+        containerConnector.back()
+    }
 
     screen?.run {
         content.invoke(

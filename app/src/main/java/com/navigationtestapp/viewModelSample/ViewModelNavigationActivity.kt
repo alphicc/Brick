@@ -7,7 +7,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import com.navigationtestapp.core.AnimatedScreensContainer
 import com.navigationtestapp.core.TreeRouter
 import com.navigationtestapp.core.TreeRouterImpl
-import com.navigationtestapp.viewModelSample.screens.Screens.bottomMenuScreen
+import com.navigationtestapp.viewModelSample.screens.Screens.welcomeScreen
 
 val viewModelNavigationRouter: TreeRouter = TreeRouterImpl()
 
@@ -22,7 +22,7 @@ class ViewModelNavigationActivity : ComponentActivity() {
         }
 
         if (savedInstanceState == null) {
-            viewModelNavigationRouter.addScreen(bottomMenuScreen)
+            viewModelNavigationRouter.addScreen(welcomeScreen, viewModelNavigationRouter)
         }
     }
 }

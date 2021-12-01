@@ -13,9 +13,9 @@ class TreeRouterImpl(
 
     override val childList: StateFlow<List<Screen<*>>> = graphController.currentChildFlow
 
-    override fun back(): Boolean {
-        TODO("Not yet implemented")
-    }
+    override val hasBackNavigationVariants: StateFlow<Boolean> = graphController.hasBackNavigationVariants
+
+    override fun back() = graphController.back()
 
     override fun branch(key: String): TreeRouter {
         return TreeRouterImpl(initialScreen, this)

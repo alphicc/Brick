@@ -7,6 +7,7 @@ interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter {
 
     //  val childRouter: StateFlow<TreeRouter?>
 
-    fun back(): Boolean
+    override fun back()
+
     fun branch(key: String): TreeRouter
 }
