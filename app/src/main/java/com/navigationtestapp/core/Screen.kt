@@ -1,4 +1,4 @@
-package com.navigationtestapp
+package com.navigationtestapp.core
 
 import androidx.compose.runtime.Composable
 import kotlinx.coroutines.flow.MutableSharedFlow

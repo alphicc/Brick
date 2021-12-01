@@ -13,6 +13,37 @@ class GraphController {
 
     private var currentNode: Node? = null
 
+    fun backScreen() {
+        tree.removeLastOrNull()?.let {
+            it.childScreens.forEach { childScreen ->
+                val childScreenLifecycleController = ScreenLifecycleController(childScreen)
+                childScreenLifecycleController.onDestroy()
+                keyManager.remove(childScreen.key)
+            }
+            val screenLifecycleController = ScreenLifecycleController(it.screen)
+            screenLifecycleController.onDestroy()
+            keyManager.remove(it.screen.key)
+
+            updateCurrentNode(it.parent)
+        }
+    }
+
+    fun backToScreen(key: String) {
+        val droppedNodes = dropNodeUntilFoundKey(currentNode, key)
+        droppedNodes.forEach {
+            it.childScreens.forEach { childScreen ->
+                val childScreenLifecycleController = ScreenLifecycleController(childScreen)
+                childScreenLifecycleController.onDestroy()
+                keyManager.remove(childScreen.key)
+            }
+            val screenLifecycleController = ScreenLifecycleController(it.screen)
+            screenLifecycleController.onDestroy()
+            keyManager.remove(it.screen.key)
+        }
+
+        updateCurrentNode(tree.lastOrNull())
+    }
+
     fun <A> replaceScreen(screen: Screen<*>, argument: A?) {
         currentNode?.let { node -> keyManager.replaceKey(node.screen.key, screen.key) }
 
@@ -33,7 +64,6 @@ class GraphController {
         val screenLifecycleController = ScreenLifecycleController(screen)
         val createdScreen = screenLifecycleController.onCreate(argument)
         val node = Node(
-            isActive = true,
             screen = createdScreen,
             childScreens = ArrayList(),
             neighbors = ArrayList(),
@@ -63,6 +93,8 @@ class GraphController {
             val droppedChildList = dropChildUntilFoundKey(childScreens, key)
 
             droppedChildList.forEach {
+                keyManager.remove(it.key)
+
                 val screenLifecycleController = ScreenLifecycleController(it)
                 screenLifecycleController.onDestroy()
             }
@@ -101,6 +133,16 @@ class GraphController {
         }
     }
 
+    private fun dropNodeUntilFoundKey(node: Node?, screenKey: String): List<Node> {
+        val droppedNodes = ArrayList<Node>()
+        if (node?.screen?.key != screenKey) {
+            tree.removeLastOrNull()
+            val newDroppedNodes = dropNodeUntilFoundKey(node?.parent, screenKey)
+            droppedNodes.addAll(newDroppedNodes)
+        }
+        return droppedNodes
+    }
+
     private fun dropChildUntilFoundKey(
         childScreens: ArrayList<Screen<*>>,
         screenKey: String
@@ -110,7 +152,6 @@ class GraphController {
             if (it.key != screenKey) {
                 val element = childScreens.removeAt(childScreens.size - 1)
                 droppedChildList.add(element)
-                keyManager.remove(element.key)
                 val innerDroppedChildList = dropChildUntilFoundKey(childScreens, screenKey)
                 droppedChildList.addAll(innerDroppedChildList)
             } else return@let
@@ -123,30 +164,4 @@ class GraphController {
         currentScreenFlow.value = node?.screen
         currentChildFlow.value = node?.childScreens?.toList() ?: emptyList()
     }
-
-    //fun backScreen(): Screen<*> {
-    //  //  currentNode?.isActive = false
-    //    //  screen.onCreate?.invoke(screen.channel, this)
-    //}
-
-    //  fun backChild()
-
-    // private fun cleanGraph(three: ArrayList<Node>): List<Node> {
-    //     val droppedNodeList = ArrayList<Node>()
-    //     three.removeAll { node ->
-    //         if (!node.isActive) {
-    //             keyManager.remove(node.screen.key)
-    //             node.childScreens.forEach { childScreen -> keyManager.remove(childScreen.key) }
-    //             droppedNodeList.add(node)
-    //         }
-    //         !node.isActive
-    //     }
-    //     three.forEach {
-    //         val innerDroppedNodeList = cleanGraph(it.neighbors)
-    //         droppedNodeList.addAll(innerDroppedNodeList)
-    //     }
-    //     return droppedNodeList
-    // }
-//
-    // private fun startOnCreateLifecycle()
 }

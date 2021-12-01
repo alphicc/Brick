@@ -1,4 +1,4 @@
-package com.navigationtestapp
+package com.navigationtestapp.core
 
 interface ScreenRouter {
     fun backScreen()

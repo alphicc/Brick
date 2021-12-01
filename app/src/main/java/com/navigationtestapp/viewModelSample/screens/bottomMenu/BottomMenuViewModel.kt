@@ -1,6 +1,6 @@
 package com.navigationtestapp.viewModelSample.screens.bottomMenu
 
-import com.navigationtestapp.TreeRouter
+import com.navigationtestapp.core.TreeRouter
 import com.navigationtestapp.viewModelSample.screens.Screens
 import com.navigationtestapp.viewModelSample.viewModelNavigationRouter
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,11 +8,17 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class BottomMenuViewModel {
 
     private val firstMenuRouter =
-        viewModelNavigationRouter.branch("Menu1", Screens.menuFirstSubScreen)
+        viewModelNavigationRouter.branch("Menu1").apply {
+            addScreen(Screens.menuFirstSubScreen, this)
+        }
     private val secondMenuRouter =
-        viewModelNavigationRouter.branch("Menu2", Screens.menuSecondSubScreen)
+        viewModelNavigationRouter.branch("Menu2").apply {
+            addScreen(Screens.menuSecondSubScreen)
+        }
     private val thirdMenuRouter =
-        viewModelNavigationRouter.branch("Menu3", Screens.menuThirdSubScreen)
+        viewModelNavigationRouter.branch("Menu3").apply {
+            addScreen(Screens.menuThirdSubScreen)
+        }
 
     val startScreenIndex: MutableStateFlow<Int> = MutableStateFlow(0)
     val containerRouter: MutableStateFlow<TreeRouter> = MutableStateFlow(firstMenuRouter)

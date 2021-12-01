@@ -1,4 +1,4 @@
-package com.navigationtestapp
+package com.navigationtestapp.core
 
 interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter {
 
@@ -8,5 +8,5 @@ interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter {
     //  val childRouter: StateFlow<TreeRouter?>
 
     fun back(): Boolean
-    fun branch(key: String, initialScreen: Screen<*>? = null): TreeRouter
+    fun branch(key: String): TreeRouter
 }

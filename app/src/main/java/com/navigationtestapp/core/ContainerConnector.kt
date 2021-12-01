@@ -1,4 +1,4 @@
-package com.navigationtestapp
+package com.navigationtestapp.core
 
 import kotlinx.coroutines.flow.StateFlow
 

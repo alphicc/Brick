@@ -1,7 +1,5 @@
 package com.navigationtestapp.core
 
-import com.navigationtestapp.Screen
-import com.navigationtestapp.TreeRouter
 import kotlinx.coroutines.flow.StateFlow
 
 class TreeRouterImpl(
@@ -9,35 +7,29 @@ class TreeRouterImpl(
     override val parentRouter: TreeRouter? = null
 ) : TreeRouter {
 
-    override val screen: StateFlow<Screen<*>?>
-        get() = TODO("Not yet implemented")
-    override val childList: StateFlow<List<Screen<*>>>
-        get() = TODO("Not yet implemented")
     private val graphController: GraphController = GraphController()
+
+    override val screen: StateFlow<Screen<*>?> = graphController.currentScreenFlow
+
+    override val childList: StateFlow<List<Screen<*>>> = graphController.currentChildFlow
 
     override fun back(): Boolean {
         TODO("Not yet implemented")
     }
 
-    override fun branch(key: String, initialScreen: Screen<*>?): TreeRouter {
-        TODO("Not yet implemented")
+    override fun branch(key: String): TreeRouter {
+        return TreeRouterImpl(initialScreen, this)
     }
 
-    override fun backScreen() {
-        TODO("Not yet implemented")
-    }
+    override fun backScreen() = graphController.backScreen()
 
-    override fun backToScreen(key: String) {
-        TODO("Not yet implemented")
-    }
+    override fun backToScreen(key: String) = graphController.backToScreen(key)
 
-    override fun replaceScreen(screen: Screen<*>) {
-        TODO("Not yet implemented")
-    }
+    override fun replaceScreen(screen: Screen<*>) =
+        graphController.replaceScreen(screen, null)
 
-    override fun <A> replaceScreen(screen: Screen<*>, argument: A) {
-        TODO("Not yet implemented")
-    }
+    override fun <A> replaceScreen(screen: Screen<*>, argument: A) =
+        graphController.replaceScreen(screen, argument)
 
     override fun addScreen(screen: Screen<*>) =
         graphController.addScreen(screen, null)

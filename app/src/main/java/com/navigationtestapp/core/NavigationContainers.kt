@@ -1,4 +1,4 @@
-package com.navigationtestapp
+package com.navigationtestapp.core
 
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
@@ -14,7 +14,7 @@ import androidx.compose.ui.Modifier
 
 @ExperimentalAnimationApi
 @Composable
-fun ScreensContainer(containerConnector: ContainerConnector) {
+fun AnimatedScreensContainer(containerConnector: ContainerConnector) {
 
     val screen by containerConnector.screen.collectAsState()
     val childList by containerConnector.childList.collectAsState()
@@ -50,17 +50,23 @@ fun ScreensContainer(containerConnector: ContainerConnector) {
                 ?: throw IllegalArgumentException("Dependency can not be null")
         )
     }
-    //childList.forEach { screen ->
-    //    AnimatedContent(
-    //        targetState = screen,
-    //        transitionSpec = {
-    //            fadeIn(animationSpec = tween(300)) with fadeOut(animationSpec = tween(300))
-    //        }
-    //    ) { childScreen ->
-    //        childScreen.content.invoke(
-    //            childScreen.dependency
-    //                ?: throw IllegalArgumentException("Dependency can not be null")
-    //        )
-    //    }
-    //}
+}
+
+@Composable
+fun ScreensContainer(containerConnector: ContainerConnector) {
+
+    val screen by containerConnector.screen.collectAsState()
+    val childList by containerConnector.childList.collectAsState()
+
+    screen?.run {
+        content.invoke(
+            dependency ?: throw IllegalArgumentException("Dependency can not be null")
+        )
+    }
+    childList.forEach { childScreen ->
+        childScreen.content.invoke(
+            childScreen.dependency
+                ?: throw IllegalArgumentException("Dependency can not be null")
+        )
+    }
 }

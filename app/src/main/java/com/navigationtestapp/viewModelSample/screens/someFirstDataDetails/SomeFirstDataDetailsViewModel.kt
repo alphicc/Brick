@@ -1,7 +1,7 @@
 package com.navigationtestapp.viewModelSample.screens.someFirstDataDetails
 
 import android.util.Log
-import com.navigationtestapp.TreeRouter
+import com.navigationtestapp.core.TreeRouter
 import com.navigationtestapp.viewModelSample.screens.Screens
 
 class SomeFirstDataDetailsViewModel(private val router: TreeRouter) {
@@ -12,6 +12,6 @@ class SomeFirstDataDetailsViewModel(private val router: TreeRouter) {
 
     fun onNextBtnClicked() {
         Log.d("Alpha", "onNextBtnClicked")
-        router.addScreen(Screens.someFirstDataDetailsScreenTwo)
+        router.addScreen(Screens.someFirstDataDetailsScreenTwo, router)
     }
 }

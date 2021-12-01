@@ -1,5 +1,6 @@
 package com.navigationtestapp.viewModelSample.screens.bottomMenu
 
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Text
@@ -8,9 +9,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.navigationtestapp.ScreensContainer
-import com.navigationtestapp.TreeRouter
+import com.navigationtestapp.core.AnimatedScreensContainer
+import com.navigationtestapp.core.TreeRouter
 
+@ExperimentalAnimationApi
 @Composable
 fun BottomMenuScreen(
     defaultIndex: Int,
@@ -26,7 +28,7 @@ fun BottomMenuScreen(
                 .padding(bottom = 48.dp)
                 .fillMaxSize()
         ) {
-            ScreensContainer(containerRouter)
+            AnimatedScreensContainer(containerRouter)
         }
 
         Row(

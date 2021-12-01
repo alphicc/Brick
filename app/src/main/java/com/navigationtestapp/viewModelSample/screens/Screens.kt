@@ -1,9 +1,11 @@
 package com.navigationtestapp.viewModelSample.screens
 
 import android.util.Log
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.navigationtestapp.Screen
+import com.navigationtestapp.core.Screen
+import com.navigationtestapp.core.TreeRouter
 import com.navigationtestapp.viewModelSample.screens.bottomMenu.BottomMenuScreen
 import com.navigationtestapp.viewModelSample.screens.bottomMenu.BottomMenuViewModel
 import com.navigationtestapp.viewModelSample.screens.childInfoOne.ChildInfoOneScreen
@@ -21,6 +23,7 @@ import com.navigationtestapp.viewModelSample.screens.third.ThirdContent
 
 object Screens {
 
+    @ExperimentalAnimationApi
     val bottomMenuScreen = Screen(
         key = "BottomMenuScreen",
         onCreate = { _, _ ->
@@ -45,8 +48,9 @@ object Screens {
 
     val menuFirstSubScreen = Screen(
         key = "menuFirstSubScreen",
-        onCreate = { _, router ->
+        onCreate = { _, dataProvider ->
             Log.d("Alpha", "onCreate menu1SubScreen")
+            val router = dataProvider.get<TreeRouter>()
             FirstContentViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy menu1SubScreen") },
@@ -72,8 +76,9 @@ object Screens {
 
     val someFirstDataDetailsScreen = Screen(
         key = "someFirstDataDetailsScreen",
-        onCreate = { _, router ->
+        onCreate = { _, dataProvider ->
             Log.d("Alpha", "onCreate SomeFirstDataDetails")
+            val router = dataProvider.get<TreeRouter>()
             SomeFirstDataDetailsViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy SomeFirstDataDetails") },
@@ -85,8 +90,9 @@ object Screens {
 
     val someFirstDataDetailsScreenTwo = Screen(
         key = "someFirstDataDetailsScreenTwo",
-        onCreate = { _, router ->
+        onCreate = { _, dataProvider ->
             Log.d("Alpha", "onCreate SomeFirstDataDetailsTwo")
+            val router = dataProvider.get<TreeRouter>()
             SomeFirstDataDetailsViewModelTwo(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy SomeFirstDataDetailsTwo") },
@@ -98,8 +104,9 @@ object Screens {
 
     val childInfoScreen = Screen(
         key = "ChildInfoScreen",
-        onCreate = { _, router ->
+        onCreate = { _, dataProvider ->
             Log.d("Alpha", "onCreate ChildInfoScreen")
+            val router = dataProvider.get<TreeRouter>()
             ChildInfoOneViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy ChildInfoScreen") },
@@ -111,11 +118,12 @@ object Screens {
 
     val childInfoScreenTwo = Screen(
         key = "ChildInfoScreenTwo",
-        onCreate = { _, router ->
-            Log.d("Alpha", "onCreate ChildInfoScreen")
+        onCreate = { _, dataProvider ->
+            Log.d("Alpha", "onCreate ChildInfoScreenTwo")
+            val router = dataProvider.get<TreeRouter>()
             ChildInfoTwoViewModel(router)
         },
-        onDestroy = { Log.d("Alpha", "onDestroy ChildInfoScreen") },
+        onDestroy = { Log.d("Alpha", "onDestroy ChildInfoScreenTwo") },
         content = {
             val viewModel = it.get<ChildInfoTwoViewModel>()
             ChildInfoTwoScreen(viewModel)

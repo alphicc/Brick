@@ -1,7 +1,7 @@
 package com.navigationtestapp.viewModelSample.screens.someFirstDataDetailsTwo
 
 import android.util.Log
-import com.navigationtestapp.TreeRouter
+import com.navigationtestapp.core.TreeRouter
 import com.navigationtestapp.viewModelSample.screens.Screens
 
 class SomeFirstDataDetailsViewModelTwo(private val router: TreeRouter) {
@@ -17,11 +17,11 @@ class SomeFirstDataDetailsViewModelTwo(private val router: TreeRouter) {
 
     fun onForwardClicked() {
         Log.d("Alpha", "onForwardClicked")
-        router.addChild(Screens.childInfoScreen)
+        router.addChild(Screens.childInfoScreen, router)
     }
 
     fun onForwardTwoClicked() {
         Log.d("Alpha", "onForwardTwoClicked")
-        router.addChild(Screens.childInfoScreenTwo)
+        router.addChild(Screens.childInfoScreenTwo, router)
     }
 }

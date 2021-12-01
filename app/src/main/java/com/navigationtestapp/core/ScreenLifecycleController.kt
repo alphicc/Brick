@@ -1,8 +1,5 @@
 package com.navigationtestapp.core
 
-import com.navigationtestapp.DataProvider
-import com.navigationtestapp.Screen
-
 class ScreenLifecycleController(private val screen: Screen<*>) {
 
     fun <A> onCreate(initialArgument: A): Screen<*> {
