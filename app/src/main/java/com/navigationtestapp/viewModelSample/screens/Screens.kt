@@ -15,11 +15,13 @@ import com.navigationtestapp.viewModelSample.screens.childInfoTwo.ChildInfoTwoVi
 import com.navigationtestapp.viewModelSample.screens.first.FirstContent
 import com.navigationtestapp.viewModelSample.screens.first.FirstContentViewModel
 import com.navigationtestapp.viewModelSample.screens.second.SecondContent
+import com.navigationtestapp.viewModelSample.screens.second.SecondContentViewModel
 import com.navigationtestapp.viewModelSample.screens.someFirstDataDetails.SomeFirstDataDetails
 import com.navigationtestapp.viewModelSample.screens.someFirstDataDetails.SomeFirstDataDetailsViewModel
 import com.navigationtestapp.viewModelSample.screens.someFirstDataDetailsTwo.SomeFirstDataDetailsTwo
 import com.navigationtestapp.viewModelSample.screens.someFirstDataDetailsTwo.SomeFirstDataDetailsViewModelTwo
 import com.navigationtestapp.viewModelSample.screens.third.ThirdContent
+import com.navigationtestapp.viewModelSample.screens.third.ThirdContentViewModel
 import com.navigationtestapp.viewModelSample.screens.welcome.Welcome
 import com.navigationtestapp.viewModelSample.screens.welcome.WelcomeViewModel
 
@@ -28,9 +30,9 @@ object Screens {
 
     val welcomeScreen = Screen(
         key = "WelcomeScreen",
-        onCreate = { _, dataProvider ->
+        onCreate = { _, argument ->
             Log.d("Alpha", "onCreate WelcomeScreen")
-            val router = dataProvider.get<TreeRouter>()
+            val router = argument.get<TreeRouter>()
             return@Screen WelcomeViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy WelcomeScreen") },
@@ -64,9 +66,9 @@ object Screens {
 
     val menuFirstSubScreen = Screen(
         key = "menuFirstSubScreen",
-        onCreate = { _, dataProvider ->
+        onCreate = { _, argument ->
             Log.d("Alpha", "onCreate menu1SubScreen")
-            val router = dataProvider.get<TreeRouter>()
+            val router = argument.get<TreeRouter>()
             FirstContentViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy menu1SubScreen") },
@@ -78,23 +80,41 @@ object Screens {
 
     val menuSecondSubScreen = Screen(
         key = "menuSecondSubScreen",
-        onCreate = { _, _ -> Log.d("Alpha", "onCreate menu2SubScreen") },
-        onDestroy = { Log.d("Alpha", "onDestroy menu2SubScreen") },
-        content = { SecondContent("SubScreen Menu2") }
+        onCreate = { channel, _ -> return@Screen SecondContentViewModel(channel) },
+        onDestroy = {
+            val viewModel = it.get<SecondContentViewModel>()
+            viewModel.onDestroy()
+        },
+        content = {
+            val secondContentViewModel = it.get<SecondContentViewModel>()
+            val count by secondContentViewModel.count.collectAsState()
+            SecondContent(count)
+        }
     )
 
     val menuThirdSubScreen = Screen(
         key = "menuThirdSubScreen",
-        onCreate = { _, _ -> Log.d("Alpha", "onCreate menu3SubScreen") },
-        onDestroy = { Log.d("Alpha", "onDestroy menu3SubScreen") },
-        content = { ThirdContent("SubScreen Menu3") }
+        onCreate = { _, argument ->
+            Log.d("Alpha", "onCreate menu3SubScreen")
+            val router = argument.get<TreeRouter>()
+            ThirdContentViewModel(router)
+        },
+        onDestroy = {
+            val viewModel = it.get<ThirdContentViewModel>()
+            viewModel.onDestroy()
+            Log.d("Alpha", "onDestroy menu3SubScreen")
+        },
+        content = {
+            val viewModel = it.get<ThirdContentViewModel>()
+            ThirdContent("SubScreen Menu3", viewModel::onIncrementClicked)
+        }
     )
 
     val someFirstDataDetailsScreen = Screen(
         key = "someFirstDataDetailsScreen",
-        onCreate = { _, dataProvider ->
+        onCreate = { _, argument ->
             Log.d("Alpha", "onCreate SomeFirstDataDetails")
-            val router = dataProvider.get<TreeRouter>()
+            val router = argument.get<TreeRouter>()
             SomeFirstDataDetailsViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy SomeFirstDataDetails") },
@@ -106,9 +126,9 @@ object Screens {
 
     val someFirstDataDetailsScreenTwo = Screen(
         key = "someFirstDataDetailsScreenTwo",
-        onCreate = { _, dataProvider ->
+        onCreate = { _, argument ->
             Log.d("Alpha", "onCreate SomeFirstDataDetailsTwo")
-            val router = dataProvider.get<TreeRouter>()
+            val router = argument.get<TreeRouter>()
             SomeFirstDataDetailsViewModelTwo(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy SomeFirstDataDetailsTwo") },
@@ -120,9 +140,9 @@ object Screens {
 
     val childInfoScreen = Screen(
         key = "ChildInfoScreen",
-        onCreate = { _, dataProvider ->
+        onCreate = { _, argument ->
             Log.d("Alpha", "onCreate ChildInfoScreen")
-            val router = dataProvider.get<TreeRouter>()
+            val router = argument.get<TreeRouter>()
             ChildInfoOneViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy ChildInfoScreen") },
@@ -134,9 +154,9 @@ object Screens {
 
     val childInfoScreenTwo = Screen(
         key = "ChildInfoScreenTwo",
-        onCreate = { _, dataProvider ->
+        onCreate = { _, argument ->
             Log.d("Alpha", "onCreate ChildInfoScreenTwo")
-            val router = dataProvider.get<TreeRouter>()
+            val router = argument.get<TreeRouter>()
             ChildInfoTwoViewModel(router)
         },
         onDestroy = { Log.d("Alpha", "onDestroy ChildInfoScreenTwo") },

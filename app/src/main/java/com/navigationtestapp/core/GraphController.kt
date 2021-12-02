@@ -1,5 +1,6 @@
 package com.navigationtestapp.core
 
+import android.util.Log
 import com.navigationtestapp.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -13,6 +14,23 @@ class GraphController(private val graphEventsInterceptor: GraphEventsInterceptor
     val hasBackNavigationVariants: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     private var currentNode: Node? = null
+
+    suspend fun <A> passArgument(screenKey: String, argument: A) {
+        Log.d("Alpha", "pass ${screenKey}")
+        tree.forEach { node ->
+            node.childScreens.forEach {
+                if (it.key == screenKey) {
+                    val dataContainer = DataContainer(argument)
+                    it.channel.emit(dataContainer)
+                }
+            }
+
+            if (node.screen.key == screenKey) {
+                val dataContainer = DataContainer(argument)
+                node.screen.channel.emit(dataContainer)
+            }
+        }
+    }
 
     fun cleanGraph() {
         tree.forEach { node ->

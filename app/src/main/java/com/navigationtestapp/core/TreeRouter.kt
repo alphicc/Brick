@@ -1,6 +1,6 @@
 package com.navigationtestapp.core
 
-interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter {
+interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter, ArgumentTranslator {
 
     val initialScreen: Screen<*>?
     val parentRouter: TreeRouter?
@@ -9,5 +9,7 @@ interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter {
 
     fun cleanRouter()
 
-    fun branch(key: String): TreeRouter
+    fun branch(containerScreenKey: String): TreeRouter
+
+    suspend fun <A> passArgument(screenKey: String, argument: A)
 }

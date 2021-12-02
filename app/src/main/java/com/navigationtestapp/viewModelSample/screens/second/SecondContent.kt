@@ -10,7 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 
 @Composable
-fun SecondContent(title: String) {
+fun SecondContent(count: Int) {
 
     Box(
         modifier = Modifier
@@ -20,7 +20,7 @@ fun SecondContent(title: String) {
 
         Text(
             modifier = Modifier.align(Alignment.Center),
-            text = title
+            text = "COUNT $count"
         )
     }
 }

@@ -17,7 +17,7 @@ class BottomMenuViewModel {
         }
     private val thirdMenuRouter =
         viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
-            addScreen(Screens.menuThirdSubScreen)
+            addScreen(Screens.menuThirdSubScreen, this)
         }
 
     val startScreenIndex: MutableStateFlow<Int> = MutableStateFlow(0)

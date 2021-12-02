@@ -5,7 +5,7 @@ import kotlinx.coroutines.flow.StateFlow
 class TreeRouterImpl(
     override val initialScreen: Screen<*>? = null,
     override val parentRouter: TreeRouter? = null
-) : TreeRouter, GraphEventsInterceptor {
+) : TreeRouter, GraphEventsInterceptor, ArgumentTranslator {
 
     private val graphController: GraphController = GraphController(this)
     private val childRouters: ArrayList<Pair<String, TreeRouter>> = ArrayList()
@@ -34,6 +34,10 @@ class TreeRouterImpl(
         val newRouter = TreeRouterImpl(initialScreen, this)
         childRouters.add(containerScreenKey to newRouter)
         return newRouter
+    }
+
+    override suspend fun <A> passArgument(screenKey: String, argument: A) {
+        redirectArgument(this, screenKey, argument)
     }
 
     override fun backScreen() = graphController.backScreen()
@@ -67,4 +71,16 @@ class TreeRouterImpl(
 
     override fun <A> addChild(screen: Screen<*>, argument: A) =
         graphController.addChild(screen, argument)
+
+    override suspend fun <A> redirectArgument(
+        from: ArgumentTranslator,
+        screenKey: String,
+        argument: A
+    ) {
+        if (parentRouter !== from) {
+            parentRouter?.redirectArgument(this, screenKey, argument)
+        }
+        childRouters.forEach { it.second.redirectArgument(this, screenKey, argument) }
+        graphController.passArgument(screenKey, argument)
+    }
 }
