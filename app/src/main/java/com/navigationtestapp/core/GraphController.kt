@@ -3,7 +3,7 @@ package com.navigationtestapp.core
 import com.navigationtestapp.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class GraphController {
+class GraphController(private val graphEventsInterceptor: GraphEventsInterceptor) {
 
     private val keyManager = KeyManager()
     private val tree: ArrayList<Node> = ArrayList()
@@ -13,6 +13,25 @@ class GraphController {
     val hasBackNavigationVariants: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     private var currentNode: Node? = null
+
+    fun cleanGraph() {
+        tree.forEach { node ->
+            node.childScreens.forEach { childScreen ->
+                val childScreenLifecycleController = ScreenLifecycleController(childScreen)
+                graphEventsInterceptor.onDestroyScreen(childScreen.key)
+                childScreenLifecycleController.onDestroy()
+                keyManager.remove(childScreen.key)
+            }
+            val screenLifecycleController = ScreenLifecycleController(node.screen)
+            graphEventsInterceptor.onDestroyScreen(node.screen.key)
+            screenLifecycleController.onDestroy()
+            keyManager.remove(node.screen.key)
+        }
+        currentNode = null
+        tree.clear()
+
+        updateCurrentNode(null)
+    }
 
     //return "true" if has back navigation variants else false
     fun back() {
@@ -34,10 +53,12 @@ class GraphController {
         tree.removeLastOrNull()?.let {
             it.childScreens.forEach { childScreen ->
                 val childScreenLifecycleController = ScreenLifecycleController(childScreen)
+                graphEventsInterceptor.onDestroyScreen(childScreen.key)
                 childScreenLifecycleController.onDestroy()
                 keyManager.remove(childScreen.key)
             }
             val screenLifecycleController = ScreenLifecycleController(it.screen)
+            graphEventsInterceptor.onDestroyScreen(it.screen.key)
             screenLifecycleController.onDestroy()
             keyManager.remove(it.screen.key)
 
@@ -50,10 +71,12 @@ class GraphController {
         droppedNodes.forEach {
             it.childScreens.forEach { childScreen ->
                 val childScreenLifecycleController = ScreenLifecycleController(childScreen)
+                graphEventsInterceptor.onDestroyScreen(childScreen.key)
                 childScreenLifecycleController.onDestroy()
                 keyManager.remove(childScreen.key)
             }
             val screenLifecycleController = ScreenLifecycleController(it.screen)
+            graphEventsInterceptor.onDestroyScreen(it.screen.key)
             screenLifecycleController.onDestroy()
             keyManager.remove(it.screen.key)
         }
@@ -66,6 +89,7 @@ class GraphController {
 
         currentNode?.screen?.let {
             val oldScreenLifecycleController = ScreenLifecycleController(it)
+            graphEventsInterceptor.onDestroyScreen(it.key)
             oldScreenLifecycleController.onDestroy()
         }
         val newScreenLifecycleController = ScreenLifecycleController(screen)
@@ -83,7 +107,6 @@ class GraphController {
         val node = Node(
             screen = createdScreen,
             childScreens = ArrayList(),
-            neighbors = ArrayList(),
             parent = currentNode
         )
         tree.add(node)
@@ -98,6 +121,7 @@ class GraphController {
                 keyManager.remove(screen.key)
 
                 val screenLifecycleController = ScreenLifecycleController(screen)
+                graphEventsInterceptor.onDestroyScreen(screen.key)
                 screenLifecycleController.onDestroy()
 
                 updateCurrentNode(this)
@@ -113,6 +137,7 @@ class GraphController {
                 keyManager.remove(it.key)
 
                 val screenLifecycleController = ScreenLifecycleController(it)
+                graphEventsInterceptor.onDestroyScreen(it.key)
                 screenLifecycleController.onDestroy()
             }
 
@@ -127,6 +152,7 @@ class GraphController {
 
                 val oldChildScreen = childScreens[childScreens.size - 1]
                 val oldScreenLifecycleController = ScreenLifecycleController(oldChildScreen)
+                graphEventsInterceptor.onDestroyScreen(oldChildScreen.key)
                 oldScreenLifecycleController.onDestroy()
 
                 val newScreenLifecycleController = ScreenLifecycleController(screen)

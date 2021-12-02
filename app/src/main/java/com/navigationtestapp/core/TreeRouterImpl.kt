@@ -5,20 +5,35 @@ import kotlinx.coroutines.flow.StateFlow
 class TreeRouterImpl(
     override val initialScreen: Screen<*>? = null,
     override val parentRouter: TreeRouter? = null
-) : TreeRouter {
+) : TreeRouter, GraphEventsInterceptor {
 
-    private val graphController: GraphController = GraphController()
+    private val graphController: GraphController = GraphController(this)
+    private val childRouters: ArrayList<Pair<String, TreeRouter>> = ArrayList()
 
     override val screen: StateFlow<Screen<*>?> = graphController.currentScreenFlow
 
     override val childList: StateFlow<List<Screen<*>>> = graphController.currentChildFlow
 
-    override val hasBackNavigationVariants: StateFlow<Boolean> = graphController.hasBackNavigationVariants
+    override val hasBackNavigationVariants: StateFlow<Boolean> =
+        graphController.hasBackNavigationVariants
+
+    override fun onDestroyScreen(key: String) {
+        childRouters.removeAll {
+            if (it.first == key) {
+                it.second.cleanRouter()
+                true
+            } else false
+        }
+    }
 
     override fun back() = graphController.back()
 
-    override fun branch(key: String): TreeRouter {
-        return TreeRouterImpl(initialScreen, this)
+    override fun cleanRouter() = graphController.cleanGraph()
+
+    override fun branch(containerScreenKey: String): TreeRouter {
+        val newRouter = TreeRouterImpl(initialScreen, this)
+        childRouters.add(containerScreenKey to newRouter)
+        return newRouter
     }
 
     override fun backScreen() = graphController.backScreen()

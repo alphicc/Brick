@@ -8,15 +8,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 class BottomMenuViewModel {
 
     private val firstMenuRouter =
-        viewModelNavigationRouter.branch("Menu1").apply {
+        viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
             addScreen(Screens.menuFirstSubScreen, this)
         }
     private val secondMenuRouter =
-        viewModelNavigationRouter.branch("Menu2").apply {
+        viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
             addScreen(Screens.menuSecondSubScreen)
         }
     private val thirdMenuRouter =
-        viewModelNavigationRouter.branch("Menu3").apply {
+        viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
             addScreen(Screens.menuThirdSubScreen)
         }
 
