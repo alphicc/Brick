@@ -39,14 +39,6 @@ class MainActivity : ComponentActivity() {
 
                 Button(modifier = Modifier.padding(top = 16.dp), onClick = {
                     context.startActivity(
-                        Intent(context, BottomMenuNavigationActivity::class.java)
-                    )
-                }) {
-                    Text(text = "Bottom menu navigation")
-                }
-
-                Button(modifier = Modifier.padding(top = 16.dp), onClick = {
-                    context.startActivity(
                         Intent(context, ViewModelNavigationActivity::class.java)
                     )
                 }) {

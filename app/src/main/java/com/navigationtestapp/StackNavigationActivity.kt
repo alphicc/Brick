@@ -93,7 +93,7 @@ val screenChild5 = Screen(
     key = "C5",
     onCreate = { _, _ -> Log.d("Alpha", "onCreate C5") },
     onDestroy = { Log.d("Alpha", "onDestroy C5") },
-    content = { ChildExt(50, "backToChild") { router.backToChild("C1") } }
+    content = { ChildExt(50) }
 )
 
 @ExperimentalAnimationApi
@@ -175,7 +175,7 @@ fun Child(int: Int, actionTitle: String, action: () -> Unit) {
 
 
 @Composable
-fun ChildExt(int: Int, actionTitle: String, action: () -> Unit) {
+fun ChildExt(int: Int) {
 
     val color = remember {
         val rnd = Random()

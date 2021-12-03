@@ -1,6 +1,5 @@
 package com.navigationtestapp.core
 
-import android.util.Log
 import com.navigationtestapp.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
@@ -16,7 +15,6 @@ class GraphController(private val graphEventsInterceptor: GraphEventsInterceptor
     private var currentNode: Node? = null
 
     suspend fun <A> passArgument(screenKey: String, argument: A) {
-        Log.d("Alpha", "pass ${screenKey}")
         tree.forEach { node ->
             node.childScreens.forEach {
                 if (it.key == screenKey) {
@@ -196,9 +194,10 @@ class GraphController(private val graphEventsInterceptor: GraphEventsInterceptor
 
     private fun dropNodeUntilFoundKey(node: Node?, screenKey: String): List<Node> {
         val droppedNodes = ArrayList<Node>()
-        if (node?.screen?.key != screenKey) {
+        if (node != null && node.screen.key != screenKey) {
+            droppedNodes.add(node)
             tree.removeLastOrNull()
-            val newDroppedNodes = dropNodeUntilFoundKey(node?.parent, screenKey)
+            val newDroppedNodes = dropNodeUntilFoundKey(node.parent, screenKey)
             droppedNodes.addAll(newDroppedNodes)
         }
         return droppedNodes
