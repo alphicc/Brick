@@ -1,6 +1,6 @@
-package com.navigationtestapp.core
+package com.alphicc.brick
 
-class ScreenLifecycleController(private val screen: Screen<*>) {
+internal class ScreenLifecycleController(private val screen: Screen<*>) {
 
     fun <A> onCreate(initialArgument: A): Screen<*> {
         val argumentDataContainer = DataContainer(initialArgument)

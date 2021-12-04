@@ -1,9 +1,8 @@
-package com.navigationtestapp.core
+package com.alphicc.brick
 
-import com.navigationtestapp.*
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class GraphController(private val graphEventsInterceptor: GraphEventsInterceptor) {
+internal class GraphController(private val graphEventsInterceptor: GraphEventsInterceptor) {
 
     private val keyManager = KeyManager()
     private val tree: ArrayList<Node> = ArrayList()

@@ -1,8 +1,8 @@
-package com.navigationtestapp.core
+package com.alphicc.brick
 
 import kotlinx.coroutines.flow.StateFlow
 
-class TreeRouterImpl(
+internal class TreeRouterImpl(
     override val initialScreen: Screen<*>? = null,
     override val parentRouter: TreeRouter? = null
 ) : TreeRouter, GraphEventsInterceptor, ArgumentTranslator {

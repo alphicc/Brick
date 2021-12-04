@@ -1,4 +1,4 @@
-package com.navigationtestapp.core
+package com.alphicc.brick
 
 import androidx.compose.runtime.Composable
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,7 +12,7 @@ data class Screen<D>(
 ) : BaseScreen<D>(key, onCreate, onDestroy)
 
 open class BaseScreen<D>(
-    internal open val key: String,
+    open val key: String,
     internal open val onCreate: ((SharedFlow<DataContainer>, DataContainer) -> D)?,
     internal open val onDestroy: ((DataContainer) -> Unit)?,
     internal val channel: MutableSharedFlow<DataContainer> = MutableSharedFlow(),

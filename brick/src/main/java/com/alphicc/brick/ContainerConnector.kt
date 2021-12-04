@@ -1,4 +1,4 @@
-package com.navigationtestapp.core
+package com.alphicc.brick
 
 import kotlinx.coroutines.flow.StateFlow
 

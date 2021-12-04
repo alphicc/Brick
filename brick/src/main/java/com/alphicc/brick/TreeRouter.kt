@@ -1,4 +1,4 @@
-package com.navigationtestapp.core
+package com.alphicc.brick
 
 interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter, ArgumentTranslator {
 
@@ -12,4 +12,8 @@ interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter, Argu
     fun branch(containerScreenKey: String): TreeRouter
 
     suspend fun <A> passArgument(screenKey: String, argument: A)
+
+    companion object {
+        fun new(): TreeRouter = TreeRouterImpl()
+    }
 }

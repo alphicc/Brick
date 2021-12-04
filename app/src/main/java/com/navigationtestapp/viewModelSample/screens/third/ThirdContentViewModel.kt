@@ -1,7 +1,7 @@
 package com.navigationtestapp.viewModelSample.screens.third
 
 import android.util.Log
-import com.navigationtestapp.core.TreeRouter
+import com.alphicc.brick.TreeRouter
 import com.navigationtestapp.viewModelSample.screens.Screens
 import kotlinx.coroutines.*
 

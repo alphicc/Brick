@@ -9,8 +9,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.navigationtestapp.core.AnimatedScreensContainer
-import com.navigationtestapp.core.TreeRouter
+import com.alphicc.brick.AnimatedScreensContainer
+import com.alphicc.brick.TreeRouter
 
 @ExperimentalAnimationApi
 @Composable

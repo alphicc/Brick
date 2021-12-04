@@ -1,6 +1,6 @@
-package com.navigationtestapp.core
+package com.alphicc.brick
 
-class KeyManager {
+internal class KeyManager {
 
     private val keys: ArrayList<String> = ArrayList()
 

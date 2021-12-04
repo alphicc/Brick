@@ -1,7 +1,7 @@
 package com.navigationtestapp.viewModelSample.screens.second
 
 import android.util.Log
-import com.navigationtestapp.core.DataContainer
+import com.alphicc.brick.DataContainer
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

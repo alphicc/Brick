@@ -1,6 +1,6 @@
 package com.navigationtestapp.viewModelSample.screens.bottomMenu
 
-import com.navigationtestapp.core.TreeRouter
+import com.alphicc.brick.TreeRouter
 import com.navigationtestapp.viewModelSample.screens.Screens
 import com.navigationtestapp.viewModelSample.viewModelNavigationRouter
 import kotlinx.coroutines.flow.MutableStateFlow

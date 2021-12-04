@@ -4,8 +4,8 @@ import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.navigationtestapp.core.Screen
-import com.navigationtestapp.core.TreeRouter
+import com.alphicc.brick.Screen
+import com.alphicc.brick.TreeRouter
 import com.navigationtestapp.viewModelSample.screens.bottomMenu.BottomMenuScreen
 import com.navigationtestapp.viewModelSample.screens.bottomMenu.BottomMenuViewModel
 import com.navigationtestapp.viewModelSample.screens.childInfoOne.ChildInfoOneScreen

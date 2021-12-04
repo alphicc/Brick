@@ -1,6 +1,7 @@
 package com.navigationtestapp.viewModelSample.screens.childInfoTwo
 
-import com.navigationtestapp.core.TreeRouter
+import com.alphicc.brick.TreeRouter
+
 
 class ChildInfoTwoViewModel(treeRouter: TreeRouter) {
 }

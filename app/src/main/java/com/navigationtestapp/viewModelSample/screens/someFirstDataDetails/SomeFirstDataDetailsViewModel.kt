@@ -1,7 +1,7 @@
 package com.navigationtestapp.viewModelSample.screens.someFirstDataDetails
 
 import android.util.Log
-import com.navigationtestapp.core.TreeRouter
+import com.alphicc.brick.TreeRouter
 import com.navigationtestapp.viewModelSample.screens.Screens
 
 class SomeFirstDataDetailsViewModel(private val router: TreeRouter) {

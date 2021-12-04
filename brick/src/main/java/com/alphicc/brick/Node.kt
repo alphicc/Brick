@@ -1,6 +1,6 @@
-package com.navigationtestapp.core
+package com.alphicc.brick
 
-data class Node(
+internal data class Node(
     var screen: Screen<*>,
     val parent: Node? = null,
     val childScreens: ArrayList<Screen<*>>

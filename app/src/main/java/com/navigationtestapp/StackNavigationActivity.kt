@@ -18,13 +18,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.navigationtestapp.core.Screen
-import com.navigationtestapp.core.ScreensContainer
-import com.navigationtestapp.core.TreeRouter
-import com.navigationtestapp.core.TreeRouterImpl
+import com.alphicc.brick.Screen
+import com.alphicc.brick.ScreensContainer
+import com.alphicc.brick.TreeRouter
 import java.util.*
 
-private val router: TreeRouter = TreeRouterImpl()
+private val router: TreeRouter = TreeRouter.new()
 
 val screen1 = Screen(
     key = "1",
@@ -109,6 +108,12 @@ class StackNavigationActivity : ComponentActivity() {
         if (savedInstanceState == null) {
             router.addScreen(screen1)
         }
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+
+        router.cleanRouter()
     }
 }
 
