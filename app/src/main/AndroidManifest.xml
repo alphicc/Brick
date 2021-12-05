@@ -25,7 +25,7 @@
 
         <activity android:name=".BottomMenuNavigationActivity" />
 
-        <activity android:name=".viewModelSample.ViewModelNavigationActivity" />
+        <activity android:name=".largeSample.ViewModelNavigationActivity" />
     </application>
 
 </manifest>
