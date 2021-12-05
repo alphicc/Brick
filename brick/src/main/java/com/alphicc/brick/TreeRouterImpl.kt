@@ -17,6 +17,8 @@ internal class TreeRouterImpl(
     override val hasBackNavigationVariants: StateFlow<Boolean> =
         graphController.hasBackNavigationVariants
 
+    override fun currentScreenKey(): String? = screen.value?.key
+
     override fun onDestroyScreen(key: String) {
         childRouters.removeAll {
             if (it.first == key) {
@@ -55,6 +57,8 @@ internal class TreeRouterImpl(
 
     override fun <A> addScreen(screen: Screen<*>, argument: A) =
         graphController.addScreen(screen, argument)
+
+    override fun lastChildKey(): String? = childList.value.lastOrNull()?.key
 
     override fun backChild() = graphController.backChild()
 

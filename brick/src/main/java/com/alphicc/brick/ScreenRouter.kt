@@ -1,6 +1,7 @@
 package com.alphicc.brick
 
 interface ScreenRouter {
+    fun currentScreenKey(): String?
     fun backScreen()
     fun backToScreen(key: String)
     fun replaceScreen(screen: Screen<*>)
