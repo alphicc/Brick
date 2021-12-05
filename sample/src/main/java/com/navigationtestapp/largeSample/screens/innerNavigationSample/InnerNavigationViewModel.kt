@@ -6,6 +6,6 @@ import com.navigationtestapp.largeSample.screens.Screens
 class InnerNavigationViewModel(private val router: TreeRouter) {
 
     fun onInnerNavigationClicked() {
-        router.addScreen(Screens.someFirstDataDetailsScreen, router)
+        router.addScreen(Screens.somethingDetailsScreen, router)
     }
 }

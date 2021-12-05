@@ -9,15 +9,15 @@ class BottomMenuViewModel {
 
     private val firstMenuRouter =
         viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
-            addScreen(Screens.menuFirstSubScreen, this)
+            addScreen(Screens.innerNavigationScreen, this)
         }
     private val secondMenuRouter =
         viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
-            addScreen(Screens.menuSecondSubScreen)
+            addScreen(Screens.channelArgumentReceiveScreen)
         }
     private val thirdMenuRouter =
         viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
-            addScreen(Screens.menuThirdSubScreen, this)
+            addScreen(Screens.channelArgumentSendScreen, this)
         }
 
     val startScreenIndex: MutableStateFlow<Int> = MutableStateFlow(0)

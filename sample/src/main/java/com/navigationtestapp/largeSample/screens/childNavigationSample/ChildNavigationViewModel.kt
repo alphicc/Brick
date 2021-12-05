@@ -10,10 +10,10 @@ class ChildNavigationViewModel(private val router: TreeRouter) {
     }
 
     fun onForwardClicked() {
-        router.addChild(Screens.childInfoScreen, router)
+        router.addChild(Screens.redSquareScreen, router)
     }
 
     fun onForwardTwoClicked() {
-        router.addChild(Screens.childInfoScreenTwo, router)
+        router.addChild(Screens.blueSquareScreen, router)
     }
 }

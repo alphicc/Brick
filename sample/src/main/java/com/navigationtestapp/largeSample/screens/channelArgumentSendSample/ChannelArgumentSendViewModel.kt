@@ -13,7 +13,7 @@ class ChannelArgumentSendViewModel(private val router: TreeRouter) {
     fun onIncrementClicked() {
         scope.launch {
             counter += 1
-            router.passArgument(Screens.menuSecondSubScreen.key, counter)
+            router.passArgument(Screens.channelArgumentReceiveScreen.key, counter)
         }
     }
 

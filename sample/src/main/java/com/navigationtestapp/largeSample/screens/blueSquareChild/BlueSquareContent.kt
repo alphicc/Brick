@@ -13,7 +13,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun RedSquareContent(childInfoTwoViewModel: ChildInfoTwoViewModel) {
+fun BlueSquareContent(blueSquareViewModel: BlueSquareViewModel) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Box(

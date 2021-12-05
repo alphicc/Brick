@@ -6,6 +6,6 @@ import com.navigationtestapp.largeSample.screens.Screens
 class SomethingDetailsViewModel(private val router: TreeRouter) {
 
     fun onNextBtnClicked() {
-        router.addScreen(Screens.someFirstDataDetailsScreenTwo, router)
+        router.addScreen(Screens.childNavigationContentScreen, router)
     }
 }

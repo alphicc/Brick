@@ -5,8 +5,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.alphicc.brick.Screen
 import com.alphicc.brick.TreeRouter
-import com.navigationtestapp.largeSample.screens.blueSquareChild.ChildInfoTwoViewModel
-import com.navigationtestapp.largeSample.screens.blueSquareChild.RedSquareContent
+import com.navigationtestapp.largeSample.screens.blueSquareChild.BlueSquareContent
+import com.navigationtestapp.largeSample.screens.blueSquareChild.BlueSquareViewModel
 import com.navigationtestapp.largeSample.screens.bottomMenu.BottomMenuScreen
 import com.navigationtestapp.largeSample.screens.bottomMenu.BottomMenuViewModel
 import com.navigationtestapp.largeSample.screens.channelArgumentReceiveSample.ChannelArgumentReceiveContent
@@ -57,7 +57,7 @@ object Screens {
         }
     )
 
-    val menuFirstSubScreen = Screen(
+    val innerNavigationScreen = Screen(
         key = "InnerNavigationContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -69,7 +69,7 @@ object Screens {
         }
     )
 
-    val menuSecondSubScreen = Screen(
+    val channelArgumentReceiveScreen = Screen(
         key = "ChannelArgumentReceiveContent",
         onCreate = { channel, _ -> return@Screen ChannelArgumentReceiveViewModel(channel) },
         onDestroy = {
@@ -83,7 +83,7 @@ object Screens {
         }
     )
 
-    val menuThirdSubScreen = Screen(
+    val channelArgumentSendScreen = Screen(
         key = "ChannelArgumentSendContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -99,7 +99,7 @@ object Screens {
         }
     )
 
-    val someFirstDataDetailsScreen = Screen(
+    val somethingDetailsScreen = Screen(
         key = "SomethingDetailsContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -111,7 +111,7 @@ object Screens {
         }
     )
 
-    val someFirstDataDetailsScreenTwo = Screen(
+    val childNavigationContentScreen = Screen(
         key = "ChildNavigationContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -123,7 +123,7 @@ object Screens {
         }
     )
 
-    val childInfoScreen = Screen(
+    val redSquareScreen = Screen(
         key = "RedSquareContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -135,15 +135,15 @@ object Screens {
         }
     )
 
-    val childInfoScreenTwo = Screen(
-        key = "RedSquareContent",
+    val blueSquareScreen = Screen(
+        key = "BlueSquareContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
-            ChildInfoTwoViewModel(router)
+            BlueSquareViewModel(router)
         },
         content = {
-            val viewModel = it.get<ChildInfoTwoViewModel>()
-            RedSquareContent(viewModel)
+            val viewModel = it.get<BlueSquareViewModel>()
+            BlueSquareContent(viewModel)
         }
     )
 }
