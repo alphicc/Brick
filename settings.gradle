@@ -7,5 +7,5 @@ dependencyResolutionManagement {
 }
 rootProject.name = "NavigationTestApp"
 
-include ':app'
+include ':sample'
 include ':brick'

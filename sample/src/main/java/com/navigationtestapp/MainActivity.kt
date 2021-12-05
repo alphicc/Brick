@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.navigationtestapp.largeSample.ViewModelNavigationActivity
+import com.navigationtestapp.smallSample.StackNavigationActivity
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
