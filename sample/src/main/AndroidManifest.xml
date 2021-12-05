@@ -21,11 +21,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".StackNavigationActivity" />
-
-        <activity android:name=".BottomMenuNavigationActivity" />
+        <activity android:name=".smallSample.StackNavigationActivity" />
 
         <activity android:name=".largeSample.ViewModelNavigationActivity" />
     </application>
-
 </manifest>
