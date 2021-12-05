@@ -8,26 +8,20 @@ import com.alphicc.brick.AnimatedScreensContainer
 import com.alphicc.brick.TreeRouter
 import com.navigationtestapp.largeSample.screens.Screens.welcomeScreen
 
-val viewModelNavigationRouter: TreeRouter = TreeRouter.new()
+val largeSampleRouter: TreeRouter = TreeRouter.new()
 
 @ExperimentalAnimationApi
-class ViewModelNavigationActivity : ComponentActivity() {
+class LargeSampleActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AnimatedScreensContainer(viewModelNavigationRouter)
+            AnimatedScreensContainer(largeSampleRouter)
         }
 
         if (savedInstanceState == null) {
-            viewModelNavigationRouter.addScreen(welcomeScreen, viewModelNavigationRouter)
+            largeSampleRouter.addScreen(welcomeScreen, largeSampleRouter)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        viewModelNavigationRouter.cleanRouter()
     }
 }

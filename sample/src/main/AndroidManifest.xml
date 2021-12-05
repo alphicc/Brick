@@ -21,8 +21,8 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".smallSample.StackNavigationActivity" />
+        <activity android:name=".smallSample.SmallSampleActivity" />
 
-        <activity android:name=".largeSample.ViewModelNavigationActivity" />
+        <activity android:name=".largeSample.LargeSampleActivity" />
     </application>
 </manifest>

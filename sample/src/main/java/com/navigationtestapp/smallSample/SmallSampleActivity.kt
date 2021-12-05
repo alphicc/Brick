@@ -1,7 +1,6 @@
 package com.navigationtestapp.smallSample
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -23,51 +22,51 @@ import com.alphicc.brick.ScreensContainer
 import com.alphicc.brick.TreeRouter
 import java.util.*
 
-private val router: TreeRouter = TreeRouter.new()
+val smallSampleRouter: TreeRouter = TreeRouter.new()
 
 val screen1 = Screen<Unit>(
     key = "1",
-    content = { SimpleScreen(1, "new") { router.addScreen(screen2) } }
+    content = { SimpleScreen(1, "new") { smallSampleRouter.addScreen(screen2) } }
 )
 
 val screen2 = Screen<Unit>(
     key = "2",
-    content = { SimpleScreen(2, "new") { router.addScreen(screen3) } }
+    content = { SimpleScreen(2, "new") { smallSampleRouter.addScreen(screen3) } }
 )
 
 val screen3 = Screen<Unit>(
     key = "3",
-    content = { SimpleScreen(3, "new") { router.addScreen(screen4) } }
+    content = { SimpleScreen(3, "new") { smallSampleRouter.addScreen(screen4) } }
 )
 
 val screen4 = Screen<Unit>(
     key = "4",
-    content = { SimpleScreen(4, "replace") { router.replaceScreen(screen5) } }
+    content = { SimpleScreen(4, "replace") { smallSampleRouter.replaceScreen(screen5) } }
 )
 
 val screen5 = Screen<Unit>(
     key = "5",
-    content = { SimpleScreen(5, "addChild") { router.addChild(screenChild1) } }
+    content = { SimpleScreen(5, "addChild") { smallSampleRouter.addChild(screenChild1) } }
 )
 
 val screenChild1 = Screen<Unit>(
     key = "C1",
-    content = { Child(10, "newChild") { router.addChild(screenChild2) } }
+    content = { Child(10, "newChild") { smallSampleRouter.addChild(screenChild2) } }
 )
 
 val screenChild2 = Screen<Unit>(
     key = "C2",
-    content = { Child(20, "newChild") { router.addChild(screenChild3) } }
+    content = { Child(20, "newChild") { smallSampleRouter.addChild(screenChild3) } }
 )
 
 val screenChild3 = Screen<Unit>(
     key = "C3",
-    content = { Child(30, "newChild") { router.addChild(screenChild4) } }
+    content = { Child(30, "newChild") { smallSampleRouter.addChild(screenChild4) } }
 )
 
 val screenChild4 = Screen<Unit>(
     key = "C4",
-    content = { Child(40, "replaceChild") { router.replaceChild(screenChild5) } }
+    content = { Child(40, "replaceChild") { smallSampleRouter.replaceChild(screenChild5) } }
 )
 
 val screenChild5 = Screen<Unit>(
@@ -76,24 +75,18 @@ val screenChild5 = Screen<Unit>(
 )
 
 @ExperimentalAnimationApi
-class StackNavigationActivity : ComponentActivity() {
+class SmallSampleActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ScreensContainer(router)
+            ScreensContainer(smallSampleRouter)
         }
 
         if (savedInstanceState == null) {
-            router.addScreen(screen1)
+            smallSampleRouter.addScreen(screen1)
         }
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-
-        router.cleanRouter()
     }
 }
 

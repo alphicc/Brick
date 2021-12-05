@@ -14,8 +14,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.navigationtestapp.largeSample.ViewModelNavigationActivity
-import com.navigationtestapp.smallSample.StackNavigationActivity
+import com.navigationtestapp.largeSample.LargeSampleActivity
+import com.navigationtestapp.largeSample.largeSampleRouter
+import com.navigationtestapp.smallSample.SmallSampleActivity
+import com.navigationtestapp.smallSample.smallSampleRouter
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
@@ -31,17 +33,15 @@ class MainActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(onClick = {
-                    context.startActivity(
-                        Intent(context, StackNavigationActivity::class.java)
-                    )
+                    smallSampleRouter.cleanRouter()
+                    context.startActivity(Intent(context, SmallSampleActivity::class.java))
                 }) {
                     Text(text = "Stack navigation")
                 }
 
                 Button(modifier = Modifier.padding(top = 16.dp), onClick = {
-                    context.startActivity(
-                        Intent(context, ViewModelNavigationActivity::class.java)
-                    )
+                    largeSampleRouter.cleanRouter()
+                    context.startActivity(Intent(context, LargeSampleActivity::class.java))
                 }) {
                     Text(text = "Nested navigation")
                 }

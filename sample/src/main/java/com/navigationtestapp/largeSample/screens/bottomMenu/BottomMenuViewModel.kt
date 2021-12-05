@@ -2,21 +2,21 @@ package com.navigationtestapp.largeSample.screens.bottomMenu
 
 import com.alphicc.brick.TreeRouter
 import com.navigationtestapp.largeSample.screens.Screens
-import com.navigationtestapp.largeSample.viewModelNavigationRouter
+import com.navigationtestapp.largeSample.largeSampleRouter
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class BottomMenuViewModel {
 
     private val firstMenuRouter =
-        viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
+        largeSampleRouter.branch(Screens.bottomMenuScreen.key).apply {
             addScreen(Screens.innerNavigationScreen, this)
         }
     private val secondMenuRouter =
-        viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
+        largeSampleRouter.branch(Screens.bottomMenuScreen.key).apply {
             addScreen(Screens.channelArgumentReceiveScreen)
         }
     private val thirdMenuRouter =
-        viewModelNavigationRouter.branch(Screens.bottomMenuScreen.key).apply {
+        largeSampleRouter.branch(Screens.bottomMenuScreen.key).apply {
             addScreen(Screens.channelArgumentSendScreen, this)
         }
 
