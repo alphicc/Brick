@@ -1,8 +1,8 @@
 ![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--alpha02-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
 <h1 align="center">
-    <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/logo.png?token=ALZGDT2QD7AXNL3S4OT6GPTBVUJ7S"/>
+    <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/logo.png?token=ALZGDT53SYM5UW6JIH5ORMDBVZQDA"/>
     <br>
-	    Brick 
+	    Brick
     </br>
     <br>
 		<em>
@@ -27,10 +27,10 @@ Brick is a lightweight library to take completely control of your app.
 <table align="center">
     <tr>
         <td>
-            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/small%20sample.gif?token=ALZGDT264ED4VX3UUG64IBLBVUJ6Q" width="256"/>
+            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/small%20sample.gif?token=ALZGDT4V54JKWH2VXD66KPDBVZQDK" width="256"/>
         </td>
         <td>
-            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/large%20sample.gif?token=ALZGDTZDSYETJDFHYZW4PKLBVUJ3Y" width="256"/>
+            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/large%20sample.gif?token=ALZGDTYTZYYSJY54OXTWS3TBVZQD4" width="256"/>
         </td>
     </tr>
     <tr>
@@ -47,7 +47,7 @@ Brick is a lightweight library to take completely control of your app.
 Add repository in your project
 ```kotlin
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 ```
 Add the dependency in your build.gradle
@@ -77,12 +77,65 @@ class SmallSampleActivity : ComponentActivity() {
   val containerConnector: ContainerConnector = ... //inject or provide from application class
 
   override fun onCreate(savedInstanceState: Bundle?) {
-	  super.onCreate(savedInstanceState)
+      super.onCreate(savedInstanceState)
 
-	  setContent {
-		  ScreensContainer(containerConnector)
-	  }
+      setContent {
+          ScreensContainer(containerConnector)
+      }
   }
 }
 ```
 4. Navigate!
+## Work representation
+### Integration schema
+<h1 align="center">
+    <img height="500" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/integration%20schema.png?token=ALZGDT6MAZUEFEK5A6B5PCDBVZQLW"/>
+</h1>
+
+### Work schema
+<h1 align="center">
+    <img height="500" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/work%20schema.png?token=ALZGDT7PXMK4OWBY6ZASBF3BVZQQE"/>
+</h1>
+
+### Lifecycle sample
+<h1 align="center">
+    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/lifecycle.png?token=ALZGDTY3YIFA7OJAVZYYGJTBVZQVS"/>
+</h1>
+
+## Multistack navigation
+1. Create nested router using method **branch**.
+```kotlin
+//Screens.bottomMenuScreen.key - screen key that contains nested container
+private val firstMenuRouter = mainRouter.branch(Screens.bottomMenuScreen.key).apply {
+  addScreen(Screens.innerNavigationScreen, this)//initial navigation sample
+}
+```
+
+2. Pass created nested router to your nested **ScreensContainer**.
+```kotlin
+//inside your composable function
+AnimatedScreensContainer(firstMenuRouter)
+```
+3. Use your nested router to make nested navigation!
+
+### Multistack graph sample (simple)
+<h1 align="center">
+    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/multistack%20graph%20short.png?token=ALZGDT7PKA4PDTQNG72D7GDBVZSLK"/>
+</h1>
+
+### Multistack graph sample (extended)
+<h1 align="center">
+    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/multistack%20graph%20full.png?token=ALZGDT3GUAL6Y4P3H2OIGK3BVZSKS"/>
+</h1>
+
+## Navigation methods list
++ currentScreenKey
++ backScreen
++ backToScreen
++ replaceScreen
++ addScreen
++ lastChildKey
++ backChild
++ backToChild
++ replaceChild
++ addChild
