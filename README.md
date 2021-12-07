@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 ![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--alpha02-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/logo.png?token=ALZGDT53SYM5UW6JIH5ORMDBVZQDA"/>
@@ -140,3 +141,6 @@ AnimatedScreensContainer(firstMenuRouter)
 + replaceChild
 + addChild
 + cleanRouter
+=======
+# Brick
+>>>>>>> 425e62334af2f5ddd02448861eecffeb04a1eeb0
