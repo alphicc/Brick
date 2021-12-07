@@ -1,6 +1,6 @@
 ![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--alpha02-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
 <h1 align="center">
-    <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/logo.png?token=ALZGDT53SYM5UW6JIH5ORMDBVZQDA"/>
+    <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/logo.png"/>
     <br>
 	    Brick
     </br>
@@ -27,10 +27,10 @@ Brick is a lightweight library to take completely control of your app.
 <table align="center">
     <tr>
         <td>
-            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/small%20sample.gif?token=ALZGDT4V54JKWH2VXD66KPDBVZQDK" width="256"/>
+            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/small%20sample.gif" width="256"/>
         </td>
         <td>
-            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/large%20sample.gif?token=ALZGDTYTZYYSJY54OXTWS3TBVZQD4" width="256"/>
+            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/large%20sample.gif" width="256"/>
         </td>
     </tr>
     <tr>
@@ -89,17 +89,17 @@ class SmallSampleActivity : ComponentActivity() {
 ## Work representation
 ### Integration schema
 <h1 align="center">
-    <img height="500" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/integration%20schema.png?token=ALZGDT6MAZUEFEK5A6B5PCDBVZQLW"/>
+    <img height="500" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/integration%20schema.png"/>
 </h1>
 
 ### Work schema
 <h1 align="center">
-    <img height="500" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/work%20schema.png?token=ALZGDT7PXMK4OWBY6ZASBF3BVZQQE"/>
+    <img height="500" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/work%20schema.png"/>
 </h1>
 
 ### Lifecycle sample
 <h1 align="center">
-    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/lifecycle.png?token=ALZGDTY3YIFA7OJAVZYYGJTBVZQVS"/>
+    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/lifecycle.png"/>
 </h1>
 
 ## Multistack navigation
@@ -120,12 +120,12 @@ AnimatedScreensContainer(firstMenuRouter)
 
 ### Multistack graph sample (simple)
 <h1 align="center">
-    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/multistack%20graph%20short.png?token=ALZGDT7PKA4PDTQNG72D7GDBVZSLK"/>
+    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/multistack%20graph%20short.png"/>
 </h1>
 
 ### Multistack graph sample (extended)
 <h1 align="center">
-    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/multistack%20graph%20full.png?token=ALZGDT3GUAL6Y4P3H2OIGK3BVZSKS"/>
+    <img height="600" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/multistack%20graph%20full.png"/>
 </h1>
 
 ## Navigation methods list
