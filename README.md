@@ -11,7 +11,7 @@
     </br>
 </h1>
 
-Brick is a lightweight library to take completely control of your app.
+Brick is a lightweight library to make navigation.
 
 ## Features
 + Framework free (Router can be injected in any layer of project. Navigate from any place you want. Example: UI-navigation or business logic navigation)
@@ -59,7 +59,7 @@ dependencies {
 ```
 Thats all!
 ## Usage
-1. Create **Router** in **any** place of your project (**Note: router contains all information about screen. Router destroyed == all navigation/screens data destroyed**).
+1. Create **Router** in **any** place of your project (**Note: router contains all information about screen. Router destroyed = all navigation/screens data destroyed**).
 ```kotlin
 val router: TreeRouter = TreeRouter.new()
 ```
@@ -103,7 +103,7 @@ class SmallSampleActivity : ComponentActivity() {
 </h1>
 
 ## Multistack navigation
-1. Create nested router using method **branch**.
+1. Create nested router using **branch** method.
 ```kotlin
 //Screens.bottomMenuScreen.key - screen key that contains nested container
 private val firstMenuRouter = mainRouter.branch(Screens.bottomMenuScreen.key).apply {
