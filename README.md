@@ -1,4 +1,4 @@
-![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--alpha03-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
+![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--alpha04-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/logo.png"/>
     <br>
@@ -23,9 +23,13 @@ Brick is a lightweight library to make navigation.
 + Arguments support
 + Screens communication support
 + Current screen check
++ Transition animations
 ## Samples
 <table align="center">
     <tr>
+        <td>
+            <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/animations%20sample.gif" width="256"/>
+        </td>
         <td>
             <img src="https://raw.githubusercontent.com/alphicc/Brick/develop/media/small%20sample.gif" width="256"/>
         </td>
@@ -34,6 +38,9 @@ Brick is a lightweight library to make navigation.
         </td>
     </tr>
     <tr>
+        <td align="center">
+            Transition Animation
+        </td>
         <td align="center">
             Small sample
         </td>
