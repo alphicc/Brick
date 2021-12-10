@@ -3,7 +3,9 @@ package com.navigationtestapp.largeSample
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.*
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.tween
 import com.alphicc.brick.AnimatedScreensContainer
 import com.alphicc.brick.TreeRouter
 import com.navigationtestapp.largeSample.screens.Screens.welcomeScreen
@@ -17,7 +19,17 @@ class LargeSampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AnimatedScreensContainer(largeSampleRouter)
+            AnimatedScreensContainer(
+                containerConnector = largeSampleRouter,
+                enterTransition = scaleIn(
+                    initialScale = .90f,
+                    animationSpec = tween(easing = LinearEasing)
+                ) + fadeIn(),
+                exitTransition = scaleOut(
+                    targetScale = .90f,
+                    animationSpec = tween(easing = LinearEasing)
+                ) + fadeOut(),
+            )
         }
 
         if (savedInstanceState == null) {
