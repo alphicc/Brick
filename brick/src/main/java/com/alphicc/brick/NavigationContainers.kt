@@ -15,7 +15,11 @@ import androidx.compose.ui.Modifier
 
 @ExperimentalAnimationApi
 @Composable
-fun AnimatedScreensContainer(containerConnector: ContainerConnector) {
+fun AnimatedScreensContainer(
+    containerConnector: ContainerConnector,
+    enterTransition: EnterTransition = fadeIn(animationSpec = tween(300)),
+    exitTransition: ExitTransition = fadeOut(animationSpec = tween(300))
+) {
 
     val screen by containerConnector.screen.collectAsState()
     val childList by containerConnector.childList.collectAsState()
@@ -27,9 +31,7 @@ fun AnimatedScreensContainer(containerConnector: ContainerConnector) {
 
     AnimatedContent(
         targetState = screen,
-        transitionSpec = {
-            fadeIn(animationSpec = tween(300)) with fadeOut(animationSpec = tween(300))
-        }
+        transitionSpec = { enterTransition with exitTransition }
     ) {
 
         it?.run {
