@@ -1,4 +1,4 @@
-package com.alphicc.brick
+package com.alphicc.brick.navigationContainers
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
@@ -12,6 +12,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.alphicc.brick.ContainerConnector
 
 @ExperimentalAnimationApi
 @Composable
@@ -21,6 +22,7 @@ fun AnimatedScreensContainer(
     exitTransition: ExitTransition = fadeOut(animationSpec = tween(300))
 ) {
 
+    val overlay by containerConnector.overlay.collectAsState()
     val screen by containerConnector.screen.collectAsState()
     val childList by containerConnector.childList.collectAsState()
     val hasBackNavigationVariants by containerConnector.hasBackNavigationVariants.collectAsState()
@@ -58,28 +60,10 @@ fun AnimatedScreensContainer(
                 ?: throw IllegalArgumentException("Dependency can not be null")
         )
     }
-}
 
-@Composable
-fun ScreensContainer(containerConnector: ContainerConnector) {
-
-    val screen by containerConnector.screen.collectAsState()
-    val childList by containerConnector.childList.collectAsState()
-    val hasBackNavigationVariants by containerConnector.hasBackNavigationVariants.collectAsState()
-
-    BackHandler(hasBackNavigationVariants) {
-        containerConnector.back()
-    }
-
-    screen?.run {
+    overlay?.run {
         content.invoke(
             dependency ?: throw IllegalArgumentException("Dependency can not be null")
-        )
-    }
-    childList.forEach { childScreen ->
-        childScreen.content.invoke(
-            childScreen.dependency
-                ?: throw IllegalArgumentException("Dependency can not be null")
         )
     }
 }

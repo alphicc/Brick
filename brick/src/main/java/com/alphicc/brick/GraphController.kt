@@ -7,13 +7,38 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
     private val keyManager = KeyManager()
     private val tree: ArrayList<Node> = ArrayList()
 
+    val currentOverlayFlow: MutableStateFlow<Screen<*>?> = MutableStateFlow(null)
     val currentScreenFlow: MutableStateFlow<Screen<*>?> = MutableStateFlow(null)
     val currentChildFlow: MutableStateFlow<List<Screen<*>>> = MutableStateFlow(emptyList())
     val hasBackNavigationVariants: MutableStateFlow<Boolean> = MutableStateFlow(false)
 
     private var currentNode: Node? = null
 
+    fun <A> setOverlay(screen: Screen<*>, argument: A?) {
+        keyManager.add(screen.key)
+
+        val screenLifecycleController = ScreenLifecycleController(screen)
+        val createdScreen = screenLifecycleController.onCreate(argument)
+        currentOverlayFlow.value = createdScreen
+    }
+
+    fun removeOverlay() {
+        currentOverlayFlow.value?.let { screen ->
+            keyManager.remove(screen.key)
+            val screenLifecycleController = ScreenLifecycleController(screen)
+            screenLifecycleController.onDestroy()
+            currentOverlayFlow.value = null
+        }
+    }
+
     suspend fun <A> passArgument(screenKey: String, argument: A) {
+        currentOverlayFlow.value?.let { overlayScreen ->
+            if (overlayScreen.key == screenKey) {
+                val dataContainer = DataContainer(argument)
+                overlayScreen.channel.emit(dataContainer)
+            }
+        }
+
         tree.forEach { node ->
             node.childScreens.forEach {
                 if (it.key == screenKey) {
@@ -45,6 +70,7 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
         currentNode = null
         tree.clear()
 
+        removeOverlay()
         updateCurrentNode(null)
     }
 
