@@ -91,7 +91,6 @@ object Screens {
             ChannelArgumentSendViewModel(router)
         },
         onDestroy = {
-            Log.d("Alpha", "OnDestroy ChannelArgumentSendContent")
             val viewModel = it.get<ChannelArgumentSendViewModel>()
             viewModel.onDestroy()
         },
@@ -106,9 +105,6 @@ object Screens {
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             SomethingDetailsViewModel(router)
-        },
-        onDestroy = {
-            Log.d("Alpha", "OnDestroy SomethingDetailsContent")
         },
         content = {
             val viewModel = it.get<SomethingDetailsViewModel>()
@@ -133,9 +129,6 @@ object Screens {
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             RedSquareViewModel(router)
-        },
-        onDestroy = {
-            Log.d("Alpha", "OnDestroy RedSquareContent")
         },
         content = {
             val viewModel = it.get<RedSquareViewModel>()

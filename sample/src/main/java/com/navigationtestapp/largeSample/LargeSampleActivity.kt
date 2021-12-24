@@ -11,8 +11,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.AnimatedScreensContainer
 import com.alphicc.brick.TreeRouter
+import com.alphicc.brick.navigationContainers.AnimatedScreensContainer
 import com.navigationtestapp.largeSample.screens.Screens.welcomeScreen
 
 val largeSampleRouter: TreeRouter = TreeRouter.new()

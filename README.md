@@ -1,4 +1,4 @@
-![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--alpha04-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
+![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--alpha05-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/main/media/logo.png"/>
     <br>
@@ -28,6 +28,9 @@ Brick is a lightweight library to make navigation.
 <table align="center">
     <tr>
         <td>
+            <img src="https://raw.githubusercontent.com/alphicc/Brick/main/media/overlay%20sample.gif" width="256"/>
+        </td>
+        <td>
             <img src="https://raw.githubusercontent.com/alphicc/Brick/main/media/animations%20sample.gif" width="256"/>
         </td>
         <td>
@@ -38,6 +41,9 @@ Brick is a lightweight library to make navigation.
         </td>
     </tr>
     <tr>
+        <td align="center">
+            Overlay sample
+        </td>
         <td align="center">
             Transition Animation
         </td>
@@ -61,7 +67,7 @@ Add the dependency in your build.gradle
 ```kotlin
 dependencies {
     //Brick
-    implementation 'io.github.alphicc:brick:1.0.0-alpha03'
+    implementation 'io.github.alphicc:brick:1.0.0-alpha05'
 }
 ```
 Thats all!
@@ -147,3 +153,5 @@ AnimatedScreensContainer(firstMenuRouter)
 + replaceChild
 + addChild
 + cleanRouter
++ setOverlay
++ removeOverlay

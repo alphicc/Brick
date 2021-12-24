@@ -79,7 +79,7 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
         val hasBackNavigationVariants = when {
             currentNode?.childScreens?.isNotEmpty() == true -> {
                 backChild()
-                true
+                currentNode?.childScreens?.isNotEmpty() == true || currentNode?.parent != null
             }
             currentNode?.parent != null -> {
                 backScreen()

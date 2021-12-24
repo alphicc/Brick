@@ -16,6 +16,8 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import com.navigationtestapp.largeSample.LargeSampleActivity
 import com.navigationtestapp.largeSample.largeSampleRouter
+import com.navigationtestapp.overlaySample.OverlaySampleActivity
+import com.navigationtestapp.overlaySample.overlaySampleRouter
 import com.navigationtestapp.smallSample.SmallSampleActivity
 import com.navigationtestapp.smallSample.smallSampleRouter
 
@@ -44,6 +46,13 @@ class MainActivity : ComponentActivity() {
                     context.startActivity(Intent(context, LargeSampleActivity::class.java))
                 }) {
                     Text(text = "Nested navigation")
+                }
+
+                Button(modifier = Modifier.padding(top = 16.dp), onClick = {
+                    overlaySampleRouter.cleanRouter()
+                    context.startActivity(Intent(context, OverlaySampleActivity::class.java))
+                }) {
+                    Text(text = "Overlay")
                 }
             }
         }

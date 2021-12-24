@@ -24,5 +24,7 @@
         <activity android:name=".smallSample.SmallSampleActivity" />
 
         <activity android:name=".largeSample.LargeSampleActivity" />
+
+        <activity android:name=".overlaySample.OverlaySampleActivity" />
     </application>
 </manifest>
