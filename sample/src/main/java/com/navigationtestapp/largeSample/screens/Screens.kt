@@ -1,5 +1,6 @@
 package com.navigationtestapp.largeSample.screens
 
+import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue

@@ -6,8 +6,13 @@ import androidx.activity.compose.setContent
 import androidx.compose.animation.*
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.tween
-import com.alphicc.brick.AnimatedScreensContainer
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Button
+import androidx.compose.material.Text
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.dp
 import com.alphicc.brick.TreeRouter
+import com.alphicc.brick.navigationContainers.AnimatedScreensContainer
 import com.navigationtestapp.largeSample.screens.Screens.welcomeScreen
 
 val largeSampleRouter: TreeRouter = TreeRouter.new()
@@ -30,6 +35,13 @@ class LargeSampleActivity : ComponentActivity() {
                     animationSpec = tween(easing = LinearEasing)
                 ) + fadeOut(),
             )
+
+            Button(
+                modifier = Modifier.padding(top = 48.dp),
+                onClick = { largeSampleRouter.cleanRouter() }
+            ) {
+                Text(text = "CleanRouter")
+            }
         }
 
         if (savedInstanceState == null) {

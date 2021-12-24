@@ -10,6 +10,8 @@ internal class TreeRouterImpl(
     private val graphController: GraphController = GraphController(this)
     private val childRouters: ArrayList<Pair<String, TreeRouter>> = ArrayList()
 
+    override val overlay: StateFlow<Screen<*>?> = graphController.currentOverlayFlow
+
     override val screen: StateFlow<Screen<*>?> = graphController.currentScreenFlow
 
     override val childList: StateFlow<List<Screen<*>>> = graphController.currentChildFlow
@@ -30,12 +32,29 @@ internal class TreeRouterImpl(
 
     override fun back() = graphController.back()
 
+    override fun getRootRouter(): TreeRouter = parentRouter?.getRootRouter() ?: this
+
     override fun cleanRouter() = graphController.cleanGraph()
 
     override fun branch(containerScreenKey: String): TreeRouter {
         val newRouter = TreeRouterImpl(initialScreen, this)
         childRouters.add(containerScreenKey to newRouter)
         return newRouter
+    }
+
+    override fun setOverlay(screen: Screen<*>) {
+        val rootRouter = getRootRouter()
+        if (rootRouter === this) graphController.setOverlay(screen, null)
+    }
+
+    override fun <A> setOverlay(screen: Screen<*>, argument: A) {
+        val rootRouter = getRootRouter()
+        if (rootRouter === this) graphController.setOverlay(screen, argument)
+    }
+
+    override fun removeOverlay() {
+        val rootRouter = getRootRouter()
+        if (rootRouter === this) graphController.removeOverlay()
     }
 
     override suspend fun <A> passArgument(screenKey: String, argument: A) {
