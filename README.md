@@ -24,6 +24,7 @@ Brick is a lightweight library to make navigation.
 + Screens communication support
 + Current screen check
 + Transition animations
++ Overlay navigation
 ## Samples
 <table align="center">
     <tr>
