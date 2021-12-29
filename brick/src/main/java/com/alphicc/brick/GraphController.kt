@@ -15,7 +15,8 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
     private var currentNode: Node? = null
 
     fun <A> setOverlay(screen: Screen<*>, argument: A?) {
-        keyManager.add(screen.key)
+        val isSuccess = keyManager.add(screen.key)
+        if (!isSuccess) return
 
         val screenLifecycleController = ScreenLifecycleController(screen)
         val createdScreen = screenLifecycleController.onCreate(argument)
@@ -126,7 +127,10 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
     }
 
     fun <A> replaceScreen(screen: Screen<*>, argument: A?) {
-        currentNode?.let { node -> keyManager.replaceKey(node.screen.key, screen.key) }
+        currentNode?.let { node ->
+            val isSuccess = keyManager.replaceKey(node.screen.key, screen.key)
+            if (!isSuccess) return
+        }
 
         currentNode?.screen?.let {
             val oldScreenLifecycleController = ScreenLifecycleController(it)
@@ -141,7 +145,8 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
     }
 
     fun <A> addScreen(screen: Screen<*>, argument: A?) {
-        keyManager.add(screen.key)
+        val isSuccess = keyManager.add(screen.key)
+        if (!isSuccess) return
 
         val screenLifecycleController = ScreenLifecycleController(screen)
         val createdScreen = screenLifecycleController.onCreate(argument)
@@ -189,7 +194,8 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
     fun <A> replaceChild(screen: Screen<*>, argument: A?) {
         currentNode?.run {
             if (childScreens.size >= 1) {
-                keyManager.replaceKey(childScreens.last().key, screen.key)
+                val isSuccess = keyManager.replaceKey(childScreens.last().key, screen.key)
+                if (!isSuccess) return
 
                 val oldChildScreen = childScreens[childScreens.size - 1]
                 val oldScreenLifecycleController = ScreenLifecycleController(oldChildScreen)
@@ -207,7 +213,8 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
 
     fun <A> addChild(screen: Screen<*>, argument: A?) {
         currentNode?.run {
-            keyManager.add(screen.key)
+            val isSuccess = keyManager.add(screen.key)
+            if (!isSuccess) return
 
             val screenLifecycle = ScreenLifecycleController(screen)
             val createdScreen = screenLifecycle.onCreate(argument)
