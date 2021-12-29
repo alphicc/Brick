@@ -1,4 +1,4 @@
-![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--alpha05-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
+![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--beta01-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/main/media/logo.png"/>
     <br>
