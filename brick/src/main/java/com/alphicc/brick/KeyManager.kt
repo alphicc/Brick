@@ -4,21 +4,22 @@ internal class KeyManager {
 
     private val keys: ArrayList<String> = ArrayList()
 
-    fun add(key: String) {
+    fun add(key: String): Boolean {
         if (keys.contains(key)) {
-            throw IllegalArgumentException("Key $key already existed")
+            return false
         }
 
         keys.add(key)
+        return true
     }
 
     fun remove(key: String) {
         keys.remove(key)
     }
 
-    fun replaceKey(oldKey: String, newKey: String) {
+    fun replaceKey(oldKey: String, newKey: String): Boolean {
         remove(oldKey)
-        add(newKey)
+        return add(newKey)
     }
 
     fun clear() = keys.clear()
