@@ -34,7 +34,7 @@ internal class TreeRouterImpl(
 
     override fun getRootRouter(): TreeRouter = parentRouter?.getRootRouter() ?: this
 
-    override fun cleanRouter() = graphController.cleanGraph()
+    override fun cleanRouter() = graphController.cleanRouter()
 
     override fun branch(containerScreenKey: String): TreeRouter {
         val newRouter = TreeRouterImpl(initialScreen, this)
@@ -61,9 +61,11 @@ internal class TreeRouterImpl(
         redirectArgument(this, screenKey, argument)
     }
 
-    override fun backScreen() = graphController.backScreen()
+    override fun backScreen() =
+        graphController.backScreen()
 
-    override fun backToScreen(key: String) = graphController.backToScreen(key)
+    override fun backToScreen(key: String) =
+        graphController.backToScreen(key)
 
     override fun replaceScreen(screen: Screen<*>) =
         graphController.replaceScreen(screen, null)
@@ -77,11 +79,20 @@ internal class TreeRouterImpl(
     override fun <A> addScreen(screen: Screen<*>, argument: A) =
         graphController.addScreen(screen, argument)
 
-    override fun lastChildKey(): String? = childList.value.lastOrNull()?.key
+    override fun newRootScreen(screen: Screen<*>) =
+        graphController.newRootScreen(screen, null)
 
-    override fun backChild() = graphController.backChild()
+    override fun <A> newRootScreen(screen: Screen<*>, argument: A) =
+        graphController.newRootScreen(screen, argument)
 
-    override fun backToChild(key: String) = graphController.backToChild(key)
+    override fun lastChildKey(): String? =
+        childList.value.lastOrNull()?.key
+
+    override fun backChild() =
+        graphController.backChild()
+
+    override fun backToChild(key: String) =
+        graphController.backToChild(key)
 
     override fun replaceChild(screen: Screen<*>) =
         graphController.replaceChild(screen, null)
