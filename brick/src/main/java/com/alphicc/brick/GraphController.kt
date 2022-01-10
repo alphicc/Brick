@@ -55,22 +55,8 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
         }
     }
 
-    fun cleanGraph() {
-        tree.forEach { node ->
-            node.childScreens.forEach { childScreen ->
-                val childScreenLifecycleController = ScreenLifecycleController(childScreen)
-                graphEventsInterceptor.onDestroyScreen(childScreen.key)
-                childScreenLifecycleController.onDestroy()
-                keyManager.remove(childScreen.key)
-            }
-            val screenLifecycleController = ScreenLifecycleController(node.screen)
-            graphEventsInterceptor.onDestroyScreen(node.screen.key)
-            screenLifecycleController.onDestroy()
-            keyManager.remove(node.screen.key)
-        }
-        currentNode = null
-        tree.clear()
-
+    fun cleanRouter() {
+        cleanGraph()
         removeOverlay()
         updateCurrentNode(null)
     }
@@ -222,6 +208,30 @@ internal class GraphController(private val graphEventsInterceptor: GraphEventsIn
 
             updateCurrentNode(this)
         }
+    }
+
+    fun <A> newRootScreen(screen: Screen<*>, argument: A?) {
+        cleanGraph()
+        addScreen(screen, argument)
+    }
+
+    private fun cleanGraph() {
+        tree.forEach { node ->
+            node.childScreens.forEach { childScreen ->
+                val childScreenLifecycleController = ScreenLifecycleController(childScreen)
+                graphEventsInterceptor.onDestroyScreen(childScreen.key)
+                childScreenLifecycleController.onDestroy()
+                keyManager.remove(childScreen.key)
+            }
+            val screenLifecycleController = ScreenLifecycleController(node.screen)
+            graphEventsInterceptor.onDestroyScreen(node.screen.key)
+            screenLifecycleController.onDestroy()
+            keyManager.remove(node.screen.key)
+        }
+        currentNode = null
+        tree.clear()
+
+        removeOverlay()
     }
 
     private fun dropNodeUntilFoundKey(node: Node?, screenKey: String): List<Node> {
