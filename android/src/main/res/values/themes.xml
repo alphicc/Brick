@@ -1,0 +1,14 @@
+<resources>
+    <style name="Theme.NavigationTestApp" parent="Theme.AppCompat.DayNight.DarkActionBar">
+        <item name="colorPrimary">@color/purple_500</item>
+    </style>
+
+    <style name="Theme.NavigationTestApp.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
+    <style name="Theme.NavigationTestApp.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar"/>
+
+    <style name="Theme.NavigationTestApp.PopupOverlay" parent="ThemeOverlay.AppCompat.Light"/>
+</resources>
