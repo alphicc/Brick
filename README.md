@@ -100,7 +100,7 @@ Thats all!
 ```kotlin
 val router: TreeRouter = TreeRouter.new()
 ```
-2. Create **Screen**. **Screen != UI**. Screen has lifecycle, channels to communicate between other screens. Screen can live without UI. UI (only android composable function for now &#128526;) - part of Screen.
+2. Create **Screen**. **Screen != UI**. Screen has lifecycle, channels to communicate between other screens. Screen can live without UI. UI - part of Screen.
 ```kotlin
 val screen1 = Screen<Unit>(
   key = "1",
