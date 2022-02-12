@@ -60,7 +60,7 @@ Brick is a lightweight library to make navigation.
 <table align="center">
     <tr>
         <td>
-            <img src="https://raw.githubusercontent.com/alphicc/Brick/main/media/desktop%20sample.gif" width="512"/>
+            <img src="https://raw.githubusercontent.com/alphicc/Brick/main/media/desktop%20sample.gif"/>
         </td>
     </tr>
     <tr>
