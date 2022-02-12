@@ -57,6 +57,19 @@ Brick is a lightweight library to make navigation.
     </tr>
 </table>
 
+<table align="center">
+    <tr>
+        <td>
+            <img src="https://raw.githubusercontent.com/alphicc/Brick/main/media/desktop%20sample.gif" width="256"/>
+        </td>
+    </tr>
+    <tr>
+        <td align="center">
+            Desktop sample
+        </td>
+    </tr>
+</table>
+
 ## Installation
 Add repository in your project
 ```kotlin
