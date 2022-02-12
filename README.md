@@ -88,7 +88,7 @@ dependencies {
 }
 ```
 
-Set jvmTarget in your build.gradle
+Android: Set jvmTarget in your build.gradle
 ```kotlin
 kotlinOptions {
     jvmTarget = '11'
