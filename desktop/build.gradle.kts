@@ -19,7 +19,7 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                implementation(project(":brick"))
+                implementation("io.github.alphicc:brick:1.0.0-beta03")
                 implementation(compose.desktop.currentOs)
                 api(compose.preview)
             }

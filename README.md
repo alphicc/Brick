@@ -1,4 +1,4 @@
-![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--beta03-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
+![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--beta03-blue) ![Platform](https://img.shields.io/badge/platform-android-green?color=lightgray) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen) ![Platform](https://img.shields.io/badge/platform-dektop-green?color=lightgray)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/main/media/logo.png"/>
     <br>
@@ -62,6 +62,9 @@ Add repository in your project
 ```kotlin
 repositories {
     mavenCentral()
+    maven {
+        url "https://maven.pkg.jetbrains.space/public/p/compose/dev"
+    }
 }
 ```
 Add the dependency in your build.gradle
@@ -69,6 +72,13 @@ Add the dependency in your build.gradle
 dependencies {
     //Brick
     implementation 'io.github.alphicc:brick:1.0.0-beta03'
+}
+```
+
+Set jvmTarget in your build.gradle
+```kotlin
+kotlinOptions {
+    jvmTarget = '11'
 }
 ```
 Thats all!
@@ -84,7 +94,7 @@ val screen1 = Screen<Unit>(
   content = { SimpleScreen(1, "new") { smallSampleRouter.addScreen(screen2) } } // content - ui
 )
 ```
-3. Provide **ContainerConnector** to **AnimatedScreensContainer** or  **ScreensContainer** . Your Router implements **ContainerConnector**.
+3. Provide **ContainerConnector** to **%PLATFORM%AnimatedScreensContainer** or  **%PLATFORM%ScreensContainer** . Your Router implements **ContainerConnector**.
 ```kotlin
 class SmallSampleActivity : ComponentActivity() {
 
@@ -94,7 +104,7 @@ class SmallSampleActivity : ComponentActivity() {
       super.onCreate(savedInstanceState)
 
       setContent {
-          ScreensContainer(containerConnector)
+          AndroidScreensContainer(containerConnector)
       }
   }
 }
@@ -125,10 +135,10 @@ private val firstMenuRouter = mainRouter.branch(Screens.bottomMenuScreen.key).ap
 }
 ```
 
-2. Pass created nested router to your nested **ScreensContainer**.
+2. Pass created nested router to your nested **%PLATFORM%ScreensContainer**.
 ```kotlin
 //inside your composable function
-AnimatedScreensContainer(firstMenuRouter)
+%PLATFORM%AnimatedScreensContainer(firstMenuRouter)
 ```
 3. Use your nested router to make nested navigation!
 
