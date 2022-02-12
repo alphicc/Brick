@@ -1,4 +1,4 @@
-![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--beta02-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
+![MAVEN](https://img.shields.io/badge/Maven-v1.0.0--beta03-blue) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/main/media/logo.png"/>
     <br>
@@ -68,7 +68,7 @@ Add the dependency in your build.gradle
 ```kotlin
 dependencies {
     //Brick
-    implementation 'io.github.alphicc:brick:1.0.0-beta02'
+    implementation 'io.github.alphicc:brick:1.0.0-beta03'
 }
 ```
 Thats all!
