@@ -1,7 +1,5 @@
-package io.github.alphicc.android.largeSample.screens.bottomMenu
+package io.github.alphicc.desktop.bottomMenu
 
-import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
@@ -11,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.AndroidAnimatedScreensContainer
+import com.alphicc.brick.DesktopAnimatedScreensContainer
 import com.alphicc.brick.TreeRouter
 
 @ExperimentalAnimationApi
@@ -30,7 +28,7 @@ fun BottomMenuScreen(
                 .padding(bottom = 48.dp)
                 .fillMaxSize()
         ) {
-            AndroidAnimatedScreensContainer(containerRouter)
+            DesktopAnimatedScreensContainer(containerRouter)
         }
 
         Row(

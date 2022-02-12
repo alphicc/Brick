@@ -5,7 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 
 @Composable
-fun ScreensContainer(containerConnector: ContainerConnector) {
+fun DesktopScreensContainer(containerConnector: ContainerConnector) {
 
     val overlay by containerConnector.overlay.collectAsState()
     val screen by containerConnector.screen.collectAsState()

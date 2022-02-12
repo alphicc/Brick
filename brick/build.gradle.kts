@@ -46,7 +46,6 @@ kotlin {
         }
         val desktopMain by getting {
             dependencies {
-                // implementation(compose.preview)
             }
         }
         val desktopTest by getting

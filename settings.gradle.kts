@@ -16,4 +16,4 @@ pluginManagement {
 }
 rootProject.name = "BrickMultiplatform"
 
-include(":android", ":brick")
+include(":desktop", ":android", ":brick")

@@ -17,9 +17,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.alphicc.brick.AndroidScreensContainer
 import com.alphicc.brick.Screen
 import com.alphicc.brick.TreeRouter
-import com.alphicc.brick.navigationContainers.ScreensContainer
 import java.util.*
 
 val smallSampleRouter: TreeRouter = TreeRouter.new()
@@ -81,7 +81,7 @@ class SmallSampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ScreensContainer(smallSampleRouter)
+            AndroidScreensContainer(smallSampleRouter)
         }
 
         if (savedInstanceState == null) {
