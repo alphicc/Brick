@@ -84,7 +84,7 @@ Add the dependency in your build.gradle
 ```kotlin
 dependencies {
     //Brick
-    implementation 'io.github.alphicc:brick:1.0.0-beta03'
+    implementation 'io.github.alphicc:brick:1.0.0-rc01'
 }
 ```
 
