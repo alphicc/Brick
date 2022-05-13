@@ -3,7 +3,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "1.1.0-alpha04"
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 group = "io.github.alphicc"
