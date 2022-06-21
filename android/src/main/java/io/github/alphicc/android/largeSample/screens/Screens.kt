@@ -1,6 +1,5 @@
 package io.github.alphicc.android.largeSample.screens
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -34,8 +33,8 @@ object Screens {
             val router = argument.get<TreeRouter>()
             return@Screen WelcomeViewModel(router)
         },
-        content = {
-            val viewModel = it.get<WelcomeViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<WelcomeViewModel>()
             Welcome(viewModel::onNextClicked)
         }
     )
@@ -43,8 +42,8 @@ object Screens {
     val bottomMenuScreen = Screen(
         key = "BottomMenuScreen",
         onCreate = { _, _ -> BottomMenuViewModel() },
-        content = {
-            val viewModel = it.get<BottomMenuViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<BottomMenuViewModel>()
             val defaultIndex by viewModel.startScreenIndex.collectAsState()
             val containerRouter by viewModel.containerRouter.collectAsState()
 
@@ -64,8 +63,8 @@ object Screens {
             val router = argument.get<TreeRouter>()
             InnerNavigationViewModel(router)
         },
-        content = {
-            val viewModel = it.get<InnerNavigationViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<InnerNavigationViewModel>()
             InnerNavigationContent(viewModel::onInnerNavigationClicked, "SubScreen Menu1")
         }
     )
@@ -77,8 +76,8 @@ object Screens {
             val viewModel = it.get<ChannelArgumentReceiveViewModel>()
             viewModel.onDestroy()
         },
-        content = {
-            val secondContentViewModel = it.get<ChannelArgumentReceiveViewModel>()
+        content = { dataContainer, _ ->
+            val secondContentViewModel = dataContainer.get<ChannelArgumentReceiveViewModel>()
             val count by secondContentViewModel.count.collectAsState()
             ChannelArgumentReceiveContent(count)
         }
@@ -94,8 +93,8 @@ object Screens {
             val viewModel = it.get<ChannelArgumentSendViewModel>()
             viewModel.onDestroy()
         },
-        content = {
-            val viewModel = it.get<ChannelArgumentSendViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<ChannelArgumentSendViewModel>()
             ChannelArgumentSendContent("SubScreen Menu3", viewModel::onIncrementClicked)
         }
     )
@@ -106,8 +105,8 @@ object Screens {
             val router = argument.get<TreeRouter>()
             SomethingDetailsViewModel(router)
         },
-        content = {
-            val viewModel = it.get<SomethingDetailsViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<SomethingDetailsViewModel>()
             SomethingDetailsContent(viewModel)
         }
     )
@@ -118,8 +117,8 @@ object Screens {
             val router = argument.get<TreeRouter>()
             ChildNavigationViewModel(router)
         },
-        content = {
-            val viewModel = it.get<ChildNavigationViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<ChildNavigationViewModel>()
             ChildNavigationContent(viewModel)
         }
     )
@@ -130,8 +129,8 @@ object Screens {
             val router = argument.get<TreeRouter>()
             RedSquareViewModel(router)
         },
-        content = {
-            val viewModel = it.get<RedSquareViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<RedSquareViewModel>()
             RedSquareContent(viewModel)
         }
     )
@@ -142,8 +141,8 @@ object Screens {
             val router = argument.get<TreeRouter>()
             BlueSquareViewModel(router)
         },
-        content = {
-            val viewModel = it.get<BlueSquareViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<BlueSquareViewModel>()
             BlueSquareContent(viewModel)
         }
     )

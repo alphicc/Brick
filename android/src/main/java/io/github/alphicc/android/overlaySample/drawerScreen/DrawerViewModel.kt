@@ -14,7 +14,7 @@ class DrawerViewModel(private val treeRouter: TreeRouter) {
     }
 
     fun onDrawerClosed() {
-        treeRouter.back()
+        treeRouter.onBackClicked()
     }
 
     fun onShowOverlayClicked() {

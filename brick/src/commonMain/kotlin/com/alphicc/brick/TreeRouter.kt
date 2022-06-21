@@ -1,11 +1,9 @@
 package com.alphicc.brick
 
-interface TreeRouter : ContainerConnector, ScreenRouter, ChildScreenRouter, ArgumentTranslator {
+interface TreeRouter : ContainerConnector, CompositeScreenRouter, ScreenRouter, ChildScreenRouter, ArgumentTranslator {
 
     val initialScreen: Screen<*>?
     val parentRouter: TreeRouter?
-
-    override fun back()
 
     fun getRootRouter(): TreeRouter
 

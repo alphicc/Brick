@@ -17,8 +17,8 @@ val drawerScreen = Screen(
         val router = argument.get<TreeRouter>()
         return@Screen DrawerViewModel(router)
     },
-    content = { argument ->
-        val viewModel = argument.get<DrawerViewModel>()
+    content = { dataContainer, _ ->
+        val viewModel = dataContainer.get<DrawerViewModel>()
         DrawerScreenContent(viewModel)
     }
 )

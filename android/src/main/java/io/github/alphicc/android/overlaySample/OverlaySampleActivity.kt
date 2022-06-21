@@ -15,7 +15,9 @@ class OverlaySampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidScreensContainer(overlaySampleRouter)
+            AndroidScreensContainer(overlaySampleRouter) {
+                finish()
+            }
         }
 
         if (savedInstanceState == null) {

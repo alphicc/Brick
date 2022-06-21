@@ -26,6 +26,7 @@ class LargeSampleActivity : ComponentActivity() {
         setContent {
             AndroidAnimatedScreensContainer(
                 containerConnector = largeSampleRouter,
+                onRouterEmpty = { finish() },
                 enterTransition = scaleIn(
                     initialScale = .90f,
                     animationSpec = tween(easing = LinearEasing)

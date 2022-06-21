@@ -1,7 +1,5 @@
 package io.github.alphicc.android.largeSample.screens.bottomMenu
 
-import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button

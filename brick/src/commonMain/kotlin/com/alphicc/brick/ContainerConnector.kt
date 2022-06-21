@@ -6,7 +6,8 @@ interface ContainerConnector {
     val overlay: StateFlow<Screen<*>?>
     val screen: StateFlow<Screen<*>?>
     val childList: StateFlow<List<Screen<*>>>
-    val hasBackNavigationVariants: StateFlow<Boolean>
+    val compositions: StateFlow<Map<String, Screen<*>>>
+    val isRouterEmpty: StateFlow<Boolean>
 
-    fun back()
+    fun onBackClicked()
 }

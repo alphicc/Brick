@@ -19,8 +19,8 @@ val overlayScreen = Screen(
         val treeRouter = argument.get<TreeRouter>()
         return@Screen OverlayViewModel(treeRouter)
     },
-    content = { argument ->
-        val viewModel = argument.get<OverlayViewModel>()
+    content = { dataContainer, _ ->
+        val viewModel = dataContainer.get<OverlayViewModel>()
         OverlayScreenContent(viewModel)
     }
 )

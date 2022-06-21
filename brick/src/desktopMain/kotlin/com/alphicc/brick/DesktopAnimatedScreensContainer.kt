@@ -13,6 +13,7 @@ import androidx.compose.ui.Modifier
 @Composable
 fun DesktopAnimatedScreensContainer(
     containerConnector: ContainerConnector,
+    onRouterEmpty: () -> Unit = {},
     enterTransition: EnterTransition = fadeIn(animationSpec = tween(300)),
     exitTransition: ExitTransition = fadeOut(animationSpec = tween(300))
 ) {
@@ -20,6 +21,14 @@ fun DesktopAnimatedScreensContainer(
     val overlay by containerConnector.overlay.collectAsState()
     val screen by containerConnector.screen.collectAsState()
     val childList by containerConnector.childList.collectAsState()
+    val isRouterEmpty by containerConnector.isRouterEmpty.collectAsState()
+    val compositions by containerConnector.compositions.collectAsState()
+
+    LaunchedEffect(isRouterEmpty) {
+        if (isRouterEmpty) {
+            onRouterEmpty.invoke()
+        }
+    }
 
     AnimatedContent(
         targetState = screen,
@@ -27,8 +36,9 @@ fun DesktopAnimatedScreensContainer(
     ) {
 
         it?.run {
-            content.invoke(
-                dependency ?: throw IllegalArgumentException("Dependency can not be null")
+            showContent(
+                dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+                compositions = compositions
             )
         }
 
@@ -45,15 +55,16 @@ fun DesktopAnimatedScreensContainer(
     }
 
     childList.forEach { childScreen ->
-        childScreen.content.invoke(
-            childScreen.dependency
-                ?: throw IllegalArgumentException("Dependency can not be null")
+        childScreen.showContent(
+            dataContainer = childScreen.dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+            compositions = compositions
         )
     }
 
     overlay?.run {
-        content.invoke(
-            dependency ?: throw IllegalArgumentException("Dependency can not be null")
+        showContent(
+            dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+            compositions = emptyMap()
         )
     }
 }
