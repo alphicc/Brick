@@ -22,12 +22,11 @@ kotlin {
                 implementation(project(":brick"))
 
                 //implementation("io.github.alphicc:brick:1.0.0-beta03")
-                //implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.6.3")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.2")
                 implementation(compose.desktop.currentOs)
                 api(compose.preview)
             }
         }
-        //val jvmTest by getting
     }
 }
 

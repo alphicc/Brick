@@ -33,24 +33,11 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:atomicfu:${atomicfu_version}")
             }
         }
-       // val commonTest by getting {
-       //     dependencies {
-       //     }
-       // }
         val androidMain by getting {
             dependencies {
                 implementation("androidx.activity:activity-compose:${activity_compose_version}")
             }
         }
-      //  val androidTest by getting {
-      //      dependencies {
-      //      }
-      //  }
-        val desktopMain by getting {
-            dependencies {
-            }
-        }
-      //  val desktopTest by getting
     }
 }
 
