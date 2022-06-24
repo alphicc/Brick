@@ -1,7 +1,6 @@
 package io.github.alphicc.android.smallSample
 
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.animation.ExperimentalAnimationApi
@@ -13,74 +12,73 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.AndroidScreensContainer
-import com.alphicc.brick.Screen
+import com.alphicc.brick.AndroidComponentsContainer
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 import java.util.*
 
 val smallSampleRouter: TreeRouter = TreeRouter.new()
 
-val screen1 = Screen<Unit>(
+val screen1 = Component<Unit>(
     key = "1",
     content = { _, _ ->
-        SimpleScreen(1, "new") { smallSampleRouter.addScreen(screen2) }
+        SimpleScreen(1, "new") { smallSampleRouter.addComponent(screen2) }
     })
 
-val screen2 = Screen<Unit>(
+val screen2 = Component<Unit>(
     key = "2",
     content = { _, _ ->
-        SimpleScreen(2, "new") { smallSampleRouter.addScreen(screen3) }
+        SimpleScreen(2, "new") { smallSampleRouter.addComponent(screen3) }
     })
 
-val screen3 = Screen<Unit>(
+val screen3 = Component<Unit>(
     key = "3",
     content = { _, _ ->
-        SimpleScreen(3, "new") { smallSampleRouter.addScreen(screen4) }
+        SimpleScreen(3, "new") { smallSampleRouter.addComponent(screen4) }
     })
 
-val screen4 = Screen<Unit>(
+val screen4 = Component<Unit>(
     key = "4",
     content = { _, _ ->
-        SimpleScreen(4, "replace") { smallSampleRouter.replaceScreen(screen5) }
+        SimpleScreen(4, "replace") { smallSampleRouter.replaceComponent(screen5) }
     })
 
-val screen5 = Screen<Unit>(
+val screen5 = Component<Unit>(
     key = "5",
     content = { _, _ ->
         SimpleScreen(5, "addChild") { smallSampleRouter.addChild(screenChild1) }
     })
 
-val screenChild1 = Screen<Unit>(
+val screenChild1 = Component<Unit>(
     key = "C1",
     content = { _, _ ->
         Child(10, "newChild") { smallSampleRouter.addChild(screenChild2) }
     })
 
-val screenChild2 = Screen<Unit>(
+val screenChild2 = Component<Unit>(
     key = "C2",
     content = { _, _ ->
         Child(20, "newChild") { smallSampleRouter.addChild(screenChild3) }
     })
 
-val screenChild3 = Screen<Unit>(
+val screenChild3 = Component<Unit>(
     key = "C3",
     content = { _, _ ->
         Child(30, "newChild") { smallSampleRouter.addChild(screenChild4) }
     })
 
-val screenChild4 = Screen<Unit>(
+val screenChild4 = Component<Unit>(
     key = "C4",
     content = { _, _ ->
         Child(40, "replaceChild") { smallSampleRouter.replaceChild(screenChild5) }
     })
 
-val screenChild5 = Screen<Unit>(key = "C5", content = { _, _ -> ChildExt(50) })
+val screenChild5 = Component<Unit>(key = "C5", content = { _, _ -> ChildExt(50) })
 
 @ExperimentalAnimationApi
 class SmallSampleActivity : ComponentActivity() {
@@ -89,13 +87,13 @@ class SmallSampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidScreensContainer(smallSampleRouter) {
+            AndroidComponentsContainer(smallSampleRouter) {
                 finish()
             }
         }
 
         if (savedInstanceState == null) {
-            smallSampleRouter.addScreen(screen1)
+            smallSampleRouter.addComponent(screen1)
         }
     }
 }

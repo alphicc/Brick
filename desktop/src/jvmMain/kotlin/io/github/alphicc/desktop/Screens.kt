@@ -3,7 +3,7 @@ package io.github.alphicc.desktop
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.alphicc.brick.Screen
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.desktop.blueSquareChild.BlueSquareContent
 import io.github.alphicc.desktop.blueSquareChild.BlueSquareViewModel
@@ -27,11 +27,11 @@ import io.github.alphicc.desktop.welcome.WelcomeViewModel
 @OptIn(ExperimentalAnimationApi::class)
 object Screens {
 
-    val welcomeScreen = Screen(
+    val welcomeScreen = Component(
         key = "Welcome",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
-            return@Screen WelcomeViewModel(router)
+            return@Component WelcomeViewModel(router)
         },
         content = { dataContainer, _ ->
             val viewModel = dataContainer.get<WelcomeViewModel>()
@@ -39,7 +39,7 @@ object Screens {
         }
     )
 
-    val bottomMenuScreen = Screen(
+    val bottomMenuScreen = Component(
         key = "BottomMenuScreen",
         onCreate = { _, _ -> BottomMenuViewModel() },
         content = { dataContainer, _ ->
@@ -57,7 +57,7 @@ object Screens {
         }
     )
 
-    val innerNavigationScreen = Screen(
+    val innerNavigationScreen = Component(
         key = "InnerNavigationContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -69,9 +69,9 @@ object Screens {
         }
     )
 
-    val channelArgumentReceiveScreen = Screen(
+    val channelArgumentReceiveScreen = Component(
         key = "ChannelArgumentReceiveContent",
-        onCreate = { channel, _ -> return@Screen ChannelArgumentReceiveViewModel(channel) },
+        onCreate = { channel, _ -> return@Component ChannelArgumentReceiveViewModel(channel) },
         onDestroy = {
             val viewModel = it.get<ChannelArgumentReceiveViewModel>()
             viewModel.onDestroy()
@@ -83,7 +83,7 @@ object Screens {
         }
     )
 
-    val channelArgumentSendScreen = Screen(
+    val channelArgumentSendScreen = Component(
         key = "ChannelArgumentSendContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -99,7 +99,7 @@ object Screens {
         }
     )
 
-    val somethingDetailsScreen = Screen(
+    val somethingDetailsScreen = Component(
         key = "SomethingDetailsContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -111,7 +111,7 @@ object Screens {
         }
     )
 
-    val childNavigationContentScreen = Screen(
+    val childNavigationContentScreen = Component(
         key = "ChildNavigationContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -123,7 +123,7 @@ object Screens {
         }
     )
 
-    val redSquareScreen = Screen(
+    val redSquareScreen = Component(
         key = "RedSquareContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -135,7 +135,7 @@ object Screens {
         }
     )
 
-    val blueSquareScreen = Screen(
+    val blueSquareScreen = Component(
         key = "BlueSquareContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()

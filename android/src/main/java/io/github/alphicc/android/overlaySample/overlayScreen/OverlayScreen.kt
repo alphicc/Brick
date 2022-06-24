@@ -10,14 +10,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.Screen
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 
-val overlayScreen = Screen(
+val overlayScreen = Component(
     key = "overlayScreen",
     onCreate = { _, argument ->
         val treeRouter = argument.get<TreeRouter>()
-        return@Screen OverlayViewModel(treeRouter)
+        return@Component OverlayViewModel(treeRouter)
     },
     content = { dataContainer, _ ->
         val viewModel = dataContainer.get<OverlayViewModel>()

@@ -14,14 +14,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.Screen
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 
-val listScreen = Screen(
+val listScreen = Component(
     key = "listScreen",
     onCreate = { _, argument ->
         val router = argument.get<TreeRouter>()
-        return@Screen ListViewModel(router)
+        return@Component ListViewModel(router)
     },
     content = { dataContainer, _ ->
         val viewModel = dataContainer.get<ListViewModel>()

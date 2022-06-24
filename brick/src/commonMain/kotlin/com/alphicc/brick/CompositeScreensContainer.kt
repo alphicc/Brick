@@ -2,7 +2,7 @@ package com.alphicc.brick
 
 import androidx.compose.runtime.Composable
 
-class CompositeContainer(private val compositions: Map<String, Screen<*>>) {
+class CompositeContainer(private val compositions: Map<String, Component<*>>) {
 
     @Composable
     fun place(key: String) {

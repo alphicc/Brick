@@ -4,19 +4,19 @@ import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 
 internal data class Node(
-    val screen: Screen<*>,
+    val rootComponent: Component<*>,
     val parent: Node? = null
 ) {
-    private val _compositions: AtomicRef<Map<String, Screen<*>>> = atomic(emptyMap())
-    private val _childScreens: AtomicRef<List<Screen<*>>> = atomic(emptyList())
+    private val _compositions: AtomicRef<Map<String, Component<*>>> = atomic(emptyMap())
+    private val _childComponents: AtomicRef<List<Component<*>>> = atomic(emptyList())
 
-    fun compositions(): Map<String, Screen<*>> = _compositions.value
+    fun compositions(): Map<String, Component<*>> = _compositions.value
 
-    fun childScreens(): List<Screen<*>> = _childScreens.value
+    fun childComponents(): List<Component<*>> = _childComponents.value
 
-    fun addComposition(screen: Screen<*>) {
+    fun addComposition(component: Component<*>) {
         _compositions.value = _compositions.value.toMutableMap().apply {
-            this[screen.key] = screen
+            this[component.key] = component
         }
     }
 
@@ -26,21 +26,21 @@ internal data class Node(
         }
     }
 
-    fun addChildScreen(screen: Screen<*>) {
-        _childScreens.value = _childScreens.value.toMutableList().apply {
-            this.add(screen)
+    fun addChildComponent(component: Component<*>) {
+        _childComponents.value = _childComponents.value.toMutableList().apply {
+            this.add(component)
         }
     }
 
-    fun dropLastChildScreen() {
-        _childScreens.value = _childScreens.value.toMutableList().apply {
+    fun dropLastChildComponent() {
+        _childComponents.value = _childComponents.value.toMutableList().apply {
             this.removeLastOrNull()
         }
     }
 
-    fun replaceLastChildScreen(screen: Screen<*>) {
-        _childScreens.value = _childScreens.value.toMutableList().apply {
-            this[this.size - 1] = screen
+    fun replaceLastChildComponent(component: Component<*>) {
+        _childComponents.value = _childComponents.value.toMutableList().apply {
+            this[this.size - 1] = component
         }
     }
 }

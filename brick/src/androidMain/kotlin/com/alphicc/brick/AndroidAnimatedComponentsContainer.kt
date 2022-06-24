@@ -1,5 +1,6 @@
 package com.alphicc.brick
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.*
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.clickable
@@ -11,7 +12,7 @@ import androidx.compose.ui.Modifier
 
 @ExperimentalAnimationApi
 @Composable
-fun DesktopAnimatedScreensContainer(
+fun AndroidAnimatedComponentsContainer(
     containerConnector: ContainerConnector,
     onRouterEmpty: () -> Unit = {},
     enterTransition: EnterTransition = fadeIn(animationSpec = tween(300)),
@@ -19,8 +20,8 @@ fun DesktopAnimatedScreensContainer(
 ) {
 
     val overlay by containerConnector.overlay.collectAsState()
-    val screen by containerConnector.screen.collectAsState()
-    val childList by containerConnector.childList.collectAsState()
+    val component by containerConnector.mainComponent.collectAsState()
+    val childList by containerConnector.childComponentsList.collectAsState()
     val isRouterEmpty by containerConnector.isRouterEmpty.collectAsState()
     val compositions by containerConnector.compositions.collectAsState()
 
@@ -30,8 +31,12 @@ fun DesktopAnimatedScreensContainer(
         }
     }
 
+    BackHandler(true) {
+        containerConnector.onBackClicked()
+    }
+
     AnimatedContent(
-        targetState = screen,
+        targetState = component,
         transitionSpec = { enterTransition with exitTransition }
     ) {
 

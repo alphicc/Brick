@@ -6,15 +6,15 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
 internal class TreeRouterImpl(
-    override val initialScreen: Screen<*>? = null,
+    override val initialComponent: Component<*>? = null,
     override val parentRouter: TreeRouter? = null
 ) : TreeRouter {
 
     private val keyManager = KeyManager()
-    private val _currentCompositionsFlow: MutableStateFlow<Map<String, Screen<*>>> = MutableStateFlow(emptyMap())
-    private val _currentOverlayFlow: MutableStateFlow<Screen<*>?> = MutableStateFlow(null)
-    private val _currentScreenFlow: MutableStateFlow<Screen<*>?> = MutableStateFlow(null)
-    private val _currentChildFlow: MutableStateFlow<List<Screen<*>>> = MutableStateFlow(emptyList())
+    private val _currentCompositionsFlow: MutableStateFlow<Map<String, Component<*>>> = MutableStateFlow(emptyMap())
+    private val _currentOverlayFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
+    private val _currentComponentFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
+    private val _currentChildFlow: MutableStateFlow<List<Component<*>>> = MutableStateFlow(emptyList())
     private val _isRouterEmpty: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
     private val childRouters: AtomicRef<List<Pair<String, TreeRouter>>> = atomic(emptyList())
@@ -22,43 +22,43 @@ internal class TreeRouterImpl(
     private val currentNode: Node?
         get() = tree.value.lastOrNull()
 
-    override val overlay: StateFlow<Screen<*>?> = _currentOverlayFlow
+    override val overlay: StateFlow<Component<*>?> = _currentOverlayFlow
 
-    override val screen: StateFlow<Screen<*>?> = _currentScreenFlow
+    override val mainComponent: StateFlow<Component<*>?> = _currentComponentFlow
 
-    override val childList: StateFlow<List<Screen<*>>> = _currentChildFlow
+    override val childComponentsList: StateFlow<List<Component<*>>> = _currentChildFlow
 
-    override val compositions: StateFlow<Map<String, Screen<*>>> = _currentCompositionsFlow
+    override val compositions: StateFlow<Map<String, Component<*>>> = _currentCompositionsFlow
 
     override val isRouterEmpty: StateFlow<Boolean> = _isRouterEmpty
 
-    override fun currentScreenKey(): String? = screen.value?.key
+    override fun currentComponentKey(): String? = mainComponent.value?.key
 
     //return "true" if has back navigation variants else false
     override fun onBackClicked() {
         when {
-            currentNode?.childScreens()?.isNotEmpty() == true -> backChild()
-            currentNode?.parent != null -> backScreen()
-            else -> backScreen()
+            currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
+            currentNode?.parent != null -> backComponent()
+            else -> backComponent()
         }
     }
 
-    override fun attachCompositeScreen(screen: Screen<*>) =
-        attachCompositeScreenToNode(screen, null)
+    override fun attachCompositeComponent(component: Component<*>) =
+        attachCompositeComponentToNode(component, null)
 
-    override fun <A> attachCompositeScreen(screen: Screen<*>, argument: A) =
-        attachCompositeScreenToNode(screen, argument)
+    override fun <A> attachCompositeComponent(component: Component<*>, argument: A) =
+        attachCompositeComponentToNode(component, argument)
 
-    private fun <A> attachCompositeScreenToNode(screen: Screen<*>, argument: A?) {
-        val isSuccess = keyManager.add(screen.key)
+    private fun <A> attachCompositeComponentToNode(component: Component<*>, argument: A?) {
+        val isSuccess = keyManager.add(component.key)
         if (!isSuccess) return
         val currentNode = currentNode ?: return
-        screen.onCreate(argument)
-        currentNode.addComposition(screen)
+        component.onCreate(argument)
+        currentNode.addComposition(component)
         fetchNode()
     }
 
-    override fun detachCompositeScreen(key: String) {
+    override fun detachCompositeComponent(key: String) {
         val currentNode = currentNode ?: return
         keyManager.remove(key)
         val composition = currentNode.compositions()[key]
@@ -69,22 +69,22 @@ internal class TreeRouterImpl(
         }
     }
 
-    override fun backScreen() {
+    override fun backComponent() {
         val nodesTree = tree.value
         nodesTree.lastOrNull()?.let {
-            it.childScreens().forEach { childScreen ->
-                destroyChildRouters(childScreen.key)
-                childScreen.onDestroy()
-                keyManager.remove(childScreen.key)
+            it.childComponents().forEach { childComponent ->
+                destroyChildRouters(childComponent.key)
+                childComponent.onDestroy()
+                keyManager.remove(childComponent.key)
             }
             it.compositions().forEach { entry ->
                 destroyChildRouters(entry.key)
                 entry.value.onDestroy()
                 keyManager.remove(entry.key)
             }
-            destroyChildRouters(it.screen.key)
-            it.screen.onDestroy()
-            keyManager.remove(it.screen.key)
+            destroyChildRouters(it.rootComponent.key)
+            it.rootComponent.onDestroy()
+            keyManager.remove(it.rootComponent.key)
             tree.value = nodesTree.dropLast(1)
             fetchNode()
         }
@@ -98,81 +98,81 @@ internal class TreeRouterImpl(
         fetchNode()
     }
 
-    override fun branch(containerScreenKey: String): TreeRouter {
-        val newRouter = TreeRouterImpl(initialScreen, this)
+    override fun branch(containerComponentKey: String): TreeRouter {
+        val newRouter = TreeRouterImpl(initialComponent, this)
         val childRouters = childRouters.value.toMutableList()
-        childRouters.add(containerScreenKey to newRouter)
+        childRouters.add(containerComponentKey to newRouter)
         this.childRouters.value = childRouters
         return newRouter
     }
 
-    override fun setOverlay(screen: Screen<*>) {
+    override fun setOverlay(component: Component<*>) {
         val rootRouter = getRootRouter()
-        if (rootRouter === this) setOverlayNode(screen, null)
+        if (rootRouter === this) setOverlayNode(component, null)
     }
 
-    override fun <A> setOverlay(screen: Screen<*>, argument: A) {
+    override fun <A> setOverlay(component: Component<*>, argument: A) {
         val rootRouter = getRootRouter()
-        if (rootRouter === this) setOverlayNode(screen, argument)
+        if (rootRouter === this) setOverlayNode(component, argument)
     }
 
     override fun removeOverlay() {
         val rootRouter = getRootRouter()
         if (rootRouter === this) {
-            _currentOverlayFlow.value?.let { screen ->
-                keyManager.remove(screen.key)
-                screen.onDestroy()
+            _currentOverlayFlow.value?.let { component ->
+                keyManager.remove(component.key)
+                component.onDestroy()
                 _currentOverlayFlow.value = null
             }
         }
     }
 
-    override suspend fun <A> passArgument(screenKey: String, argument: A) {
-        redirectArgument(this, screenKey, argument)
+    override suspend fun <A> passArgument(componentKey: String, argument: A) {
+        redirectArgument(this, componentKey, argument)
     }
 
-    override fun backToScreen(key: String) {
+    override fun backToComponent(key: String) {
         val droppedNodes = dropNodeUntilFoundKey(currentNode, key)
         droppedNodes.forEach {
-            it.childScreens().forEach { childScreen ->
-                destroyChildRouters(childScreen.key)
-                childScreen.onDestroy()
-                keyManager.remove(childScreen.key)
+            it.childComponents().forEach { childComponent ->
+                destroyChildRouters(childComponent.key)
+                childComponent.onDestroy()
+                keyManager.remove(childComponent.key)
             }
             it.compositions().forEach { entry ->
                 destroyChildRouters(entry.key)
                 entry.value.onDestroy()
                 keyManager.remove(entry.key)
             }
-            destroyChildRouters(it.screen.key)
-            it.screen.onDestroy()
-            keyManager.remove(it.screen.key)
+            destroyChildRouters(it.rootComponent.key)
+            it.rootComponent.onDestroy()
+            keyManager.remove(it.rootComponent.key)
         }
         fetchNode()
     }
 
-    override fun replaceScreen(screen: Screen<*>) = replaceScreenFromNode(screen, null)
+    override fun replaceComponent(component: Component<*>) = replaceComponentFromNode(component, null)
 
-    override fun <A> replaceScreen(screen: Screen<*>, argument: A) = replaceScreenFromNode(screen, argument)
+    override fun <A> replaceComponent(component: Component<*>, argument: A) = replaceComponentFromNode(component, argument)
 
-    override fun addScreen(screen: Screen<*>) = addScreenNode(screen, null)
+    override fun addComponent(component: Component<*>) = addComponentNode(component, null)
 
-    override fun <A> addScreen(screen: Screen<*>, argument: A) = addScreenNode(screen, argument)
+    override fun <A> addComponent(component: Component<*>, argument: A) = addComponentNode(component, argument)
 
-    override fun newRootScreen(screen: Screen<*>) = newRootScreenNode(screen, null)
+    override fun newRootComponent(component: Component<*>) = newRootComponentNode(component, null)
 
-    override fun <A> newRootScreen(screen: Screen<*>, argument: A) = newRootScreenNode(screen, argument)
+    override fun <A> newRootComponent(component: Component<*>, argument: A) = newRootComponentNode(component, argument)
 
-    override fun lastChildKey(): String? = childList.value.lastOrNull()?.key
+    override fun lastChildKey(): String? = childComponentsList.value.lastOrNull()?.key
 
     override fun backChild() {
         currentNode?.run {
-            if (childScreens().isNotEmpty()) {
-                val screen = childScreens().last()
-                dropLastChildScreen()
-                keyManager.remove(screen.key)
-                destroyChildRouters(screen.key)
-                screen.onDestroy()
+            if (childComponents().isNotEmpty()) {
+                val component = childComponents().last()
+                dropLastChildComponent()
+                keyManager.remove(component.key)
+                destroyChildRouters(component.key)
+                component.onDestroy()
                 fetchNode()
             }
         }
@@ -190,92 +190,92 @@ internal class TreeRouterImpl(
         }
     }
 
-    override fun replaceChild(screen: Screen<*>) = replaceChildNode(screen, null)
+    override fun replaceChild(component: Component<*>) = replaceChildNode(component, null)
 
-    override fun <A> replaceChild(screen: Screen<*>, argument: A) = replaceChildNode(screen, argument)
+    override fun <A> replaceChild(component: Component<*>, argument: A) = replaceChildNode(component, argument)
 
-    override fun addChild(screen: Screen<*>) = addChildNode(screen, null)
+    override fun addChild(component: Component<*>) = addChildNode(component, null)
 
-    override fun <A> addChild(screen: Screen<*>, argument: A) = addChildNode(screen, argument)
+    override fun <A> addChild(component: Component<*>, argument: A) = addChildNode(component, argument)
 
     override suspend fun <A> redirectArgument(
         from: ArgumentTranslator,
-        screenKey: String,
+        componentKey: String,
         argument: A
     ) {
         if (parentRouter !== from) {
-            parentRouter?.redirectArgument(this, screenKey, argument)
+            parentRouter?.redirectArgument(this, componentKey, argument)
         }
-        childRouters.value.forEach { it.second.redirectArgument(this, screenKey, argument) }
-        emitArguments(screenKey, argument)
+        childRouters.value.forEach { it.second.redirectArgument(this, componentKey, argument) }
+        emitArguments(componentKey, argument)
     }
 
-    private suspend fun <A> emitArguments(screenKey: String, argument: A) {
-        _currentOverlayFlow.value?.let { overlayScreen ->
-            if (overlayScreen.key == screenKey) {
+    private suspend fun <A> emitArguments(componentKey: String, argument: A) {
+        _currentOverlayFlow.value?.let { overlayComponent ->
+            if (overlayComponent.key == componentKey) {
                 val dataContainer = DataContainer(argument)
-                overlayScreen.channel.emit(dataContainer)
+                overlayComponent.channel.emit(dataContainer)
             }
         }
 
         tree.value.forEach { node ->
-            node.childScreens().forEach {
-                if (it.key == screenKey) {
+            node.childComponents().forEach {
+                if (it.key == componentKey) {
                     val dataContainer = DataContainer(argument)
                     it.channel.emit(dataContainer)
                 }
             }
 
             node.compositions().forEach { entry ->
-                if (entry.key == screenKey) {
+                if (entry.key == componentKey) {
                     val dataContainer = DataContainer(argument)
                     entry.value.channel.emit(dataContainer)
                 }
             }
 
-            if (node.screen.key == screenKey) {
+            if (node.rootComponent.key == componentKey) {
                 val dataContainer = DataContainer(argument)
-                node.screen.channel.emit(dataContainer)
+                node.rootComponent.channel.emit(dataContainer)
             }
         }
     }
 
-    private fun <A> addChildNode(screen: Screen<*>, argument: A?) {
+    private fun <A> addChildNode(component: Component<*>, argument: A?) {
         currentNode?.run {
-            val isSuccess = keyManager.add(screen.key)
+            val isSuccess = keyManager.add(component.key)
             if (!isSuccess) return
-            screen.onCreate(argument)
-            addChildScreen(screen)
+            component.onCreate(argument)
+            addChildComponent(component)
             fetchNode()
         }
     }
 
-    private fun <A> replaceChildNode(screen: Screen<*>, argument: A?) {
+    private fun <A> replaceChildNode(component: Component<*>, argument: A?) {
         currentNode?.run {
-            if (childScreens().isNotEmpty()) {
-                val isSuccess = keyManager.replaceKey(childScreens().last().key, screen.key)
+            if (childComponents().isNotEmpty()) {
+                val isSuccess = keyManager.replaceKey(childComponents().last().key, component.key)
                 if (!isSuccess) return
-                val oldChildScreen = childScreens()[childScreens().size - 1]
-                destroyChildRouters(oldChildScreen.key)
-                oldChildScreen.onDestroy()
-                screen.onCreate(argument)
-                replaceLastChildScreen(screen)
+                val oldChildComponent = childComponents()[childComponents().size - 1]
+                destroyChildRouters(oldChildComponent.key)
+                oldChildComponent.onDestroy()
+                component.onCreate(argument)
+                replaceLastChildComponent(component)
                 fetchNode()
             }
         }
     }
 
-    private fun <A> newRootScreenNode(screen: Screen<*>, argument: A?) {
+    private fun <A> newRootComponentNode(component: Component<*>, argument: A?) {
         cleanGraph()
-        addScreen(screen, argument)
+        addComponent(component, argument)
     }
 
-    private fun <A> addScreenNode(screen: Screen<*>, argument: A?) {
-        val isSuccess = keyManager.add(screen.key)
+    private fun <A> addComponentNode(component: Component<*>, argument: A?) {
+        val isSuccess = keyManager.add(component.key)
         if (!isSuccess) return
-        screen.onCreate(argument)
+        component.onCreate(argument)
         val node = Node(
-            screen = screen,
+            rootComponent = component,
             parent = currentNode
         )
         tree.value = tree.value
@@ -284,57 +284,57 @@ internal class TreeRouterImpl(
         fetchNode()
     }
 
-    private fun <A> replaceScreenFromNode(screen: Screen<*>, argument: A?) {
+    private fun <A> replaceComponentFromNode(component: Component<*>, argument: A?) {
         currentNode?.let { node ->
-            val isSuccess = keyManager.replaceKey(node.screen.key, screen.key)
+            val isSuccess = keyManager.replaceKey(node.rootComponent.key, component.key)
             if (!isSuccess) return
         }
-        currentNode?.screen?.let {
+        currentNode?.rootComponent?.let {
             destroyChildRouters(it.key)
             it.onDestroy()
         }
-        screen.onCreate(argument)
+        component.onCreate(argument)
         tree.value = tree.value.toMutableList().apply {
             if (this.isNotEmpty()) {
-                this[this.lastIndex] = last().copy(screen = screen)
+                this[this.lastIndex] = last().copy(rootComponent = component)
             }
         }
         fetchNode()
     }
 
-    private fun <A> setOverlayNode(screen: Screen<*>, argument: A?) {
-        val isSuccess = keyManager.add(screen.key)
+    private fun <A> setOverlayNode(component: Component<*>, argument: A?) {
+        val isSuccess = keyManager.add(component.key)
         if (!isSuccess) return
 
-        screen.onCreate(argument)
-        _currentOverlayFlow.value = screen
+        component.onCreate(argument)
+        _currentOverlayFlow.value = component
     }
 
     private fun dropChildUntilFoundKey(
         node: Node,
-        screenKey: String
-    ): List<Screen<*>> {
-        val droppedChildList = ArrayList<Screen<*>>()
-        node.childScreens().lastOrNull()?.let {
-            if (it.key != screenKey) {
-                node.dropLastChildScreen()
+        componentKey: String
+    ): List<Component<*>> {
+        val droppedChildList = ArrayList<Component<*>>()
+        node.childComponents().lastOrNull()?.let {
+            if (it.key != componentKey) {
+                node.dropLastChildComponent()
                 droppedChildList.add(it)
-                val innerDroppedChildList = dropChildUntilFoundKey(node, screenKey)
+                val innerDroppedChildList = dropChildUntilFoundKey(node, componentKey)
                 droppedChildList.addAll(innerDroppedChildList)
             } else return@let
         }
         return droppedChildList
     }
 
-    private fun dropNodeUntilFoundKey(node: Node?, screenKey: String): List<Node> {
+    private fun dropNodeUntilFoundKey(node: Node?, componentKey: String): List<Node> {
         val droppedNodes = ArrayList<Node>()
-        if (node != null && node.screen.key != screenKey) {
+        if (node != null && node.rootComponent.key != componentKey) {
             droppedNodes.add(node)
             val modifiedTree = tree.value.toMutableList().apply {
                 removeLastOrNull()
             }
             tree.value = modifiedTree
-            val newDroppedNodes = dropNodeUntilFoundKey(node.parent, screenKey)
+            val newDroppedNodes = dropNodeUntilFoundKey(node.parent, componentKey)
             droppedNodes.addAll(newDroppedNodes)
         }
         return droppedNodes
@@ -342,14 +342,14 @@ internal class TreeRouterImpl(
 
     private fun cleanGraph() {
         tree.value.forEach { node ->
-            node.childScreens().forEach { childScreen ->
-                destroyChildRouters(childScreen.key)
-                childScreen.onDestroy()
-                keyManager.remove(childScreen.key)
+            node.childComponents().forEach { childComponent ->
+                destroyChildRouters(childComponent.key)
+                childComponent.onDestroy()
+                keyManager.remove(childComponent.key)
             }
-            destroyChildRouters(node.screen.key)
-            node.screen.onDestroy()
-            keyManager.remove(node.screen.key)
+            destroyChildRouters(node.rootComponent.key)
+            node.rootComponent.onDestroy()
+            keyManager.remove(node.rootComponent.key)
         }
         tree.value = emptyList()
 
@@ -369,8 +369,8 @@ internal class TreeRouterImpl(
 
     private fun fetchNode() {
         _isRouterEmpty.value = currentNode == null
-        _currentScreenFlow.value = currentNode?.screen
-        _currentChildFlow.value = currentNode?.childScreens() ?: emptyList()
+        _currentComponentFlow.value = currentNode?.rootComponent
+        _currentChildFlow.value = currentNode?.childComponents() ?: emptyList()
         _currentCompositionsFlow.value = currentNode?.compositions() ?: emptyMap()
     }
 }

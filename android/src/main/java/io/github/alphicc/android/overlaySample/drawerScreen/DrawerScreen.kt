@@ -8,14 +8,14 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import com.alphicc.brick.Screen
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 
-val drawerScreen = Screen(
+val drawerScreen = Component(
     key = "drawerScreen",
     onCreate = { _, argument ->
         val router = argument.get<TreeRouter>()
-        return@Screen DrawerViewModel(router)
+        return@Component DrawerViewModel(router)
     },
     content = { dataContainer, _ ->
         val viewModel = dataContainer.get<DrawerViewModel>()

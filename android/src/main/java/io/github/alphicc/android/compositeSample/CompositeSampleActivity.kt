@@ -10,23 +10,23 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.alphicc.brick.AndroidScreensContainer
-import com.alphicc.brick.Screen
+import com.alphicc.brick.AndroidComponentsContainer
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 
 val compositeSampleRouter: TreeRouter = TreeRouter.new()
 
-val compositeScreenInternal1 = Screen<Unit>(
+val component1 = Component<Unit>(
     key = "CompositeScreenInternal 1",
     content = { _, _ -> Text("CompositeScreenInternal 1") }
 )
 
-val compositeScreenInternal2 = Screen<Unit>(
+val component2 = Component<Unit>(
     key = "CompositeScreenInternal 2",
     content = { _, _ -> Text("CompositeScreenInternal 2") }
 )
 
-val compositeScreenInternal3 = Screen<Unit>(
+val component3 = Component<Unit>(
     key = "CompositeScreenInternal 3",
     content = { _, _ ->
         Button({}) {
@@ -35,20 +35,20 @@ val compositeScreenInternal3 = Screen<Unit>(
     }
 )
 
-val compositeScreen = Screen<Unit>(
+val compositeScreen = Component<Unit>(
     key = "CompositeScreen",
     content = { _, compositeContainer ->
         Box(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.align(Alignment.TopCenter)) {
-                compositeContainer.place(compositeScreenInternal1.key)
+                compositeContainer.place(component1.key)
             }
 
             Box(modifier = Modifier.align(Alignment.Center)) {
-                compositeContainer.place(compositeScreenInternal3.key)
+                compositeContainer.place(component3.key)
             }
 
             Box(modifier = Modifier.align(Alignment.BottomCenter)) {
-                compositeContainer.place(compositeScreenInternal2.key)
+                compositeContainer.place(component2.key)
             }
         }
     }
@@ -62,16 +62,16 @@ class CompositeSampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidScreensContainer(compositeSampleRouter) {
+            AndroidComponentsContainer(compositeSampleRouter) {
                 finish()
             }
         }
 
         if (savedInstanceState == null) {
-            compositeSampleRouter.addScreen(compositeScreen)
-            compositeSampleRouter.attachCompositeScreen(compositeScreenInternal1, "321")
-            compositeSampleRouter.attachCompositeScreen(compositeScreenInternal2)
-            compositeSampleRouter.attachCompositeScreen(compositeScreenInternal3)
+            compositeSampleRouter.addComponent(compositeScreen)
+            compositeSampleRouter.attachCompositeComponent(component1, "321")
+            compositeSampleRouter.attachCompositeComponent(component2)
+            compositeSampleRouter.attachCompositeComponent(component3)
         }
     }
 }

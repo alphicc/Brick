@@ -9,7 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.AndroidAnimatedScreensContainer
+import com.alphicc.brick.AndroidAnimatedComponentsContainer
 import com.alphicc.brick.TreeRouter
 
 @ExperimentalAnimationApi
@@ -28,7 +28,7 @@ fun BottomMenuScreen(
                 .padding(bottom = 48.dp)
                 .fillMaxSize()
         ) {
-            AndroidAnimatedScreensContainer(containerRouter)
+            AndroidAnimatedComponentsContainer(containerRouter)
         }
 
         Row(
