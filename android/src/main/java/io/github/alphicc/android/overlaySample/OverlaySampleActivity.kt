@@ -3,7 +3,7 @@ package io.github.alphicc.android.overlaySample
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.alphicc.brick.AndroidScreensContainer
+import com.alphicc.brick.AndroidComponentsContainer
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.android.overlaySample.listScreen.listScreen
 
@@ -15,11 +15,13 @@ class OverlaySampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidScreensContainer(overlaySampleRouter)
+            AndroidComponentsContainer(overlaySampleRouter) {
+                finish()
+            }
         }
 
         if (savedInstanceState == null) {
-            overlaySampleRouter.addScreen(listScreen, overlaySampleRouter)
+            overlaySampleRouter.addComponent(listScreen, overlaySampleRouter)
         }
     }
 }

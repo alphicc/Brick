@@ -6,6 +6,6 @@ import io.github.alphicc.android.largeSample.screens.Screens
 class WelcomeViewModel(private val treeRouter: TreeRouter) {
 
     fun onNextClicked() {
-        treeRouter.addScreen(Screens.bottomMenuScreen)
+        treeRouter.addComponent(Screens.bottomMenuScreen)
     }
 }

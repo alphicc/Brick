@@ -6,6 +6,6 @@ import io.github.alphicc.desktop.Screens
 class InnerNavigationViewModel(private val router: TreeRouter) {
 
     fun onInnerNavigationClicked() {
-        router.addScreen(Screens.somethingDetailsScreen, router)
+        router.addComponent(Screens.somethingDetailsScreen, router)
     }
 }

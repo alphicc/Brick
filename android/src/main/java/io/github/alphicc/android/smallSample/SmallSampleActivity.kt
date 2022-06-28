@@ -17,62 +17,68 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.AndroidScreensContainer
-import com.alphicc.brick.Screen
+import com.alphicc.brick.AndroidComponentsContainer
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 import java.util.*
 
 val smallSampleRouter: TreeRouter = TreeRouter.new()
 
-val screen1 = Screen<Unit>(
+val screen1 = Component<Unit>(
     key = "1",
-    content = { SimpleScreen(1, "new") { smallSampleRouter.addScreen(screen2) } }
-)
+    content = { _, _ ->
+        SimpleScreen(1, "new") { smallSampleRouter.addComponent(screen2) }
+    })
 
-val screen2 = Screen<Unit>(
+val screen2 = Component<Unit>(
     key = "2",
-    content = { SimpleScreen(2, "new") { smallSampleRouter.addScreen(screen3) } }
-)
+    content = { _, _ ->
+        SimpleScreen(2, "new") { smallSampleRouter.addComponent(screen3) }
+    })
 
-val screen3 = Screen<Unit>(
+val screen3 = Component<Unit>(
     key = "3",
-    content = { SimpleScreen(3, "new") { smallSampleRouter.addScreen(screen4) } }
-)
+    content = { _, _ ->
+        SimpleScreen(3, "new") { smallSampleRouter.addComponent(screen4) }
+    })
 
-val screen4 = Screen<Unit>(
+val screen4 = Component<Unit>(
     key = "4",
-    content = { SimpleScreen(4, "replace") { smallSampleRouter.replaceScreen(screen5) } }
-)
+    content = { _, _ ->
+        SimpleScreen(4, "replace") { smallSampleRouter.replaceComponent(screen5) }
+    })
 
-val screen5 = Screen<Unit>(
+val screen5 = Component<Unit>(
     key = "5",
-    content = { SimpleScreen(5, "addChild") { smallSampleRouter.addChild(screenChild1) } }
-)
+    content = { _, _ ->
+        SimpleScreen(5, "addChild") { smallSampleRouter.addChild(screenChild1) }
+    })
 
-val screenChild1 = Screen<Unit>(
+val screenChild1 = Component<Unit>(
     key = "C1",
-    content = { Child(10, "newChild") { smallSampleRouter.addChild(screenChild2) } }
-)
+    content = { _, _ ->
+        Child(10, "newChild") { smallSampleRouter.addChild(screenChild2) }
+    })
 
-val screenChild2 = Screen<Unit>(
+val screenChild2 = Component<Unit>(
     key = "C2",
-    content = { Child(20, "newChild") { smallSampleRouter.addChild(screenChild3) } }
-)
+    content = { _, _ ->
+        Child(20, "newChild") { smallSampleRouter.addChild(screenChild3) }
+    })
 
-val screenChild3 = Screen<Unit>(
+val screenChild3 = Component<Unit>(
     key = "C3",
-    content = { Child(30, "newChild") { smallSampleRouter.addChild(screenChild4) } }
-)
+    content = { _, _ ->
+        Child(30, "newChild") { smallSampleRouter.addChild(screenChild4) }
+    })
 
-val screenChild4 = Screen<Unit>(
+val screenChild4 = Component<Unit>(
     key = "C4",
-    content = { Child(40, "replaceChild") { smallSampleRouter.replaceChild(screenChild5) } }
-)
+    content = { _, _ ->
+        Child(40, "replaceChild") { smallSampleRouter.replaceChild(screenChild5) }
+    })
 
-val screenChild5 = Screen<Unit>(
-    key = "C5",
-    content = { ChildExt(50) }
-)
+val screenChild5 = Component<Unit>(key = "C5", content = { _, _ -> ChildExt(50) })
 
 @ExperimentalAnimationApi
 class SmallSampleActivity : ComponentActivity() {
@@ -81,11 +87,13 @@ class SmallSampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidScreensContainer(smallSampleRouter)
+            AndroidComponentsContainer(smallSampleRouter) {
+                finish()
+            }
         }
 
         if (savedInstanceState == null) {
-            smallSampleRouter.addScreen(screen1)
+            smallSampleRouter.addComponent(screen1)
         }
     }
 }
@@ -95,25 +103,20 @@ private fun SimpleScreen(int: Int, actionTitle: String, action: () -> Unit) {
 
     val color = remember {
         val rnd = Random()
-        val color =
-            android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+        val color = android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         Color(color)
     }
 
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(color = color)
+        modifier = Modifier.fillMaxSize().background(color = color)
     ) {
 
         Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = int.toString()
+            modifier = Modifier.align(Alignment.Center), text = int.toString()
         )
 
         Button(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            onClick = action
+            modifier = Modifier.align(Alignment.BottomCenter), onClick = action
         ) {
             Text(text = actionTitle)
         }
@@ -125,26 +128,20 @@ fun Child(int: Int, actionTitle: String, action: () -> Unit) {
 
     val color = remember {
         val rnd = Random()
-        val color =
-            android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+        val color = android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         Color(color)
     }
 
     Box(
-        modifier = Modifier
-            .padding(32.dp)
-            .fillMaxSize()
-            .background(color = color)
+        modifier = Modifier.padding(32.dp).fillMaxSize().background(color = color)
     ) {
 
         Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = int.toString()
+            modifier = Modifier.align(Alignment.Center), text = int.toString()
         )
 
         Button(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            onClick = action
+            modifier = Modifier.align(Alignment.BottomCenter), onClick = action
         ) {
             Text(text = actionTitle)
         }
@@ -157,21 +154,16 @@ fun ChildExt(int: Int) {
 
     val color = remember {
         val rnd = Random()
-        val color =
-            android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+        val color = android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         Color(color)
     }
 
     Box(
-        modifier = Modifier
-            .padding(4.dp)
-            .size(64.dp)
-            .background(color = color)
+        modifier = Modifier.padding(4.dp).size(64.dp).background(color = color)
     ) {
 
         Text(
-            modifier = Modifier.align(Alignment.Center),
-            text = int.toString()
+            modifier = Modifier.align(Alignment.Center), text = int.toString()
         )
     }
 }

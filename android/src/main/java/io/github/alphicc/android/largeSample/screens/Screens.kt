@@ -1,10 +1,9 @@
 package io.github.alphicc.android.largeSample.screens
 
-import android.util.Log
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.alphicc.brick.Screen
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.android.largeSample.screens.blueSquareChild.BlueSquareContent
 import io.github.alphicc.android.largeSample.screens.blueSquareChild.BlueSquareViewModel
@@ -28,23 +27,23 @@ import io.github.alphicc.android.largeSample.screens.welcome.WelcomeViewModel
 @OptIn(ExperimentalAnimationApi::class)
 object Screens {
 
-    val welcomeScreen = Screen(
+    val welcomeScreen = Component(
         key = "Welcome",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
-            return@Screen WelcomeViewModel(router)
+            return@Component WelcomeViewModel(router)
         },
-        content = {
-            val viewModel = it.get<WelcomeViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<WelcomeViewModel>()
             Welcome(viewModel::onNextClicked)
         }
     )
 
-    val bottomMenuScreen = Screen(
+    val bottomMenuScreen = Component(
         key = "BottomMenuScreen",
         onCreate = { _, _ -> BottomMenuViewModel() },
-        content = {
-            val viewModel = it.get<BottomMenuViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<BottomMenuViewModel>()
             val defaultIndex by viewModel.startScreenIndex.collectAsState()
             val containerRouter by viewModel.containerRouter.collectAsState()
 
@@ -58,33 +57,33 @@ object Screens {
         }
     )
 
-    val innerNavigationScreen = Screen(
+    val innerNavigationScreen = Component(
         key = "InnerNavigationContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             InnerNavigationViewModel(router)
         },
-        content = {
-            val viewModel = it.get<InnerNavigationViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<InnerNavigationViewModel>()
             InnerNavigationContent(viewModel::onInnerNavigationClicked, "SubScreen Menu1")
         }
     )
 
-    val channelArgumentReceiveScreen = Screen(
+    val channelArgumentReceiveScreen = Component(
         key = "ChannelArgumentReceiveContent",
-        onCreate = { channel, _ -> return@Screen ChannelArgumentReceiveViewModel(channel) },
+        onCreate = { channel, _ -> return@Component ChannelArgumentReceiveViewModel(channel) },
         onDestroy = {
             val viewModel = it.get<ChannelArgumentReceiveViewModel>()
             viewModel.onDestroy()
         },
-        content = {
-            val secondContentViewModel = it.get<ChannelArgumentReceiveViewModel>()
+        content = { dataContainer, _ ->
+            val secondContentViewModel = dataContainer.get<ChannelArgumentReceiveViewModel>()
             val count by secondContentViewModel.count.collectAsState()
             ChannelArgumentReceiveContent(count)
         }
     )
 
-    val channelArgumentSendScreen = Screen(
+    val channelArgumentSendScreen = Component(
         key = "ChannelArgumentSendContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
@@ -94,56 +93,56 @@ object Screens {
             val viewModel = it.get<ChannelArgumentSendViewModel>()
             viewModel.onDestroy()
         },
-        content = {
-            val viewModel = it.get<ChannelArgumentSendViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<ChannelArgumentSendViewModel>()
             ChannelArgumentSendContent("SubScreen Menu3", viewModel::onIncrementClicked)
         }
     )
 
-    val somethingDetailsScreen = Screen(
+    val somethingDetailsScreen = Component(
         key = "SomethingDetailsContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             SomethingDetailsViewModel(router)
         },
-        content = {
-            val viewModel = it.get<SomethingDetailsViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<SomethingDetailsViewModel>()
             SomethingDetailsContent(viewModel)
         }
     )
 
-    val childNavigationContentScreen = Screen(
+    val childNavigationContentScreen = Component(
         key = "ChildNavigationContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             ChildNavigationViewModel(router)
         },
-        content = {
-            val viewModel = it.get<ChildNavigationViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<ChildNavigationViewModel>()
             ChildNavigationContent(viewModel)
         }
     )
 
-    val redSquareScreen = Screen(
+    val redSquareScreen = Component(
         key = "RedSquareContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             RedSquareViewModel(router)
         },
-        content = {
-            val viewModel = it.get<RedSquareViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<RedSquareViewModel>()
             RedSquareContent(viewModel)
         }
     )
 
-    val blueSquareScreen = Screen(
+    val blueSquareScreen = Component(
         key = "BlueSquareContent",
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             BlueSquareViewModel(router)
         },
-        content = {
-            val viewModel = it.get<BlueSquareViewModel>()
+        content = { dataContainer, _ ->
+            val viewModel = dataContainer.get<BlueSquareViewModel>()
             BlueSquareContent(viewModel)
         }
     )

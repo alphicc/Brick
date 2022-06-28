@@ -3,11 +3,11 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "1.1.0"
+    id("org.jetbrains.compose") version "1.1.1"
 }
 
 group = "io.github.alphicc"
-version = "1.0"
+version = "1.0.0"
 
 kotlin {
     jvm {
@@ -19,12 +19,14 @@ kotlin {
     sourceSets {
         val jvmMain by getting {
             dependencies {
-                implementation("io.github.alphicc:brick:1.0.0-beta03")
+                implementation(project(":brick"))
+
+                //implementation("io.github.alphicc:brick:1.0.0-beta03")
+                implementation("org.jetbrains.kotlinx:kotlinx-coroutines-swing:1.6.2")
                 implementation(compose.desktop.currentOs)
                 api(compose.preview)
             }
         }
-        val jvmTest by getting
     }
 }
 

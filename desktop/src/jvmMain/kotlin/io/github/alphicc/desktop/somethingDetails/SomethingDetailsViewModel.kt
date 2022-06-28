@@ -6,6 +6,6 @@ import io.github.alphicc.desktop.Screens
 class SomethingDetailsViewModel(private val router: TreeRouter) {
 
     fun onNextBtnClicked() {
-        router.addScreen(Screens.childNavigationContentScreen, router)
+        router.addComponent(Screens.childNavigationContentScreen, router)
     }
 }

@@ -1,6 +1,7 @@
 val kotlin_version: String by properties
 val compose_version: String by properties
 val coroutines_version: String by properties
+val atomicfu_version: String by properties
 val activity_compose_version: String by properties
 val VERSION_NAME: String by properties
 
@@ -26,13 +27,10 @@ kotlin {
     sourceSets {
         val commonMain by getting {
             dependencies {
-                implementation(compose.runtime)
-                implementation(compose.foundation)
+                implementation("org.jetbrains.compose.runtime:runtime:${compose_version}")
+                implementation("org.jetbrains.compose.foundation:foundation:${compose_version}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}")
-            }
-        }
-        val commonTest by getting {
-            dependencies {
+                implementation("org.jetbrains.kotlinx:atomicfu:${atomicfu_version}")
             }
         }
         val androidMain by getting {
@@ -40,15 +38,6 @@ kotlin {
                 implementation("androidx.activity:activity-compose:${activity_compose_version}")
             }
         }
-        val androidTest by getting {
-            dependencies {
-            }
-        }
-        val desktopMain by getting {
-            dependencies {
-            }
-        }
-        val desktopTest by getting
     }
 }
 

@@ -6,7 +6,7 @@ import io.github.alphicc.desktop.Screens
 class ChildNavigationViewModel(private val router: TreeRouter) {
 
     fun onBackClicked() {
-        router.backScreen()
+        router.backComponent()
     }
 
     fun onForwardClicked() {

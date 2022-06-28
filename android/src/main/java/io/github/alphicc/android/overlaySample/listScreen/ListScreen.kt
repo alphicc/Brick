@@ -1,7 +1,6 @@
 package io.github.alphicc.android.overlaySample.listScreen
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.Icon
@@ -15,17 +14,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.Screen
+import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
 
-val listScreen = Screen(
+val listScreen = Component(
     key = "listScreen",
     onCreate = { _, argument ->
         val router = argument.get<TreeRouter>()
-        return@Screen ListViewModel(router)
+        return@Component ListViewModel(router)
     },
-    content = { argument ->
-        val viewModel = argument.get<ListViewModel>()
+    content = { dataContainer, _ ->
+        val viewModel = dataContainer.get<ListViewModel>()
         ListScreenContent(viewModel)
     }
 )

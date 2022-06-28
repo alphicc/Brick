@@ -14,6 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import io.github.alphicc.android.compositeSample.CompositeSampleActivity
+import io.github.alphicc.android.compositeSample.compositeSampleRouter
 import io.github.alphicc.android.largeSample.LargeSampleActivity
 import io.github.alphicc.android.largeSample.largeSampleRouter
 import io.github.alphicc.android.overlaySample.OverlaySampleActivity
@@ -53,6 +55,13 @@ class MainActivity : ComponentActivity() {
                     context.startActivity(Intent(context, OverlaySampleActivity::class.java))
                 }) {
                     Text(text = "Overlay")
+                }
+
+                Button(modifier = Modifier.padding(top = 16.dp), onClick = {
+                    compositeSampleRouter.cleanRouter()
+                    context.startActivity(Intent(context, CompositeSampleActivity::class.java))
+                }) {
+                    Text(text = "Composite navigation")
                 }
             }
         }
