@@ -318,3 +318,28 @@ channel.onEach { _count.value = it.get() }.launchIn(scope)
 + newRootComponent
 + attachCompositeComponent
 + detachCompositeComponent
+
+## Migrate from 1.* to 2.* version
++ Rename **AndroidAnimatedScreensContainer** to **AndroidAnimatedComponentsContainer**
++ Rename **AndroidScreensContainer** to **AndroidComponentsContainer**
++ Rename **DesktopAnimatedScreensContainer** to **DesktopAnimatedComponentsContainer**
++ Rename **DesktopScreensContainer** to **DesktopComponentsContainer**
++ To handle router empty action provide **onRouterEmpty** callback into **%PLATFORM%ComponentsContainer**
++ Rename **Screen\<T>** to **Component\<T>**
++ Inside **Component\<T>** change
+```kotlin
+...
+content = { dataContainer ->  }
+...
+//to
+...
+content = { dataContainer, compositeContainer ->  }
+...
+```
++ Rename **currentScreenKey** to **currentComponentKey**
++ Rename **backScreen** to **backComponent**
++ Rename **backToScreen** to **backToComponent**
++ Rename **replaceScreen** to **replaceComponent**
++ Rename **addScreen** to **addComponent**
++ Rename **newRootScreen** to **newRootComponent**
++ To fix other package changes just reimport
