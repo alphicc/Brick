@@ -20,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import com.alphicc.brick.AndroidComponentsContainer
 import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
+import kotlinx.coroutines.flow.filterIsInstance
 import java.util.*
 
 val smallSampleRouter: TreeRouter = TreeRouter.new()
@@ -27,7 +28,10 @@ val smallSampleRouter: TreeRouter = TreeRouter.new()
 val screen1 = Component<Unit>(
     key = "1",
     content = { _, _ ->
-        SimpleScreen(1, "new") { smallSampleRouter.addComponent(screen2) }
+        SimpleScreen(1, "new") {
+            smallSampleRouter.broadcastFlow.filterIsInstance<String>()
+            smallSampleRouter.addComponent(screen2)
+        }
     })
 
 val screen2 = Component<Unit>(
