@@ -23,7 +23,7 @@ interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRo
 
     suspend fun <A> passArgument(componentKey: String, argument: A)
 
-    suspend fun <A> passBroadcastArgument(componentKey: String, argument: A)
+    suspend fun <A> passBroadcastArgument(argument: A)
 
     companion object {
         fun new(): TreeRouter = TreeRouterImpl()

@@ -133,7 +133,7 @@ internal class TreeRouterImpl(
         redirectArgument(this, componentKey, argument)
     }
 
-    override suspend fun <A> passBroadcastArgument(componentKey: String, argument: A) {
+    override suspend fun <A> passBroadcastArgument(argument: A) {
         _broadcastFlow.emit(argument as Any)
     }
 
