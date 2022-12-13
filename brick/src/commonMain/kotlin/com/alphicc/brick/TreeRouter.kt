@@ -1,9 +1,13 @@
 package com.alphicc.brick
 
-interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRouter, ChildComponentRouter, ArgumentTranslator {
+import kotlinx.coroutines.flow.SharedFlow
+
+interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRouter, ChildComponentRouter,
+    ArgumentTranslator {
 
     val initialComponent: Component<*>?
     val parentRouter: TreeRouter?
+    val broadcastFlow: SharedFlow<Any>
 
     fun getRootRouter(): TreeRouter
 
@@ -18,6 +22,8 @@ interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRo
     fun removeOverlay()
 
     suspend fun <A> passArgument(componentKey: String, argument: A)
+
+    suspend fun <A> passBroadcastArgument(argument: A)
 
     companion object {
         fun new(): TreeRouter = TreeRouterImpl()

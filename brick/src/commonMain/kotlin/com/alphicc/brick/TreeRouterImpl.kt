@@ -2,8 +2,7 @@ package com.alphicc.brick
 
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.*
 
 internal class TreeRouterImpl(
     override val initialComponent: Component<*>? = null,
@@ -16,6 +15,7 @@ internal class TreeRouterImpl(
     private val _currentComponentFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
     private val _currentChildFlow: MutableStateFlow<List<Component<*>>> = MutableStateFlow(emptyList())
     private val _isRouterEmpty: MutableStateFlow<Boolean> = MutableStateFlow(true)
+    private val _broadcastFlow: MutableSharedFlow<Any> = MutableSharedFlow(replay = 1, extraBufferCapacity = 10)
 
     private val childRouters: AtomicRef<List<Pair<String, TreeRouter>>> = atomic(emptyList())
     private val tree: AtomicRef<List<Node>> = atomic(emptyList())
@@ -31,6 +31,8 @@ internal class TreeRouterImpl(
     override val compositions: StateFlow<Map<String, Component<*>>> = _currentCompositionsFlow
 
     override val isRouterEmpty: StateFlow<Boolean> = _isRouterEmpty
+
+    override val broadcastFlow: MutableSharedFlow<Any> = _broadcastFlow
 
     override fun currentComponentKey(): String? = mainComponent.value?.key
 
@@ -129,6 +131,10 @@ internal class TreeRouterImpl(
 
     override suspend fun <A> passArgument(componentKey: String, argument: A) {
         redirectArgument(this, componentKey, argument)
+    }
+
+    override suspend fun <A> passBroadcastArgument(argument: A) {
+        _broadcastFlow.emit(argument as Any)
     }
 
     override fun backToComponent(key: String) {

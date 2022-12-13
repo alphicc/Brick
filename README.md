@@ -1,4 +1,4 @@
-![MAVEN](https://img.shields.io/badge/Maven-v2.0.0-blue) ![Platform](https://img.shields.io/badge/platform-android-green?color=lightgray) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen) ![Platform](https://img.shields.io/badge/platform-desktop-green?color=lightgray)
+![MAVEN](https://img.shields.io/badge/Maven-v2.1.1-blue) ![Platform](https://img.shields.io/badge/platform-android-green?color=lightgray) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen) ![Platform](https://img.shields.io/badge/platform-desktop-green?color=lightgray)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/main/media/logo.png"/>
     <br>
@@ -95,7 +95,7 @@ Add the dependency in your build.gradle
 ```kotlin
 dependencies {
     //Brick
-    implementation 'io.github.alphicc:brick:2.0.0'
+    implementation 'io.github.alphicc:brick:2.1.1'
 }
 ```
 
@@ -288,6 +288,16 @@ compositeSampleRouter.detachCompositeComponent(component3) // use to detach comp
 // Screens.channelArgumentReceiveComponent.key - key of your destination component
 // counter - argument
 router.passArgument(Screens.channelArgumentReceiveComponent.key, counter)
+// Also you can pass broadcast argument to SharedFlow
+val argument: CustomArgumentType = CustomArgumentType()
+router.passBroadcastArgument(argument) // Use it to pass argument to SharedFlow
+
+router.broadcastFlow // Use it to receive arguments from SharedFlow
+    .filterIsInstance<CustomArgumentType>()
+    .onEach { argument ->
+        
+    }
+    ...
 ```
 
 **Receive data**
