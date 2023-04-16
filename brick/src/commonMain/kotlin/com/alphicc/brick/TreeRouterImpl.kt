@@ -2,7 +2,9 @@ package com.alphicc.brick
 
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 internal class TreeRouterImpl(
     override val initialComponent: Component<*>? = null,
@@ -208,19 +210,26 @@ internal class TreeRouterImpl(
         from: ArgumentTranslator,
         componentKey: String,
         argument: A
-    ) {
-        if (parentRouter !== from) {
-            parentRouter?.redirectArgument(this, componentKey, argument)
+    ): Boolean {
+        val isEmitted = emitArguments(componentKey, argument)
+        if (isEmitted) return true
+        childRouters.value.forEach {
+            val isEmittedChildRouter = it.second.redirectArgument(this, componentKey, argument)
+            if (isEmittedChildRouter) return true
         }
-        childRouters.value.forEach { it.second.redirectArgument(this, componentKey, argument) }
-        emitArguments(componentKey, argument)
+        if (parentRouter !== from) {
+            val isEmittedParentRouter = parentRouter?.redirectArgument(this, componentKey, argument)
+            if (isEmittedParentRouter == true) return true
+        }
+        return false
     }
 
-    private suspend fun <A> emitArguments(componentKey: String, argument: A) {
+    private suspend fun <A> emitArguments(componentKey: String, argument: A): Boolean {
         _currentOverlayFlow.value?.let { overlayComponent ->
             if (overlayComponent.key == componentKey) {
                 val dataContainer = DataContainer(argument)
                 overlayComponent.channel.emit(dataContainer)
+                return true
             }
         }
 
@@ -229,6 +238,7 @@ internal class TreeRouterImpl(
                 if (it.key == componentKey) {
                     val dataContainer = DataContainer(argument)
                     it.channel.emit(dataContainer)
+                    return true
                 }
             }
 
@@ -236,14 +246,17 @@ internal class TreeRouterImpl(
                 if (entry.key == componentKey) {
                     val dataContainer = DataContainer(argument)
                     entry.value.channel.emit(dataContainer)
+                    return true
                 }
             }
 
             if (node.rootComponent.key == componentKey) {
                 val dataContainer = DataContainer(argument)
                 node.rootComponent.channel.emit(dataContainer)
+                return true
             }
         }
+        return false
     }
 
     private fun <A> addChildNode(component: Component<*>, argument: A?) {
