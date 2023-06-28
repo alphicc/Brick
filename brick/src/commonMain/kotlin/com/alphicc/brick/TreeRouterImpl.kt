@@ -8,7 +8,8 @@ import kotlinx.coroutines.flow.StateFlow
 
 internal class TreeRouterImpl(
     override val initialComponent: Component<*>? = null,
-    override val parentRouter: TreeRouter? = null
+    override val parentRouter: TreeRouter? = null,
+    config: RouterConfig
 ) : TreeRouter {
 
     private val keyManager = KeyManager()
@@ -17,7 +18,10 @@ internal class TreeRouterImpl(
     private val _currentComponentFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
     private val _currentChildFlow: MutableStateFlow<List<Component<*>>> = MutableStateFlow(emptyList())
     private val _isRouterEmpty: MutableStateFlow<Boolean> = MutableStateFlow(true)
-    private val _broadcastFlow: MutableSharedFlow<Any> = MutableSharedFlow(replay = 1, extraBufferCapacity = 10)
+    private val _broadcastFlow: MutableSharedFlow<Any> = MutableSharedFlow(
+        replay = config.broadcastFlowReplay,
+        extraBufferCapacity = config.broadcastFlowExtraBufferCapacity
+    )
 
     private val childRouters: AtomicRef<List<Pair<String, TreeRouter>>> = atomic(emptyList())
     private val tree: AtomicRef<List<Node>> = atomic(emptyList())
@@ -102,8 +106,11 @@ internal class TreeRouterImpl(
         fetchNode()
     }
 
-    override fun branch(containerComponentKey: String): TreeRouter {
-        val newRouter = TreeRouterImpl(initialComponent, this)
+    override fun branch(containerComponentKey: String): TreeRouter =
+        branch(containerComponentKey, RouterConfig.default())
+
+    override fun branch(containerComponentKey: String, config: RouterConfig): TreeRouter {
+        val newRouter = TreeRouterImpl(initialComponent, this, config)
         val childRouters = childRouters.value.toMutableList()
         childRouters.add(containerComponentKey to newRouter)
         this.childRouters.value = childRouters

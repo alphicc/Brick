@@ -15,6 +15,8 @@ interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRo
 
     fun branch(containerComponentKey: String): TreeRouter
 
+    fun branch(containerComponentKey: String, config: RouterConfig): TreeRouter
+
     fun setOverlay(component: Component<*>)
 
     fun <A> setOverlay(component: Component<*>, argument: A)
@@ -26,6 +28,7 @@ interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRo
     suspend fun <A> passBroadcastArgument(argument: A)
 
     companion object {
-        fun new(): TreeRouter = TreeRouterImpl()
+        fun new(): TreeRouter = TreeRouterImpl(config = RouterConfig.default())
+        fun new(config: RouterConfig): TreeRouter = TreeRouterImpl(config = config)
     }
 }
