@@ -386,7 +386,10 @@ internal class TreeRouterImpl(
         val childRouters = childRouters.value.toMutableList()
         childRouters.removeAll {
             if (it.first == key) {
-                it.second.cleanRouter()
+                (it.second as TreeRouterImpl).run {
+                    cleanGraph()
+                    removeOverlay()
+                }
                 true
             } else false
         }
