@@ -14,6 +14,7 @@ fun AndroidComponentsContainer(containerConnector: ContainerConnector, onRouterE
     val childList by containerConnector.childComponentsList.collectAsState()
     val isRouterEmpty by containerConnector.isRouterEmpty.collectAsState()
     val compositions by containerConnector.compositions.collectAsState()
+    val keepAliveNodes by containerConnector.keepAliveNodes.collectAsState()
 
     LaunchedEffect(isRouterEmpty) {
         if (isRouterEmpty) {
@@ -25,17 +26,34 @@ fun AndroidComponentsContainer(containerConnector: ContainerConnector, onRouterE
         containerConnector.onBackClicked()
     }
 
-    component?.run {
-        showContent(
-            dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
-            compositions = compositions
-        )
+    keepAliveNodes.forEach { keepAliveNode ->
+        keepAliveNode.mainComponent?.run {
+            showContent(
+                dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+                compositions = keepAliveNode.compositions
+            )
+        }
+        keepAliveNode.childComponentsList.forEach { childScreen ->
+            childScreen.showContent(
+                dataContainer = childScreen.dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+                compositions = keepAliveNode.compositions
+            )
+        }
     }
-    childList.forEach { childScreen ->
-        childScreen.showContent(
-            dataContainer = childScreen.dependency ?: throw IllegalArgumentException("Dependency can not be null"),
-            compositions = compositions
-        )
+
+    if (component?.keepAliveCompose == false) {
+        component?.run {
+            showContent(
+                dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+                compositions = compositions
+            )
+        }
+        childList.forEach { childScreen ->
+            childScreen.showContent(
+                dataContainer = childScreen.dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+                compositions = compositions
+            )
+        }
     }
     overlay?.run {
         showContent(
