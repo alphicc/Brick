@@ -1,4 +1,4 @@
-![MAVEN](https://img.shields.io/badge/Maven-v2.2.0-blue) ![Platform](https://img.shields.io/badge/platform-android-green?color=lightgray) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen) ![Platform](https://img.shields.io/badge/platform-desktop-green?color=lightgray)
+![MAVEN](https://img.shields.io/badge/Maven-v2.3.0-blue) ![Platform](https://img.shields.io/badge/platform-android-green?color=lightgray) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen) ![Platform](https://img.shields.io/badge/platform-desktop-green?color=lightgray)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/main/media/logo.png"/>
     <br>
@@ -95,7 +95,7 @@ Add the dependency in your build.gradle
 ```kotlin
 dependencies {
     //Brick
-    implementation 'io.github.alphicc:brick:2.1.1'
+    implementation 'io.github.alphicc:brick:2.3.0'
 }
 ```
 
@@ -142,6 +142,11 @@ class SmallSampleActivity : ComponentActivity() {
         setContent {
             AndroidComponentsContainer(containerConnector) {
                 //on router empty callback
+                //called only one router
+                //e.g. : [ParentRouter] (has [ChildRouter1], [ChildRouter2] )
+                //ChildRouter1.cleanRouter -> onRouterEmpty called only inside ChildRouter1
+                //ParentRouter.cleanRouter -> onRouterEmpty called only inside ParentRouter
+                //When you called newRootComponent inside ParentRouter, ChildRouter# onRouterEmpty method didn't called
             }
         }
     }
@@ -249,6 +254,7 @@ Components.
 ```kotlin
 val component1 = Component<Unit>(
     key = "CompositeScreenInternal 1",
+    keepAliveCompose = true, //to keep compose ui in the graph (NOTE!!! ANIMATION DIDN'T WORK WITH keepAliveCompose = true. default = false)
     onCreate = { _, _ -> }, lifecycle of your componentg
     onDestroy = { _ -> },
     content = { _, _ -> Text("CompositeScreenInternal 1") }

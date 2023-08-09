@@ -27,6 +27,7 @@ val smallSampleRouter: TreeRouter = TreeRouter.new()
 
 val screen1 = Component<Unit>(
     key = "1",
+    keepAliveCompose = true,
     content = { _, _ ->
         SimpleScreen(1, "new") {
             smallSampleRouter.broadcastFlow.filterIsInstance<String>()
@@ -48,6 +49,7 @@ val screen3 = Component<Unit>(
 
 val screen4 = Component<Unit>(
     key = "4",
+    keepAliveCompose = false,
     content = { _, _ ->
         SimpleScreen(4, "replace") { smallSampleRouter.replaceComponent(screen5) }
     })

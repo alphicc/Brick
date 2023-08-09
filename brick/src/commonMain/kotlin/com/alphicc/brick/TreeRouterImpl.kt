@@ -13,6 +13,7 @@ internal class TreeRouterImpl(
 ) : TreeRouter {
 
     private val keyManager = KeyManager()
+    private val _keepAliveNode: MutableStateFlow<List<KeepAliveNode>> = MutableStateFlow(emptyList())
     private val _currentCompositionsFlow: MutableStateFlow<Map<String, Component<*>>> = MutableStateFlow(emptyMap())
     private val _currentOverlayFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
     private val _currentComponentFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
@@ -35,6 +36,8 @@ internal class TreeRouterImpl(
     override val childComponentsList: StateFlow<List<Component<*>>> = _currentChildFlow
 
     override val compositions: StateFlow<Map<String, Component<*>>> = _currentCompositionsFlow
+
+    override val keepAliveNodes: StateFlow<List<KeepAliveNode>> = _keepAliveNode
 
     override val isRouterEmpty: StateFlow<Boolean> = _isRouterEmpty
 
@@ -401,5 +404,14 @@ internal class TreeRouterImpl(
         _currentComponentFlow.value = currentNode?.rootComponent
         _currentChildFlow.value = currentNode?.childComponents() ?: emptyList()
         _currentCompositionsFlow.value = currentNode?.compositions() ?: emptyMap()
+        _keepAliveNode.value = tree.value
+            .filter { it.rootComponent.keepAliveCompose }
+            .map {
+                KeepAliveNode(
+                    it.rootComponent,
+                    it.childComponents(),
+                    it.compositions()
+                )
+            }
     }
 }

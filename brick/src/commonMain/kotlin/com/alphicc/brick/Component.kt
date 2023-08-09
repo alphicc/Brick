@@ -8,8 +8,9 @@ class Component<D>(
     override val key: String,
     override val onCreate: ((SharedFlow<DataContainer>, DataContainer) -> D)? = null,
     override val onDestroy: ((DataContainer) -> Unit)? = null,
+    override val keepAliveCompose: Boolean = false,
     private val content: @Composable (DataContainer, CompositeContainer) -> Unit
-) : BaseComponent<D>(key, onCreate, onDestroy) {
+) : BaseComponent<D>(key, onCreate, onDestroy, keepAliveCompose) {
 
     @Composable
     internal fun showContent(dataContainer: DataContainer, compositions: Map<String, Component<*>>) {
@@ -22,6 +23,7 @@ open class BaseComponent<D>(
     open val key: String,
     internal open val onCreate: ((SharedFlow<DataContainer>, DataContainer) -> D)?,
     internal open val onDestroy: ((DataContainer) -> Unit)?,
+    internal open val keepAliveCompose: Boolean,
     internal val channel: MutableSharedFlow<DataContainer> = MutableSharedFlow(),
     internal var dependency: DataContainer? = null
 ) {

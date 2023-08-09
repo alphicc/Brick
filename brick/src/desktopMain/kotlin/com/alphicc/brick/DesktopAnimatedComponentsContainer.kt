@@ -23,6 +23,7 @@ fun DesktopAnimatedComponentsContainer(
     val childList by containerConnector.childComponentsList.collectAsState()
     val isRouterEmpty by containerConnector.isRouterEmpty.collectAsState()
     val compositions by containerConnector.compositions.collectAsState()
+    val keepAliveComposeNodes by containerConnector.keepAliveNodes.collectAsState()
 
     LaunchedEffect(isRouterEmpty) {
         if (isRouterEmpty) {
@@ -30,35 +31,55 @@ fun DesktopAnimatedComponentsContainer(
         }
     }
 
-    AnimatedContent(
-        targetState = component,
-        transitionSpec = { enterTransition with exitTransition }
-    ) {
-
-        it?.run {
+    keepAliveComposeNodes.forEach { keepAliveNode ->
+        keepAliveNode.mainComponent?.run {
             showContent(
                 dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
-                compositions = compositions
+                compositions = keepAliveNode.compositions
             )
         }
 
-        if (this.transition.isRunning) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = null,
-                        onClick = {})
+        keepAliveNode.childComponentsList.forEach { childScreen ->
+            childScreen.showContent(
+                dataContainer = childScreen.dependency
+                    ?: throw IllegalArgumentException("Dependency can not be null"),
+                compositions = keepAliveNode.compositions
             )
         }
     }
 
-    childList.forEach { childScreen ->
-        childScreen.showContent(
-            dataContainer = childScreen.dependency ?: throw IllegalArgumentException("Dependency can not be null"),
-            compositions = compositions
-        )
+    if (component?.keepAliveCompose == false) {
+        AnimatedContent(
+            targetState = component,
+            transitionSpec = { enterTransition with exitTransition }
+        ) {
+
+            it?.run {
+                showContent(
+                    dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+                    compositions = compositions
+                )
+            }
+
+            childList.forEach { childScreen ->
+                childScreen.showContent(
+                    dataContainer = childScreen.dependency
+                        ?: throw IllegalArgumentException("Dependency can not be null"),
+                    compositions = compositions
+                )
+            }
+
+            if (this.transition.isRunning) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null,
+                            onClick = {})
+                )
+            }
+        }
     }
 
     overlay?.run {

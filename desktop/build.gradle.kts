@@ -6,7 +6,7 @@ plugins {
 }
 
 group = "io.github.alphicc"
-version = "2.2.1"
+version = "2.3.0"
 
 kotlin {
     jvm {
