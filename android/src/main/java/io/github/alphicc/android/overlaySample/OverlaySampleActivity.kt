@@ -6,8 +6,9 @@ import androidx.activity.compose.setContent
 import com.alphicc.brick.AndroidComponentsContainer
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.android.overlaySample.listScreen.listScreen
+import kotlinx.coroutines.GlobalScope
 
-val overlaySampleRouter = TreeRouter.new()
+val overlaySampleRouter = TreeRouter.new(GlobalScope)
 
 class OverlaySampleActivity : ComponentActivity() {
 

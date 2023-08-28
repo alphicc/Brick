@@ -2,15 +2,19 @@ package com.alphicc.brick
 
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.channels.BufferOverflow
+import kotlinx.coroutines.flow.*
 
 internal class TreeRouterImpl(
     override val initialComponent: Component<*>? = null,
     override val parentRouter: TreeRouter? = null,
+    private val coroutineScope: CoroutineScope,
     config: RouterConfig
 ) : TreeRouter {
+
+    private val _actionReceiver: MutableSharedFlow<UpdateRouterActions> =
+        MutableSharedFlow(replay = 100, extraBufferCapacity = 100, onBufferOverflow = BufferOverflow.DROP_OLDEST)
 
     private val keyManager = KeyManager()
     private val _keepAliveNode: MutableStateFlow<List<KeepAliveNode>> = MutableStateFlow(emptyList())
@@ -45,75 +49,42 @@ internal class TreeRouterImpl(
 
     override fun currentComponentKey(): String? = mainComponent.value?.key
 
-    //return "true" if has back navigation variants else false
-    override fun onBackClicked() {
-        when {
-            currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
-            currentNode?.parent != null -> backComponent()
-            else -> backComponent()
-        }
+    init {
+        observeActionReceiverUpdates()
     }
 
-    override fun attachCompositeComponent(component: Component<*>) =
-        attachCompositeComponentToNode(component, null)
+    //return "true" if has back navigation variants else false
+    override fun onBackClicked() {
+        _actionReceiver.tryEmit(UpdateRouterActions.OnBackClicked)
+    }
 
-    override fun <A> attachCompositeComponent(component: Component<*>, argument: A) =
-        attachCompositeComponentToNode(component, argument)
+    override fun attachCompositeComponent(component: Component<*>) {
+        _actionReceiver.tryEmit(UpdateRouterActions.AttachCompositeComponent(component, null))
+    }
 
-    private fun <A> attachCompositeComponentToNode(component: Component<*>, argument: A?) {
-        val isSuccess = keyManager.add(component.key)
-        if (!isSuccess) return
-        val currentNode = currentNode ?: return
-        component.onCreate(argument)
-        currentNode.addComposition(component)
-        fetchNode()
+    override fun <A> attachCompositeComponent(component: Component<*>, argument: A) {
+        _actionReceiver.tryEmit(UpdateRouterActions.AttachCompositeComponent(component, argument))
     }
 
     override fun detachCompositeComponent(key: String) {
-        val currentNode = currentNode ?: return
-        keyManager.remove(key)
-        val composition = currentNode.compositions()[key]
-        if (composition != null) {
-            composition.onDestroy()
-            currentNode.removeComposition(key)
-            fetchNode()
-        }
+        _actionReceiver.tryEmit(UpdateRouterActions.DetachCompositeComponent(key))
     }
 
     override fun backComponent() {
-        val nodesTree = tree.value
-        nodesTree.lastOrNull()?.let {
-            it.childComponents().forEach { childComponent ->
-                destroyChildRouters(childComponent.key)
-                childComponent.onDestroy()
-                keyManager.remove(childComponent.key)
-            }
-            it.compositions().forEach { entry ->
-                destroyChildRouters(entry.key)
-                entry.value.onDestroy()
-                keyManager.remove(entry.key)
-            }
-            destroyChildRouters(it.rootComponent.key)
-            it.rootComponent.onDestroy()
-            keyManager.remove(it.rootComponent.key)
-            tree.value = nodesTree.dropLast(1)
-            fetchNode()
-        }
+        _actionReceiver.tryEmit(UpdateRouterActions.BackComponent)
     }
 
     override fun getRootRouter(): TreeRouter = parentRouter?.getRootRouter() ?: this
 
     override fun cleanRouter() {
-        cleanGraph()
-        removeOverlay()
-        fetchNode()
+        _actionReceiver.tryEmit(UpdateRouterActions.CleanRouter)
     }
 
     override fun branch(containerComponentKey: String): TreeRouter =
         branch(containerComponentKey, RouterConfig.default())
 
     override fun branch(containerComponentKey: String, config: RouterConfig): TreeRouter {
-        val newRouter = TreeRouterImpl(initialComponent, this, config)
+        val newRouter = TreeRouterImpl(initialComponent, this, coroutineScope, config)
         val childRouters = childRouters.value.toMutableList()
         childRouters.add(containerComponentKey to newRouter)
         this.childRouters.value = childRouters
@@ -121,24 +92,15 @@ internal class TreeRouterImpl(
     }
 
     override fun setOverlay(component: Component<*>) {
-        val rootRouter = getRootRouter()
-        if (rootRouter === this) setOverlayNode(component, null)
+        _actionReceiver.tryEmit(UpdateRouterActions.SetOverlay(component, null))
     }
 
     override fun <A> setOverlay(component: Component<*>, argument: A) {
-        val rootRouter = getRootRouter()
-        if (rootRouter === this) setOverlayNode(component, argument)
+        _actionReceiver.tryEmit(UpdateRouterActions.SetOverlay(component, argument))
     }
 
     override fun removeOverlay() {
-        val rootRouter = getRootRouter()
-        if (rootRouter === this) {
-            _currentOverlayFlow.value?.let { component ->
-                keyManager.remove(component.key)
-                component.onDestroy()
-                _currentOverlayFlow.value = null
-            }
-        }
+        _actionReceiver.tryEmit(UpdateRouterActions.RemoveOverlay)
     }
 
     override suspend fun <A> passArgument(componentKey: String, argument: A) {
@@ -150,71 +112,58 @@ internal class TreeRouterImpl(
     }
 
     override fun backToComponent(key: String) {
-        val droppedNodes = dropNodeUntilFoundKey(currentNode, key)
-        droppedNodes.forEach {
-            it.childComponents().forEach { childComponent ->
-                destroyChildRouters(childComponent.key)
-                childComponent.onDestroy()
-                keyManager.remove(childComponent.key)
-            }
-            it.compositions().forEach { entry ->
-                destroyChildRouters(entry.key)
-                entry.value.onDestroy()
-                keyManager.remove(entry.key)
-            }
-            destroyChildRouters(it.rootComponent.key)
-            it.rootComponent.onDestroy()
-            keyManager.remove(it.rootComponent.key)
-        }
-        fetchNode()
+        _actionReceiver.tryEmit(UpdateRouterActions.BackToComponent(key))
     }
 
-    override fun replaceComponent(component: Component<*>) = replaceComponentFromNode(component, null)
+    override fun replaceComponent(component: Component<*>) {
+        _actionReceiver.tryEmit(UpdateRouterActions.ReplaceComponent(component, null))
+    }
 
-    override fun <A> replaceComponent(component: Component<*>, argument: A) = replaceComponentFromNode(component, argument)
+    override fun <A> replaceComponent(component: Component<*>, argument: A) {
+        _actionReceiver.tryEmit(UpdateRouterActions.ReplaceComponent(component, argument))
+    }
 
-    override fun addComponent(component: Component<*>) = addComponentNode(component, null)
+    override fun addComponent(component: Component<*>) {
+        _actionReceiver.tryEmit(UpdateRouterActions.AddComponent(component, null))
+    }
 
-    override fun <A> addComponent(component: Component<*>, argument: A) = addComponentNode(component, argument)
+    override fun <A> addComponent(component: Component<*>, argument: A) {
+        _actionReceiver.tryEmit(UpdateRouterActions.AddComponent(component, argument))
+    }
 
-    override fun newRootComponent(component: Component<*>) = newRootComponentNode(component, null)
+    override fun newRootComponent(component: Component<*>) {
+        _actionReceiver.tryEmit(UpdateRouterActions.NewRootComponent(component, null))
+    }
 
-    override fun <A> newRootComponent(component: Component<*>, argument: A) = newRootComponentNode(component, argument)
+    override fun <A> newRootComponent(component: Component<*>, argument: A) {
+        _actionReceiver.tryEmit(UpdateRouterActions.NewRootComponent(component, argument))
+    }
 
     override fun lastChildKey(): String? = childComponentsList.value.lastOrNull()?.key
 
     override fun backChild() {
-        currentNode?.run {
-            if (childComponents().isNotEmpty()) {
-                val component = childComponents().last()
-                dropLastChildComponent()
-                keyManager.remove(component.key)
-                destroyChildRouters(component.key)
-                component.onDestroy()
-                fetchNode()
-            }
-        }
+        _actionReceiver.tryEmit(UpdateRouterActions.BackChild)
     }
 
     override fun backToChild(key: String) {
-        currentNode?.run {
-            val droppedChildList = dropChildUntilFoundKey(this, key)
-            droppedChildList.forEach {
-                keyManager.remove(it.key)
-                destroyChildRouters(it.key)
-                it.onDestroy()
-            }
-            fetchNode()
-        }
+        _actionReceiver.tryEmit(UpdateRouterActions.BackToChild(key))
     }
 
-    override fun replaceChild(component: Component<*>) = replaceChildNode(component, null)
+    override fun replaceChild(component: Component<*>) {
+        _actionReceiver.tryEmit(UpdateRouterActions.ReplaceChild(component, null))
+    }
 
-    override fun <A> replaceChild(component: Component<*>, argument: A) = replaceChildNode(component, argument)
+    override fun <A> replaceChild(component: Component<*>, argument: A) {
+        _actionReceiver.tryEmit(UpdateRouterActions.ReplaceChild(component, argument))
+    }
 
-    override fun addChild(component: Component<*>) = addChildNode(component, null)
+    override fun addChild(component: Component<*>) {
+        _actionReceiver.tryEmit(UpdateRouterActions.AddChild(component, null))
+    }
 
-    override fun <A> addChild(component: Component<*>, argument: A) = addChildNode(component, argument)
+    override fun <A> addChild(component: Component<*>, argument: A) {
+        _actionReceiver.tryEmit(UpdateRouterActions.AddChild(component, argument))
+    }
 
     override suspend fun <A> redirectArgument(
         from: ArgumentTranslator,
@@ -267,6 +216,122 @@ internal class TreeRouterImpl(
             }
         }
         return false
+    }
+
+    private fun onBackClickedAction() {
+        when {
+            currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
+            currentNode?.parent != null -> backComponent()
+            else -> backComponent()
+        }
+    }
+
+    private fun <A> attachCompositeComponentToNode(component: Component<*>, argument: A?) {
+        val isSuccess = keyManager.add(component.key)
+        if (!isSuccess) return
+        val currentNode = currentNode ?: return
+        component.onCreate(argument)
+        currentNode.addComposition(component)
+        fetchNode()
+    }
+
+    private fun detachCompositeComponentFromNode(key: String) {
+        val currentNode = currentNode ?: return
+        keyManager.remove(key)
+        val composition = currentNode.compositions()[key]
+        if (composition != null) {
+            composition.onDestroy()
+            currentNode.removeComposition(key)
+            fetchNode()
+        }
+    }
+
+    private fun backComponentAction() {
+        val nodesTree = tree.value
+        nodesTree.lastOrNull()?.let {
+            it.childComponents().forEach { childComponent ->
+                destroyChildRouters(childComponent.key)
+                childComponent.onDestroy()
+                keyManager.remove(childComponent.key)
+            }
+            it.compositions().forEach { entry ->
+                destroyChildRouters(entry.key)
+                entry.value.onDestroy()
+                keyManager.remove(entry.key)
+            }
+            destroyChildRouters(it.rootComponent.key)
+            it.rootComponent.onDestroy()
+            keyManager.remove(it.rootComponent.key)
+            tree.value = nodesTree.dropLast(1)
+            fetchNode()
+        }
+    }
+
+    private fun cleanRouterAction() {
+        cleanGraph()
+        removeOverlay()
+        fetchNode()
+    }
+
+    private fun <A> setOverlayAction(component: Component<*>, argument: A) {
+        val rootRouter = getRootRouter()
+        if (rootRouter === this) setOverlayNode(component, argument)
+    }
+
+    private fun removeOverlayAction() {
+        val rootRouter = getRootRouter()
+        if (rootRouter === this) {
+            _currentOverlayFlow.value?.let { component ->
+                keyManager.remove(component.key)
+                component.onDestroy()
+                _currentOverlayFlow.value = null
+            }
+        }
+    }
+
+    private fun backToComponentAction(key: String) {
+        val droppedNodes = dropNodeUntilFoundKey(currentNode, key)
+        droppedNodes.forEach {
+            it.childComponents().forEach { childComponent ->
+                destroyChildRouters(childComponent.key)
+                childComponent.onDestroy()
+                keyManager.remove(childComponent.key)
+            }
+            it.compositions().forEach { entry ->
+                destroyChildRouters(entry.key)
+                entry.value.onDestroy()
+                keyManager.remove(entry.key)
+            }
+            destroyChildRouters(it.rootComponent.key)
+            it.rootComponent.onDestroy()
+            keyManager.remove(it.rootComponent.key)
+        }
+        fetchNode()
+    }
+
+    private fun backChildAction() {
+        currentNode?.run {
+            if (childComponents().isNotEmpty()) {
+                val component = childComponents().last()
+                dropLastChildComponent()
+                keyManager.remove(component.key)
+                destroyChildRouters(component.key)
+                component.onDestroy()
+                fetchNode()
+            }
+        }
+    }
+
+    private fun backToChildAction(key: String) {
+        currentNode?.run {
+            val droppedChildList = dropChildUntilFoundKey(this, key)
+            droppedChildList.forEach {
+                keyManager.remove(it.key)
+                destroyChildRouters(it.key)
+                it.onDestroy()
+            }
+            fetchNode()
+        }
     }
 
     private fun <A> addChildNode(component: Component<*>, argument: A?) {
@@ -413,5 +478,36 @@ internal class TreeRouterImpl(
                     it.compositions()
                 )
             }
+    }
+
+    private fun observeActionReceiverUpdates() {
+        _actionReceiver.onEach { action ->
+            when (action) {
+                is UpdateRouterActions.AddChild<*> -> addChildNode(action.component, action.argument)
+                is UpdateRouterActions.AddComponent<*> -> addComponentNode(action.component, action.argument)
+
+                is UpdateRouterActions.AttachCompositeComponent<*> -> attachCompositeComponentToNode(
+                    action.component,
+                    action.argument
+                )
+
+                is UpdateRouterActions.BackChild -> backChildAction()
+                is UpdateRouterActions.BackComponent -> backComponentAction()
+                is UpdateRouterActions.BackToChild -> backToChildAction(action.key)
+                is UpdateRouterActions.BackToComponent -> backToComponentAction(action.key)
+                is UpdateRouterActions.CleanRouter -> cleanRouterAction()
+                is UpdateRouterActions.DetachCompositeComponent -> detachCompositeComponentFromNode(action.key)
+                is UpdateRouterActions.NewRootComponent<*> -> newRootComponentNode(action.component, action.argument)
+                is UpdateRouterActions.OnBackClicked -> onBackClickedAction()
+                is UpdateRouterActions.RemoveOverlay -> removeOverlayAction()
+                is UpdateRouterActions.ReplaceChild<*> -> replaceChildNode(action.component, action.argument)
+                is UpdateRouterActions.ReplaceComponent<*> -> replaceComponentFromNode(
+                    action.component,
+                    action.argument
+                )
+
+                is UpdateRouterActions.SetOverlay<*> -> setOverlayAction(action.component, action.argument)
+            }
+        }.launchIn(coroutineScope)
     }
 }

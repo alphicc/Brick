@@ -5,8 +5,9 @@ import androidx.compose.ui.window.application
 import com.alphicc.brick.DesktopComponentsContainer
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.desktop.Screens.welcomeScreen
+import kotlinx.coroutines.GlobalScope
 
-val router: TreeRouter = TreeRouter.new().apply {
+val router: TreeRouter = TreeRouter.new(GlobalScope).apply {
     addComponent(welcomeScreen, this)
 }
 

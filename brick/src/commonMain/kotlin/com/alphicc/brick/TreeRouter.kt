@@ -1,5 +1,6 @@
 package com.alphicc.brick
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.SharedFlow
 
 interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRouter, ChildComponentRouter,
@@ -28,7 +29,10 @@ interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRo
     suspend fun <A> passBroadcastArgument(argument: A)
 
     companion object {
-        fun new(): TreeRouter = TreeRouterImpl(config = RouterConfig.default())
-        fun new(config: RouterConfig): TreeRouter = TreeRouterImpl(config = config)
+        fun new(coroutineScope: CoroutineScope): TreeRouter =
+            TreeRouterImpl(coroutineScope = coroutineScope, config = RouterConfig.default())
+
+        fun new(coroutineScope: CoroutineScope, config: RouterConfig): TreeRouter =
+            TreeRouterImpl(coroutineScope = coroutineScope, config = config)
     }
 }

@@ -13,8 +13,9 @@ import androidx.compose.ui.Modifier
 import com.alphicc.brick.AndroidComponentsContainer
 import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
+import kotlinx.coroutines.GlobalScope
 
-val compositeSampleRouter: TreeRouter = TreeRouter.new()
+val compositeSampleRouter: TreeRouter = TreeRouter.new(GlobalScope)
 
 val component1 = Component<Unit>(
     key = "CompositeScreenInternal 1",

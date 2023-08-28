@@ -14,8 +14,9 @@ import androidx.compose.ui.unit.dp
 import com.alphicc.brick.AndroidAnimatedComponentsContainer
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.android.largeSample.screens.Screens.welcomeScreen
+import kotlinx.coroutines.GlobalScope
 
-val largeSampleRouter: TreeRouter = TreeRouter.new()
+val largeSampleRouter: TreeRouter = TreeRouter.new(GlobalScope)
 
 @ExperimentalAnimationApi
 class LargeSampleActivity : ComponentActivity() {

@@ -20,10 +20,11 @@ import androidx.compose.ui.unit.dp
 import com.alphicc.brick.AndroidComponentsContainer
 import com.alphicc.brick.Component
 import com.alphicc.brick.TreeRouter
+import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.flow.filterIsInstance
 import java.util.*
 
-val smallSampleRouter: TreeRouter = TreeRouter.new()
+val smallSampleRouter: TreeRouter = TreeRouter.new(GlobalScope)
 
 val screen1 = Component<Unit>(
     key = "1",
