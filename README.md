@@ -1,4 +1,4 @@
-![MAVEN](https://img.shields.io/badge/Maven-v2.3.0-blue) ![Platform](https://img.shields.io/badge/platform-android-green?color=lightgray) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen) ![Platform](https://img.shields.io/badge/platform-desktop-green?color=lightgray)
+![MAVEN](https://img.shields.io/badge/Maven-v2.4.0-blue) ![Platform](https://img.shields.io/badge/platform-android-green?color=lightgray) ![API](https://img.shields.io/badge/API-21-brightgreen?color=brightgreen) ![Platform](https://img.shields.io/badge/platform-desktop-green?color=lightgray)
 <h1 align="center">
     <img height="300" src="https://raw.githubusercontent.com/alphicc/Brick/main/media/logo.png"/>
     <br>
