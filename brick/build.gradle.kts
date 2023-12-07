@@ -3,6 +3,7 @@ val compose_version: String by properties
 val coroutines_version: String by properties
 val atomicfu_version: String by properties
 val activity_compose_version: String by properties
+val immutable_collections_version: String by properties
 val VERSION_NAME: String by properties
 
 plugins {
@@ -31,6 +32,7 @@ kotlin {
                 implementation("org.jetbrains.compose.foundation:foundation:${compose_version}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}")
                 implementation("org.jetbrains.kotlinx:atomicfu:${atomicfu_version}")
+                implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:${immutable_collections_version}")
             }
         }
         val androidMain by getting {

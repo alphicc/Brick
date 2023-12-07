@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 fun DesktopComponentsContainer(containerConnector: ContainerConnector, onRouterEmpty: () -> Unit = {}) {
@@ -53,7 +54,7 @@ fun DesktopComponentsContainer(containerConnector: ContainerConnector, onRouterE
     overlay?.run {
         showContent(
             dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
-            compositions = emptyMap()
+            compositions = persistentMapOf()
         )
     }
 }

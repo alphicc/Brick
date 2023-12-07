@@ -1,8 +1,9 @@
 package com.alphicc.brick
 
 import androidx.compose.runtime.Composable
+import kotlinx.collections.immutable.ImmutableMap
 
-class CompositeContainer(private val compositions: Map<String, Component<*>>) {
+class CompositeContainer(private val compositions: ImmutableMap<String, Component<*>>) {
 
     @Composable
     fun place(key: String) {
