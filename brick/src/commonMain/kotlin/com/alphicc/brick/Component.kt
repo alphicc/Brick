@@ -1,6 +1,7 @@
 package com.alphicc.brick
 
 import androidx.compose.runtime.Composable
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 
@@ -13,7 +14,7 @@ class Component<D>(
 ) : BaseComponent<D>(key, onCreate, onDestroy, keepAliveCompose) {
 
     @Composable
-    internal fun showContent(dataContainer: DataContainer, compositions: Map<String, Component<*>>) {
+    internal fun showContent(dataContainer: DataContainer, compositions: ImmutableMap<String, Component<*>>) {
         val compositeContainer = CompositeContainer(compositions)
         content.invoke(dataContainer, compositeContainer)
     }

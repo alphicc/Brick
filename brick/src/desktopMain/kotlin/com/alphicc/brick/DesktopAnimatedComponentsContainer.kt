@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import kotlinx.collections.immutable.persistentMapOf
 
 @ExperimentalAnimationApi
 @Composable
@@ -85,7 +86,7 @@ fun DesktopAnimatedComponentsContainer(
     overlay?.run {
         showContent(
             dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
-            compositions = emptyMap()
+            compositions = persistentMapOf()
         )
     }
 }

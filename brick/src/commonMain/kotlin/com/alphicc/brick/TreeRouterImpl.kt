@@ -2,6 +2,7 @@ package com.alphicc.brick
 
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
+import kotlinx.collections.immutable.*
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -13,11 +14,11 @@ internal class TreeRouterImpl(
 ) : TreeRouter {
 
     private val keyManager = KeyManager()
-    private val _keepAliveNode: MutableStateFlow<List<KeepAliveNode>> = MutableStateFlow(emptyList())
-    private val _currentCompositionsFlow: MutableStateFlow<Map<String, Component<*>>> = MutableStateFlow(emptyMap())
+    private val _keepAliveNode: MutableStateFlow<ImmutableList<KeepAliveNode>> = MutableStateFlow(persistentListOf())
+    private val _currentCompositionsFlow: MutableStateFlow<ImmutableMap<String, Component<*>>> = MutableStateFlow(persistentMapOf())
     private val _currentOverlayFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
     private val _currentComponentFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
-    private val _currentChildFlow: MutableStateFlow<List<Component<*>>> = MutableStateFlow(emptyList())
+    private val _currentChildFlow: MutableStateFlow<ImmutableList<Component<*>>> = MutableStateFlow(persistentListOf())
     private val _isRouterEmpty: MutableStateFlow<Boolean> = MutableStateFlow(true)
     private val _broadcastFlow: MutableSharedFlow<Any> = MutableSharedFlow(
         replay = config.broadcastFlowReplay,
@@ -33,11 +34,11 @@ internal class TreeRouterImpl(
 
     override val mainComponent: StateFlow<Component<*>?> = _currentComponentFlow
 
-    override val childComponentsList: StateFlow<List<Component<*>>> = _currentChildFlow
+    override val childComponentsList: StateFlow<ImmutableList<Component<*>>> = _currentChildFlow
 
-    override val compositions: StateFlow<Map<String, Component<*>>> = _currentCompositionsFlow
+    override val compositions: StateFlow<ImmutableMap<String, Component<*>>> = _currentCompositionsFlow
 
-    override val keepAliveNodes: StateFlow<List<KeepAliveNode>> = _keepAliveNode
+    override val keepAliveNodes: StateFlow<ImmutableList<KeepAliveNode>> = _keepAliveNode
 
     override val isRouterEmpty: StateFlow<Boolean> = _isRouterEmpty
 
@@ -402,8 +403,8 @@ internal class TreeRouterImpl(
     private fun fetchNode() {
         _isRouterEmpty.value = currentNode == null
         _currentComponentFlow.value = currentNode?.rootComponent
-        _currentChildFlow.value = currentNode?.childComponents() ?: emptyList()
-        _currentCompositionsFlow.value = currentNode?.compositions() ?: emptyMap()
+        _currentChildFlow.value = currentNode?.childComponents() ?: persistentListOf()
+        _currentCompositionsFlow.value = currentNode?.compositions() ?: persistentMapOf()
         _keepAliveNode.value = tree.value
             .filter { it.rootComponent.keepAliveCompose }
             .map {
@@ -412,6 +413,6 @@ internal class TreeRouterImpl(
                     it.childComponents(),
                     it.compositions()
                 )
-            }
+            }.toImmutableList()
     }
 }

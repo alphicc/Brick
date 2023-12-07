@@ -2,11 +2,11 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "1.4.3"
+    id("org.jetbrains.compose") version "1.5.10"
 }
 
 group = "io.github.alphicc"
-version = "2.3.0"
+version = "2.4.0"
 
 kotlin {
     jvm {

@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import kotlinx.collections.immutable.persistentMapOf
 
 @ExperimentalAnimationApi
 @Composable
@@ -56,7 +57,7 @@ fun AndroidAnimatedComponentsContainer(
     if (component?.keepAliveCompose == false) {
         AnimatedContent(
             targetState = component,
-            transitionSpec = { enterTransition with exitTransition }
+            transitionSpec = { enterTransition togetherWith exitTransition }, label = "NavigationTransitionAnim"
         ) {
 
             it?.run {
@@ -90,7 +91,7 @@ fun AndroidAnimatedComponentsContainer(
     overlay?.run {
         showContent(
             dataContainer = dependency ?: throw IllegalArgumentException("Dependency can not be null"),
-            compositions = emptyMap()
+            compositions = persistentMapOf()
         )
     }
 }
