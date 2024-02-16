@@ -7,9 +7,9 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import kotlinx.collections.immutable.persistentMapOf
 
+@Deprecated("Use ComponentsContainer", ReplaceWith("ComponentsContainer()", "com.alphicc.brick.ComponentsContainer"))
 @Composable
 fun AndroidComponentsContainer(containerConnector: ContainerConnector, onRouterEmpty: () -> Unit = {}) {
-
     val overlay by containerConnector.overlay.collectAsState()
     val component by containerConnector.mainComponent.collectAsState()
     val childList by containerConnector.childComponentsList.collectAsState()

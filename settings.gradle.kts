@@ -1,4 +1,4 @@
-pluginManagement {
+    pluginManagement {
     val kotlin_version: String by settings
     val compose_version: String by settings
 

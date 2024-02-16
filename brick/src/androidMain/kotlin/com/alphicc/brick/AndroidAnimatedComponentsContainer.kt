@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import kotlinx.collections.immutable.persistentMapOf
 
+@Deprecated("Use ")
 @ExperimentalAnimationApi
 @Composable
 fun AndroidAnimatedComponentsContainer(

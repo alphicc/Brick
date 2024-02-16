@@ -5,7 +5,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import kotlinx.collections.immutable.persistentMapOf
-
+@Deprecated("Use ")
 @Composable
 fun DesktopComponentsContainer(containerConnector: ContainerConnector, onRouterEmpty: () -> Unit = {}) {
 
