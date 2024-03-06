@@ -1,6 +1,7 @@
 package com.alphicc.brick
 
 import androidx.compose.runtime.Composable
+import com.alphicc.brick.ui.CompositeContainer
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -9,12 +10,15 @@ class Component<D>(
     override val key: String,
     override val onCreate: ((SharedFlow<DataContainer>, DataContainer) -> D)? = null,
     override val onDestroy: ((DataContainer) -> Unit)? = null,
-    override val keepAliveCompose: Boolean = false,
+    override val descriptor: Descriptor,
     private val content: @Composable (DataContainer, CompositeContainer) -> Unit
-) : BaseComponent<D>(key, onCreate, onDestroy, keepAliveCompose) {
+) : BaseComponent<D>(key, onCreate, onDestroy, descriptor) {
 
     @Composable
-    internal fun showContent(dataContainer: DataContainer, compositions: ImmutableMap<String, Component<*>>) {
+    internal fun showContent(
+        dataContainer: DataContainer,
+        compositions: ImmutableMap<String, Component<*>>
+    ) {
         val compositeContainer = CompositeContainer(compositions)
         content.invoke(dataContainer, compositeContainer)
     }
@@ -24,7 +28,7 @@ open class BaseComponent<D>(
     open val key: String,
     internal open val onCreate: ((SharedFlow<DataContainer>, DataContainer) -> D)?,
     internal open val onDestroy: ((DataContainer) -> Unit)?,
-    internal open val keepAliveCompose: Boolean,
+    internal open val descriptor: Descriptor,
     internal val channel: MutableSharedFlow<DataContainer> = MutableSharedFlow(),
     internal var dependency: DataContainer? = null
 ) {

@@ -1,13 +1,14 @@
 package com.alphicc.brick
 
+import com.alphicc.brick.ui.ContainerConnector
 import kotlinx.coroutines.flow.SharedFlow
 
-interface TreeRouter : ContainerConnector, CompositeComponentRouter, ComponentRouter, ChildComponentRouter,
+interface TreeRouter : ContainerConnector, ComponentRouter, ChildComponentRouter, CompositeComponentRouter,
     ArgumentTranslator {
 
     val initialComponent: Component<*>?
     val parentRouter: TreeRouter?
-    val broadcastFlow: SharedFlow<Any>
+    val broadcastArgumentsFlow: SharedFlow<Any>
 
     fun getRootRouter(): TreeRouter
 

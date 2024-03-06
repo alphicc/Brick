@@ -17,9 +17,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.AndroidComponentsContainer
 import com.alphicc.brick.Component
+import com.alphicc.brick.Descriptor
 import com.alphicc.brick.TreeRouter
+import com.alphicc.brick.ui.ComponentsContainer
 import kotlinx.coroutines.flow.filterIsInstance
 import java.util.*
 
@@ -27,64 +28,76 @@ val smallSampleRouter: TreeRouter = TreeRouter.new()
 
 val screen1 = Component<Unit>(
     key = "1",
-    keepAliveCompose = true,
+    descriptor = Descriptor.Main.Default,
     content = { _, _ ->
         SimpleScreen(1, "new") {
-            smallSampleRouter.broadcastFlow.filterIsInstance<String>()
+            smallSampleRouter.broadcastArgumentsFlow.filterIsInstance<String>()
             smallSampleRouter.addComponent(screen2)
         }
     })
 
 val screen2 = Component<Unit>(
     key = "2",
+    descriptor = Descriptor.Main.Default,
     content = { _, _ ->
         SimpleScreen(2, "new") { smallSampleRouter.addComponent(screen3) }
     })
 
 val screen3 = Component<Unit>(
     key = "3",
+    descriptor = Descriptor.Main.Default,
     content = { _, _ ->
         SimpleScreen(3, "new") { smallSampleRouter.addComponent(screen4) }
     })
 
 val screen4 = Component<Unit>(
     key = "4",
-    keepAliveCompose = false,
+    descriptor = Descriptor.Main.Default,
     content = { _, _ ->
         SimpleScreen(4, "replace") { smallSampleRouter.replaceComponent(screen5) }
     })
 
 val screen5 = Component<Unit>(
     key = "5",
+    descriptor = Descriptor.Main.Default,
     content = { _, _ ->
         SimpleScreen(5, "addChild") { smallSampleRouter.addChild(screenChild1) }
     })
 
 val screenChild1 = Component<Unit>(
     key = "C1",
+    descriptor = Descriptor.Child,
     content = { _, _ ->
         Child(10, "newChild") { smallSampleRouter.addChild(screenChild2) }
     })
 
 val screenChild2 = Component<Unit>(
     key = "C2",
+    descriptor = Descriptor.Child,
     content = { _, _ ->
         Child(20, "newChild") { smallSampleRouter.addChild(screenChild3) }
     })
 
 val screenChild3 = Component<Unit>(
     key = "C3",
+    descriptor = Descriptor.Child,
     content = { _, _ ->
         Child(30, "newChild") { smallSampleRouter.addChild(screenChild4) }
     })
 
 val screenChild4 = Component<Unit>(
     key = "C4",
+    descriptor = Descriptor.Child,
     content = { _, _ ->
         Child(40, "replaceChild") { smallSampleRouter.replaceChild(screenChild5) }
     })
 
-val screenChild5 = Component<Unit>(key = "C5", content = { _, _ -> ChildExt(50) })
+val screenChild5 = Component<Unit>(
+    key = "C5",
+    descriptor = Descriptor.Child,
+    content = { _, _ ->
+        ChildExt(50)
+    })
 
 @ExperimentalAnimationApi
 class SmallSampleActivity : ComponentActivity() {
@@ -93,7 +106,7 @@ class SmallSampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidComponentsContainer(smallSampleRouter) {
+            ComponentsContainer(smallSampleRouter) {
                 finish()
             }
         }
@@ -109,12 +122,15 @@ private fun SimpleScreen(int: Int, actionTitle: String, action: () -> Unit) {
 
     val color = remember {
         val rnd = Random()
-        val color = android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+        val color =
+            android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         Color(color)
     }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(color = color)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(color = color)
     ) {
 
         Text(
@@ -134,12 +150,16 @@ fun Child(int: Int, actionTitle: String, action: () -> Unit) {
 
     val color = remember {
         val rnd = Random()
-        val color = android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+        val color =
+            android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         Color(color)
     }
 
     Box(
-        modifier = Modifier.padding(32.dp).fillMaxSize().background(color = color)
+        modifier = Modifier
+            .padding(32.dp)
+            .fillMaxSize()
+            .background(color = color)
     ) {
 
         Text(
@@ -160,12 +180,16 @@ fun ChildExt(int: Int) {
 
     val color = remember {
         val rnd = Random()
-        val color = android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
+        val color =
+            android.graphics.Color.argb(255, rnd.nextInt(256), rnd.nextInt(256), rnd.nextInt(256))
         Color(color)
     }
 
     Box(
-        modifier = Modifier.padding(4.dp).size(64.dp).background(color = color)
+        modifier = Modifier
+            .padding(4.dp)
+            .size(64.dp)
+            .background(color = color)
     ) {
 
         Text(

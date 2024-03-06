@@ -3,8 +3,8 @@ package io.github.alphicc.android.overlaySample
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import com.alphicc.brick.AndroidComponentsContainer
 import com.alphicc.brick.TreeRouter
+import com.alphicc.brick.ui.ComponentsContainer
 import io.github.alphicc.android.overlaySample.listScreen.listScreen
 
 val overlaySampleRouter = TreeRouter.new()
@@ -15,7 +15,7 @@ class OverlaySampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidComponentsContainer(overlaySampleRouter) {
+            ComponentsContainer(overlaySampleRouter) {
                 finish()
             }
         }

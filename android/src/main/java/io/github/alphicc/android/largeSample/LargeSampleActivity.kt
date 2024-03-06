@@ -11,8 +11,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import com.alphicc.brick.AndroidAnimatedComponentsContainer
 import com.alphicc.brick.TreeRouter
+import com.alphicc.brick.ui.ComponentsContainer
 import io.github.alphicc.android.largeSample.screens.Screens.welcomeScreen
 
 val largeSampleRouter: TreeRouter = TreeRouter.new()
@@ -24,17 +24,9 @@ class LargeSampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidAnimatedComponentsContainer(
+            ComponentsContainer(
                 containerConnector = largeSampleRouter,
-                onRouterEmpty = { finish() },
-                enterTransition = scaleIn(
-                    initialScale = .90f,
-                    animationSpec = tween(easing = LinearEasing)
-                ) + fadeIn(),
-                exitTransition = scaleOut(
-                    targetScale = .90f,
-                    animationSpec = tween(easing = LinearEasing)
-                ) + fadeOut(),
+                onRouterEmpty = { finish() }
             )
 
             Button(

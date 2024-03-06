@@ -63,6 +63,14 @@ kotlin {
             }
         }
     }
+
+    targets.all {
+        compilations.all {
+            compilerOptions.configure {
+                freeCompilerArgs.add("-Xopt-in=com.alphicc.brick.InternalApi")
+            }
+        }
+    }
 }
 
 android {

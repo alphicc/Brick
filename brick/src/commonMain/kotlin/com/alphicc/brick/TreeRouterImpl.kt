@@ -2,7 +2,11 @@ package com.alphicc.brick
 
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
-import kotlinx.collections.immutable.*
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,13 +18,16 @@ internal class TreeRouterImpl(
 ) : TreeRouter {
 
     private val keyManager = KeyManager()
-    private val _keepAliveNode: MutableStateFlow<ImmutableList<KeepAliveNode>> = MutableStateFlow(persistentListOf())
-    private val _currentCompositionsFlow: MutableStateFlow<ImmutableMap<String, Component<*>>> = MutableStateFlow(persistentMapOf())
+    private val _keepAliveNodes: MutableStateFlow<ImmutableList<KeepAliveNode>> =
+        MutableStateFlow(persistentListOf())
+    private val _currentCompositionsFlow: MutableStateFlow<ImmutableMap<String, Component<*>>> =
+        MutableStateFlow(persistentMapOf())
     private val _currentOverlayFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
     private val _currentComponentFlow: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
-    private val _currentChildFlow: MutableStateFlow<ImmutableList<Component<*>>> = MutableStateFlow(persistentListOf())
+    private val _currentChildFlow: MutableStateFlow<ImmutableList<Component<*>>> =
+        MutableStateFlow(persistentListOf())
     private val _isRouterEmpty: MutableStateFlow<Boolean> = MutableStateFlow(true)
-    private val _broadcastFlow: MutableSharedFlow<Any> = MutableSharedFlow(
+    private val _broadcastArgumentsFlow: MutableSharedFlow<Any> = MutableSharedFlow(
         replay = config.broadcastFlowReplay,
         extraBufferCapacity = config.broadcastFlowExtraBufferCapacity
     )
@@ -34,73 +41,16 @@ internal class TreeRouterImpl(
 
     override val mainComponent: StateFlow<Component<*>?> = _currentComponentFlow
 
-    override val childComponentsList: StateFlow<ImmutableList<Component<*>>> = _currentChildFlow
+    override val childComponents: StateFlow<ImmutableList<Component<*>>> = _currentChildFlow
 
-    override val compositions: StateFlow<ImmutableMap<String, Component<*>>> = _currentCompositionsFlow
+    override val compositions: StateFlow<ImmutableMap<String, Component<*>>> =
+        _currentCompositionsFlow
 
-    override val keepAliveNodes: StateFlow<ImmutableList<KeepAliveNode>> = _keepAliveNode
+    override val keepAliveNodes: StateFlow<ImmutableList<KeepAliveNode>> = _keepAliveNodes
 
     override val isRouterEmpty: StateFlow<Boolean> = _isRouterEmpty
 
-    override val broadcastFlow: MutableSharedFlow<Any> = _broadcastFlow
-
-    override fun currentComponentKey(): String? = mainComponent.value?.key
-
-    //return "true" if has back navigation variants else false
-    override fun onBackClicked() {
-        when {
-            currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
-            currentNode?.parent != null -> backComponent()
-            else -> backComponent()
-        }
-    }
-
-    override fun attachCompositeComponent(component: Component<*>) =
-        attachCompositeComponentToNode(component, null)
-
-    override fun <A> attachCompositeComponent(component: Component<*>, argument: A) =
-        attachCompositeComponentToNode(component, argument)
-
-    private fun <A> attachCompositeComponentToNode(component: Component<*>, argument: A?) {
-        val isSuccess = keyManager.add(component.key)
-        if (!isSuccess) return
-        val currentNode = currentNode ?: return
-        component.onCreate(argument)
-        currentNode.addComposition(component)
-        fetchNode()
-    }
-
-    override fun detachCompositeComponent(key: String) {
-        val currentNode = currentNode ?: return
-        keyManager.remove(key)
-        val composition = currentNode.compositions()[key]
-        if (composition != null) {
-            composition.onDestroy()
-            currentNode.removeComposition(key)
-            fetchNode()
-        }
-    }
-
-    override fun backComponent() {
-        val nodesTree = tree.value
-        nodesTree.lastOrNull()?.let {
-            it.childComponents().forEach { childComponent ->
-                destroyChildRouters(childComponent.key)
-                childComponent.onDestroy()
-                keyManager.remove(childComponent.key)
-            }
-            it.compositions().forEach { entry ->
-                destroyChildRouters(entry.key)
-                entry.value.onDestroy()
-                keyManager.remove(entry.key)
-            }
-            destroyChildRouters(it.rootComponent.key)
-            it.rootComponent.onDestroy()
-            keyManager.remove(it.rootComponent.key)
-            tree.value = nodesTree.dropLast(1)
-            fetchNode()
-        }
-    }
+    override val broadcastArgumentsFlow: MutableSharedFlow<Any> = _broadcastArgumentsFlow
 
     override fun getRootRouter(): TreeRouter = parentRouter?.getRootRouter() ?: this
 
@@ -147,7 +97,39 @@ internal class TreeRouterImpl(
     }
 
     override suspend fun <A> passBroadcastArgument(argument: A) {
-        _broadcastFlow.emit(argument as Any)
+        _broadcastArgumentsFlow.emit(argument as Any)
+    }
+
+    //return "true" if has back navigation variants else false
+    override fun onBackClicked() {
+        when {
+            currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
+            currentNode?.parent != null -> backComponent()
+            else -> backComponent()
+        }
+    }
+
+    override fun lastComponentKey(): String? = mainComponent.value?.key
+
+    override fun backComponent() {
+        val nodesTree = tree.value
+        nodesTree.lastOrNull()?.let {
+            it.childComponents().forEach { childComponent ->
+                destroyChildRouters(childComponent.key)
+                childComponent.onDestroy()
+                keyManager.remove(childComponent.key)
+            }
+            it.compositions().forEach { entry ->
+                destroyChildRouters(entry.key)
+                entry.value.onDestroy()
+                keyManager.remove(entry.key)
+            }
+            destroyChildRouters(it.rootComponent.key)
+            it.rootComponent.onDestroy()
+            keyManager.remove(it.rootComponent.key)
+            tree.value = nodesTree.dropLast(1)
+            fetchNode()
+        }
     }
 
     override fun backToComponent(key: String) {
@@ -170,19 +152,23 @@ internal class TreeRouterImpl(
         fetchNode()
     }
 
-    override fun replaceComponent(component: Component<*>) = replaceComponentFromNode(component, null)
+    override fun replaceComponent(component: Component<*>) =
+        replaceComponentFromNode(component, null)
 
-    override fun <A> replaceComponent(component: Component<*>, argument: A) = replaceComponentFromNode(component, argument)
+    override fun <A> replaceComponent(component: Component<*>, argument: A) =
+        replaceComponentFromNode(component, argument)
 
     override fun addComponent(component: Component<*>) = addComponentNode(component, null)
 
-    override fun <A> addComponent(component: Component<*>, argument: A) = addComponentNode(component, argument)
+    override fun <A> addComponent(component: Component<*>, argument: A) =
+        addComponentNode(component, argument)
 
     override fun newRootComponent(component: Component<*>) = newRootComponentNode(component, null)
 
-    override fun <A> newRootComponent(component: Component<*>, argument: A) = newRootComponentNode(component, argument)
+    override fun <A> newRootComponent(component: Component<*>, argument: A) =
+        newRootComponentNode(component, argument)
 
-    override fun lastChildKey(): String? = childComponentsList.value.lastOrNull()?.key
+    override fun lastChildKey(): String? = childComponents.value.lastOrNull()?.key
 
     override fun backChild() {
         currentNode?.run {
@@ -209,13 +195,42 @@ internal class TreeRouterImpl(
         }
     }
 
-    override fun replaceChild(component: Component<*>) = replaceChildNode(component, null)
-
-    override fun <A> replaceChild(component: Component<*>, argument: A) = replaceChildNode(component, argument)
-
     override fun addChild(component: Component<*>) = addChildNode(component, null)
 
-    override fun <A> addChild(component: Component<*>, argument: A) = addChildNode(component, argument)
+    override fun <A> addChild(component: Component<*>, argument: A) =
+        addChildNode(component, argument)
+
+    override fun replaceChild(component: Component<*>) = replaceChildNode(component, null)
+
+    override fun <A> replaceChild(component: Component<*>, argument: A) =
+        replaceChildNode(component, argument)
+
+    override fun attachCompositeComponent(component: Component<*>) =
+        attachCompositeComponentToNode(component, null)
+
+    override fun <A> attachCompositeComponent(component: Component<*>, argument: A) =
+        attachCompositeComponentToNode(component, argument)
+
+    override fun detachCompositeComponent(key: String) {
+        val currentNode = currentNode ?: return
+        keyManager.remove(key)
+        val composition = currentNode.compositions()[key]
+        if (composition != null) {
+            composition.onDestroy()
+            currentNode.removeComposition(key)
+            fetchNode()
+        }
+    }
+
+    private fun <A> attachCompositeComponentToNode(component: Component<*>, argument: A?) {
+        checkComponentType(component, ComponentType.COMPOSITE)
+        val isSuccess = keyManager.add(component.key)
+        if (!isSuccess) return
+        val currentNode = currentNode ?: return
+        component.onCreate(argument)
+        currentNode.addComposition(component)
+        fetchNode()
+    }
 
     override suspend fun <A> redirectArgument(
         from: ArgumentTranslator,
@@ -271,6 +286,7 @@ internal class TreeRouterImpl(
     }
 
     private fun <A> addChildNode(component: Component<*>, argument: A?) {
+        checkComponentType(component, ComponentType.CHILD)
         currentNode?.run {
             val isSuccess = keyManager.add(component.key)
             if (!isSuccess) return
@@ -281,6 +297,7 @@ internal class TreeRouterImpl(
     }
 
     private fun <A> replaceChildNode(component: Component<*>, argument: A?) {
+        checkComponentType(component, ComponentType.CHILD)
         currentNode?.run {
             if (childComponents().isNotEmpty()) {
                 val isSuccess = keyManager.replaceKey(childComponents().last().key, component.key)
@@ -301,6 +318,7 @@ internal class TreeRouterImpl(
     }
 
     private fun <A> addComponentNode(component: Component<*>, argument: A?) {
+        checkComponentType(component, ComponentType.MAIN)
         val isSuccess = keyManager.add(component.key)
         if (!isSuccess) return
         component.onCreate(argument)
@@ -315,6 +333,7 @@ internal class TreeRouterImpl(
     }
 
     private fun <A> replaceComponentFromNode(component: Component<*>, argument: A?) {
+        checkComponentType(component, ComponentType.MAIN)
         currentNode?.let { node ->
             val isSuccess = keyManager.replaceKey(node.rootComponent.key, component.key)
             if (!isSuccess) return
@@ -333,6 +352,7 @@ internal class TreeRouterImpl(
     }
 
     private fun <A> setOverlayNode(component: Component<*>, argument: A?) {
+        checkComponentType(component, ComponentType.OVERLAY)
         val isSuccess = keyManager.add(component.key)
         if (!isSuccess) return
 
@@ -405,8 +425,8 @@ internal class TreeRouterImpl(
         _currentComponentFlow.value = currentNode?.rootComponent
         _currentChildFlow.value = currentNode?.childComponents() ?: persistentListOf()
         _currentCompositionsFlow.value = currentNode?.compositions() ?: persistentMapOf()
-        _keepAliveNode.value = tree.value
-            .filter { it.rootComponent.keepAliveCompose }
+        _keepAliveNodes.value = tree.value
+            .filter { it.rootComponent.descriptor is Descriptor.Main.RetainUi }
             .map {
                 KeepAliveNode(
                     it.rootComponent,
@@ -414,5 +434,12 @@ internal class TreeRouterImpl(
                     it.compositions()
                 )
             }.toImmutableList()
+    }
+
+    private fun checkComponentType(component: Component<*>, requiredComponentType: ComponentType) {
+        val componentType = component.descriptor.componentType
+        require(componentType == requiredComponentType) {
+            "Invalid component type $componentType"
+        }
     }
 }

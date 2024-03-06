@@ -9,10 +9,12 @@ import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.alphicc.brick.Component
+import com.alphicc.brick.Descriptor
 import com.alphicc.brick.TreeRouter
 
 val drawerScreen = Component(
     key = "drawerScreen",
+    descriptor = Descriptor.Child,
     onCreate = { _, argument ->
         val router = argument.get<TreeRouter>()
         return@Component DrawerViewModel(router)

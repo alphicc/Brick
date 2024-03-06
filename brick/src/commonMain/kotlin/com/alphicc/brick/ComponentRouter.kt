@@ -1,7 +1,7 @@
 package com.alphicc.brick
 
 interface ComponentRouter {
-    fun currentComponentKey(): String?
+    fun lastComponentKey(): String?
     fun backComponent()
     fun backToComponent(key: String)
     fun replaceComponent(component: Component<*>)

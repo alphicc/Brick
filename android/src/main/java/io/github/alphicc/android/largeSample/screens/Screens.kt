@@ -4,6 +4,7 @@ import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import com.alphicc.brick.Component
+import com.alphicc.brick.Descriptor
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.android.largeSample.screens.blueSquareChild.BlueSquareContent
 import io.github.alphicc.android.largeSample.screens.blueSquareChild.BlueSquareViewModel
@@ -29,6 +30,7 @@ object Screens {
 
     val welcomeScreen = Component(
         key = "Welcome",
+        descriptor = Descriptor.Main.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             return@Component WelcomeViewModel(router)
@@ -41,6 +43,7 @@ object Screens {
 
     val bottomMenuScreen = Component(
         key = "BottomMenuScreen",
+        descriptor = Descriptor.Main.Default,
         onCreate = { _, _ -> BottomMenuViewModel() },
         content = { dataContainer, _ ->
             val viewModel = dataContainer.get<BottomMenuViewModel>()
@@ -59,6 +62,7 @@ object Screens {
 
     val innerNavigationScreen = Component(
         key = "InnerNavigationContent",
+        descriptor = Descriptor.Main.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             InnerNavigationViewModel(router)
@@ -71,6 +75,7 @@ object Screens {
 
     val channelArgumentReceiveScreen = Component(
         key = "ChannelArgumentReceiveContent",
+        descriptor = Descriptor.Main.Default,
         onCreate = { channel, _ -> return@Component ChannelArgumentReceiveViewModel(channel) },
         onDestroy = {
             val viewModel = it.get<ChannelArgumentReceiveViewModel>()
@@ -85,6 +90,7 @@ object Screens {
 
     val channelArgumentSendScreen = Component(
         key = "ChannelArgumentSendContent",
+        descriptor = Descriptor.Main.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             ChannelArgumentSendViewModel(router)
@@ -101,6 +107,7 @@ object Screens {
 
     val somethingDetailsScreen = Component(
         key = "SomethingDetailsContent",
+        descriptor = Descriptor.Main.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             SomethingDetailsViewModel(router)
@@ -113,6 +120,7 @@ object Screens {
 
     val childNavigationContentScreen = Component(
         key = "ChildNavigationContent",
+        descriptor = Descriptor.Main.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             ChildNavigationViewModel(router)
@@ -125,6 +133,7 @@ object Screens {
 
     val redSquareScreen = Component(
         key = "RedSquareContent",
+        descriptor = Descriptor.Child,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             RedSquareViewModel(router)
@@ -137,6 +146,7 @@ object Screens {
 
     val blueSquareScreen = Component(
         key = "BlueSquareContent",
+        descriptor = Descriptor.Child,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             BlueSquareViewModel(router)

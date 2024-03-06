@@ -10,24 +10,28 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import com.alphicc.brick.AndroidComponentsContainer
 import com.alphicc.brick.Component
+import com.alphicc.brick.Descriptor
 import com.alphicc.brick.TreeRouter
+import com.alphicc.brick.ui.ComponentsContainer
 
 val compositeSampleRouter: TreeRouter = TreeRouter.new()
 
 val component1 = Component<Unit>(
     key = "CompositeScreenInternal 1",
+    descriptor = Descriptor.Composite,
     content = { _, _ -> Text("CompositeScreenInternal 1") }
 )
 
 val component2 = Component<Unit>(
     key = "CompositeScreenInternal 2",
+    descriptor = Descriptor.Composite,
     content = { _, _ -> Text("CompositeScreenInternal 2") }
 )
 
 val component3 = Component<Unit>(
     key = "CompositeScreenInternal 3",
+    descriptor = Descriptor.Composite,
     content = { _, _ ->
         Button({}) {
             Text("CompositeScreenInternal 3")
@@ -37,6 +41,7 @@ val component3 = Component<Unit>(
 
 val compositeScreen = Component<Unit>(
     key = "CompositeScreen",
+    descriptor = Descriptor.Main.Default,
     content = { _, compositeContainer ->
         Box(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.align(Alignment.TopCenter)) {
@@ -62,7 +67,7 @@ class CompositeSampleActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
 
         setContent {
-            AndroidComponentsContainer(compositeSampleRouter) {
+            ComponentsContainer(compositeSampleRouter) {
                 finish()
             }
         }

@@ -15,10 +15,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.alphicc.brick.Component
+import com.alphicc.brick.Descriptor
 import com.alphicc.brick.TreeRouter
 
 val listScreen = Component(
     key = "listScreen",
+    descriptor = Descriptor.Main.Default,
     onCreate = { _, argument ->
         val router = argument.get<TreeRouter>()
         return@Component ListViewModel(router)
