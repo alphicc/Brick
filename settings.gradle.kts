@@ -1,4 +1,4 @@
-    pluginManagement {
+pluginManagement {
     val kotlin_version: String by settings
     val compose_version: String by settings
 
@@ -16,4 +16,4 @@
 }
 rootProject.name = "BrickMultiplatform"
 
-include(":desktop", ":android", ":brick")
+include(/* ":desktop",*/":android", ":brick")

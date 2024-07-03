@@ -3,10 +3,10 @@ package com.alphicc.brick
 import com.alphicc.brick.ui.ContainerConnector
 import kotlinx.coroutines.flow.SharedFlow
 
-interface TreeRouter : ContainerConnector, ComponentRouter, ChildComponentRouter, CompositeComponentRouter,
+interface TreeRouter : ContainerConnector, ComponentRouter, ChildComponentRouter,
+    CompositeComponentRouter,
     ArgumentTranslator {
 
-    val initialComponent: Component<*>?
     val parentRouter: TreeRouter?
     val broadcastArgumentsFlow: SharedFlow<Any>
 
@@ -14,15 +14,15 @@ interface TreeRouter : ContainerConnector, ComponentRouter, ChildComponentRouter
 
     fun cleanRouter()
 
-    fun branch(containerComponentKey: String): TreeRouter
-
-    fun branch(containerComponentKey: String, config: RouterConfig): TreeRouter
-
     fun setOverlay(component: Component<*>)
 
     fun <A> setOverlay(component: Component<*>, argument: A)
 
     fun removeOverlay()
+
+    suspend fun branch(containerComponentKey: String): TreeRouter
+
+    suspend fun branch(containerComponentKey: String, config: RouterConfig): TreeRouter
 
     suspend fun <A> passArgument(componentKey: String, argument: A)
 

@@ -11,7 +11,8 @@ class CompositeContainer(private val compositions: ImmutableMap<String, Componen
         val composition = compositions[key]
         composition?.run {
             showContent(
-                dataContainer = this.dependency ?: throw IllegalArgumentException("Dependency can not be null"),
+                dataContainer = this.dependency
+                    ?: throw IllegalArgumentException("Dependency can not be null"),
                 compositions = compositions
             )
         }

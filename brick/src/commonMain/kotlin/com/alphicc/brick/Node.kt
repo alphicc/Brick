@@ -2,14 +2,21 @@ package com.alphicc.brick
 
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
-import kotlinx.collections.immutable.*
+import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
+import kotlinx.collections.immutable.persistentListOf
+import kotlinx.collections.immutable.persistentMapOf
+import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toImmutableMap
 
 internal data class Node(
     val rootComponent: Component<*>,
     val parent: Node? = null
 ) {
-    private val _compositions: AtomicRef<ImmutableMap<String, Component<*>>> = atomic(persistentMapOf())
-    private val _childComponents: AtomicRef<ImmutableList<Component<*>>> = atomic(persistentListOf())
+    private val _compositions: AtomicRef<ImmutableMap<String, Component<*>>> =
+        atomic(persistentMapOf())
+    private val _childComponents: AtomicRef<ImmutableList<Component<*>>> =
+        atomic(persistentListOf())
 
     fun compositions(): ImmutableMap<String, Component<*>> = _compositions.value
 

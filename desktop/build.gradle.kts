@@ -2,7 +2,7 @@ import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 plugins {
     kotlin("multiplatform")
-    id("org.jetbrains.compose") version "1.5.10"
+    id("org.jetbrains.compose")
 }
 
 group = "io.github.alphicc"
@@ -11,7 +11,7 @@ version = "2.4.1"
 kotlin {
     jvm {
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "17"
         }
         withJava()
     }

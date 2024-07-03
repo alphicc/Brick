@@ -103,7 +103,7 @@ Android: Set jvmTarget in your build.gradle
 
 ```kotlin
 kotlinOptions {
-    jvmTarget = '11'
+    jvmTarget = '17'
 }
 ```
 

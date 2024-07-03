@@ -1,0 +1,12 @@
+[versions]
+kotlin = "1.9.23"
+compose-plugin = "1.6.2"
+kotlin-plugin-compose = "2.0.0-RC3"
+
+[libraries]
+
+
+[plugins]
+jetbrainsCompose = { id = "org.jetbrains.compose", version.ref = "compose-plugin" }
+kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin-plugin-compose" }

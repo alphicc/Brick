@@ -6,7 +6,7 @@ sealed class Descriptor(
 
     sealed class Main(val retain: Boolean) : Descriptor(ComponentType.MAIN) {
 
-        sealed class RetainUi(val navigateAnimation: NavigateAnimation) : Main(true) {
+        sealed class RetainUi(private val navigateAnimation: NavigateAnimation) : Main(true) {
 
             data object SwipeBack : RetainUi(NavigateAnimation.SWIPE_BACK)
 
@@ -27,6 +27,6 @@ enum class ComponentType {
     MAIN, CHILD, COMPOSITE, OVERLAY
 }
 
-enum class NavigateAnimation {
+private enum class NavigateAnimation {
     SWIPE_BACK, SWIPE_DOWN, CROSS_FADE
 }

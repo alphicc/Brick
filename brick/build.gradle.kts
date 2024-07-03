@@ -1,4 +1,5 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
+import org.gradle.kotlin.dsl.support.kotlinCompilerOptions
+import org.jetbrains.compose.compose
 import org.jetbrains.compose.desktop.application.dsl.TargetFormat
 
 val kotlin_version: String by properties
@@ -14,6 +15,9 @@ plugins {
     id("org.jetbrains.compose")
     id("com.android.library")
     id("com.vanniktech.maven.publish")
+//    id("org.jetbrains.kotlin.multiplatform")
+//    alias(libs.plugins.jetbrainsCompose) apply false
+//    alias(libs.plugins.compose.compiler) apply false
 }
 
 group = "io.github.alphicc"
@@ -25,7 +29,7 @@ kotlin {
     }
     jvm("desktop") {
         compilations.all {
-            kotlinOptions.jvmTarget = "11"
+            kotlinOptions.jvmTarget = "17"
         }
     }
 
@@ -44,17 +48,17 @@ kotlin {
         val commonMain by getting {
             dependencies {
                 implementation("org.jetbrains.compose.runtime:runtime:${compose_version}")
+                implementation("org.jetbrains.compose.material3:material3:${compose_version}")
                 implementation("org.jetbrains.compose.foundation:foundation:${compose_version}")
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}")
                 implementation("org.jetbrains.kotlinx:atomicfu:${atomicfu_version}")
                 implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:${immutable_collections_version}")
 
-                implementation(compose.runtime)
-                implementation(compose.foundation)
-                implementation(compose.material)
-                implementation(compose.ui)
-                @OptIn(ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
+//                implementation(compose.runtime)
+//                implementation(compose.foundation)
+//                implementation(compose.material)
+//                implementation(compose.ui)
+//                implementation(compose.components.resources)
             }
         }
         val androidMain by getting {
@@ -74,13 +78,21 @@ kotlin {
 }
 
 android {
+    namespace = "com.alphicc.brick"
+
     compileSdk = 34
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
     defaultConfig {
         minSdk = 21
         targetSdk = 34
     }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
 }
+
 
 compose.desktop {
     application {

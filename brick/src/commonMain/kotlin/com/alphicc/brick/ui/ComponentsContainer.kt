@@ -1,6 +1,7 @@
 package com.alphicc.brick.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -21,6 +22,8 @@ fun ComponentsContainer(
     val keepAliveNodes by containerConnector.keepAliveNodes.collectAsState()
 
     val isRouterEmpty by containerConnector.isRouterEmpty.collectAsState()
+    val animState by containerConnector.animState.collectAsState()
+    val topComponentKey by containerConnector.topComponentKey.collectAsState()
 
     LaunchedEffect(isRouterEmpty) {
         if (isRouterEmpty) {
@@ -30,15 +33,20 @@ fun ComponentsContainer(
 
     NativeBackHandler(containerConnector)
 
-    RootAnimator(keepAliveNodes)
-
     component?.run {
+        DisposableEffect("ke") {
+            println("showComponent")
+            onDispose {
+                println("on dispose showComponent")
+            }
+        }
         showContent(
             dataContainer = dependency
                 ?: throw IllegalArgumentException("Dependency can not be null"),
             compositions = compositions
         )
     }
+
     childList.forEach { childScreen ->
         childScreen.showContent(
             dataContainer = childScreen.dependency
@@ -54,4 +62,7 @@ fun ComponentsContainer(
             compositions = persistentMapOf()
         )
     }
+
+//    println("topComponentKey = $topComponentKey // ${component?.key} animState = $animState")
+    RootAnimator(topComponentKey != component?.key, keepAliveNodes, animState)
 }
