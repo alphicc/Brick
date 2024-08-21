@@ -16,6 +16,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import com.alphicc.brick.Descriptor
 import kotlinx.coroutines.Dispatchers
@@ -26,6 +27,8 @@ import kotlinx.coroutines.withContext
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.math.roundToInt
 import kotlin.native.HiddenFromObjC
+import kotlin.time.Duration.Companion.microseconds
+import kotlin.time.Duration.Companion.nanoseconds
 
 //заход в экран контроллится rememberSaveable
 //заход в экран и выход сопровождается публикацией иветов в шину, подписчики по индексу получают необходимые данные
@@ -34,15 +37,20 @@ import kotlin.native.HiddenFromObjC
 @Composable
 internal fun FrameAnimator(
     key: String,
-    descriptor: Descriptor.Main.RetainUi,
+    index: Int,
+    descriptor: Descriptor.Main,
     gestureCommunicator: GestureCommunicator,
+    navigateBack: (immediately: Boolean) -> Unit,
+    requestKey: (index: Int) -> String?,
     content: @Composable () -> Unit
 ) {
 
     val frameState = rememberSaveable { mutableStateOf(0) }
     val gestureEvent by gestureCommunicator.bus.collectAsState(UpdateActions.None)
 
-    val offsetX = rememberSaveable { mutableStateOf(0f) }
+    var screenWidth by mutableStateOf(0)
+    var minimumXOffset by mutableStateOf(0f)
+    var offsetX by remember { mutableStateOf(0f) }
     var alpha by remember { mutableStateOf(0f) }
 
     DisposableEffect(key) {
@@ -56,25 +64,51 @@ internal fun FrameAnimator(
         gestureCommunicator.bus
             .onEach { updateAction ->
                 withContext(Dispatchers.Default) {
-                    println("RECEIVE $updateAction")
+                    println("RECEIVE $updateAction key=$key")
                     when (updateAction) {
+                        is UpdateActions.Animations.Shift.ShiftScene -> {
+                            offsetX = screenWidth * updateAction.percent
+                            delay(1)
+                            if (updateAction.finish) {
+                                navigateBack(true)
+                            }
+                        }
+
+                        is UpdateActions.Animations.Shift.ShiftBackdrop -> {
+//                            val percent = 1 - (updateAction.offsetX / screenWidth)
+                            offsetX = minimumXOffset * updateAction.percent
+                            delay(1)
+//                            println("percent=${updateAction.percent}")
+                        }
+
+                        is UpdateActions.Animations.SwipeBack -> {
+                            println("receive SwipeBack key=$key offsetX=${updateAction.offsetX} minimumXOffset=$minimumXOffset")
+                            delay(1)
+                            alpha = updateAction.alpha
+                            val newOffset = updateAction.offsetX * screenWidth
+                            offsetX = if (newOffset < minimumXOffset) {
+                                minimumXOffset
+                            } else updateAction.offsetX * screenWidth
+                        }
+
                         is UpdateActions.Animations.CrossFade -> {
-                            println("receive crossFade ${updateAction.alpha}")
+//                            println("receive crossFade ${updateAction.alpha}")
                             delay(8)
                             alpha = updateAction.alpha
                         }
 
                         is UpdateActions.Triggers.BackAction -> {
                             val actions = updateAction.getActionsByTrigger(descriptor)
-                            println("receive BackAction start ${actions.size}")
+//                            println("receive BackAction start ${actions.size} key=$key")
                             gestureCommunicator.publishAll(actions)
-                            println("receive BackAction end")
+//                            println("receive BackAction end")
                         }
+
                         is UpdateActions.Triggers.ForwardAction -> {
                             val actions = updateAction.getActionsByTrigger(descriptor)
-                            println("receive ForwardAction start ${actions.size}")
+//                            println("receive ForwardAction start ${actions.size}")
                             gestureCommunicator.publishAll(actions)
-                            println("receive ForwardAction end")
+//                            println("receive ForwardAction end")
                         }
 
                         is UpdateActions.None -> Unit
@@ -82,29 +116,71 @@ internal fun FrameAnimator(
                 }
             }
             .launchIn(this)
-//        if (frameState.value == 0) {
-//            frameState.value = 1
-//            val showAnimations = when (gestureEvent) {
-//                is UpdateActions.CrossFade -> (gestureEvent as UpdateActions.CrossFade).getShowActions()
-//                else -> emptyList()
-//            }
-//            showAnimations.forEach { updateAction ->
-//                gestureCommunicator.publish(updateAction)
-//            }
-//        } else if ()
     }
+
+
+    NativeBackHandler(
+        enabled = true,
+        navigateBack = {
+            navigateBack(false)
+        }
+    )
+
+    println("key=$key offsetX=$offsetX")
+
+    var draggableEnabled by remember { mutableStateOf(true) }
 
     Box(
         modifier = Modifier
+            .onGloballyPositioned { layoutCoordinates ->
+                screenWidth = layoutCoordinates.size.width
+                minimumXOffset =
+                    layoutCoordinates.size.width * UpdateActions.Animations.SwipeBack.SHIFT_THRESHOLD
+            }
             .offset {
-                IntOffset.Zero.copy(x = offsetX.value.roundToInt())
+                IntOffset.Zero.copy(x = offsetX.roundToInt())
             }
             .draggable(
-                enabled = true,
+                enabled = draggableEnabled,
                 orientation = Orientation.Horizontal,
                 state = rememberDraggableState {
-                    val offset = offsetX.value + it
-                    if (offset > 0) offsetX.value = offset
+                    if (descriptor is Descriptor.Main.Animated.SwipeBack) {
+                        val offset = offsetX + it
+                        if (offset > 0) offsetX = offset
+                        val backdropKey = requestKey(index - 1)
+                        backdropKey?.let { key ->
+                            val updateAction =
+                                UpdateActions.Animations.Shift.ShiftBackdrop.getBackdropAction(
+                                    key,
+                                    offsetX,
+                                    screenWidth.toFloat()
+                                )
+                            gestureCommunicator.tryPublish(updateAction)
+                        }
+                    }
+                },
+                onDragStopped = { velocity: Float ->
+                    if (descriptor is Descriptor.Main.Animated.SwipeBack) {
+                        val backdropKey = requestKey(index - 1)
+                        draggableEnabled = false
+                        val speed = when {
+                            velocity > 0 || velocity < 0 -> velocity
+                            velocity == 0f && offsetX > screenWidth / 2 -> 300f
+                            else -> -300f
+                        }
+                        val actions =
+                            UpdateActions.Animations.Shift.ShiftScene.getActionsByVelocity(
+                                key,
+                                backdropKey.orEmpty(),
+                                offsetX,
+                                speed,
+                                screenWidth.toFloat()
+                            )
+                        gestureCommunicator.publishAll(actions)
+                        draggableEnabled = true
+                    }
+
+                    println("velocity = $velocity offsetX=$offsetX screenWidth=$screenWidth")
                 }
             )
             .alpha(alpha)

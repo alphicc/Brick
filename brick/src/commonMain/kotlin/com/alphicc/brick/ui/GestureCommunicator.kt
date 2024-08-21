@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 @Immutable
 internal data class GestureCommunicator(
     val bus: Flow<UpdateActions>,
+    val tryPublish: (UpdateActions) -> Unit,
     val publish: suspend (UpdateActions) -> Unit,
     val publishAll: suspend (List<UpdateActions>) -> Unit
 )

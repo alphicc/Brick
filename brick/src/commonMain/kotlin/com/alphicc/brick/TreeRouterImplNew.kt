@@ -3,9 +3,7 @@ package com.alphicc.brick
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
 import kotlinx.collections.immutable.toImmutableList
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,13 +25,7 @@ internal class TreeRouterImpl(
     )
 
     override val overlay: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
-    override val mainComponent: MutableStateFlow<Component<*>?> = MutableStateFlow(null)
-    override val childComponents: MutableStateFlow<ImmutableList<Component<*>>> =
-        MutableStateFlow(persistentListOf())
-    override val compositions: MutableStateFlow<ImmutableMap<String, Component<*>>> =
-        MutableStateFlow(persistentMapOf())
-    override val keepAliveNodes: MutableStateFlow<ImmutableList<KeepAliveNode>> =
-        MutableStateFlow(persistentListOf())
+    override val nodes: MutableStateFlow<ImmutableList<Node>> = MutableStateFlow(persistentListOf())
     override val isRouterEmpty: MutableStateFlow<Boolean> = MutableStateFlow(true)
 
     private var currentNode: NodeNew? = null
@@ -80,16 +72,60 @@ internal class TreeRouterImpl(
         TODO("Not yet implemented")
     }
 
-    override fun onBackClicked() {
+    override fun onBackClicked(immediately: Boolean) {
         when {
-            lastDefaultNode(currentNode)?.childComponents()?.isNotEmpty() == true -> backChild()
-            lastDefaultNode(currentNode)?.bottom != null -> backComponent()//??
-            else -> backComponent()
+            currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
+            currentNode?.bottom != null -> {
+                if (immediately) backComponentNow()
+                else backComponent()
+            }
+            else -> {
+                if (immediately) backComponentNow()
+                else backComponent()
+            }
         }
     }
 
     override fun lastComponentKey(): String? {
         TODO("Not yet implemented")
+    }
+
+    override fun backComponentNow() {
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.BACK,
+                newKey = currentNode?.bottom?.key.orEmpty(),
+                oldKeys = persistentListOf(currentNode?.key.orEmpty())
+            ),
+            preAction = {
+                currentNode?.run {
+                    childComponents().forEach { childComponent ->
+                        destroyChildRouters(childComponent.key)
+                        childComponent.onDestroy()
+                        keyManager.remove(childComponent.key)
+                    }
+                    compositions().forEach { entry ->
+                        destroyChildRouters(entry.key)
+                        entry.value.onDestroy()
+                        keyManager.remove(entry.key)
+                    }
+                    destroyChildRouters(component.key)
+                    component.onDestroy()
+                    keyManager.remove(component.key)
+                    updateNodeInTree(
+                        node = this.bottom,
+                        transform = { transformNode -> transformNode.copy(top = null) },
+                        afterTransform = {
+                            updateNodeInTree(this, { null })
+                            currentNode = this.bottom
+                        }
+                    )
+                }
+                fetchNode()
+            },
+            postAction = {
+            }
+        )
     }
 
     override fun backComponent() {
@@ -194,6 +230,7 @@ internal class TreeRouterImpl(
                     oldKeys = persistentListOf(currentNode?.key.orEmpty())
                 ),
                 preAction = {
+                    println("preAction keepAliveNodes = ${nodes.value.size}")
                     component.onCreate(argument)
                     val newNode = NodeNew(component = component, bottom = currentNode)
                     updateNodeInTree(
@@ -205,8 +242,10 @@ internal class TreeRouterImpl(
                         }
                     )
                     fetchNode()
+                    println("postAction keepAliveNodes = ${nodes.value.size}")
                 },
                 postAction = {
+                    println("postAction call")
                     val replacedNode = currentNode?.bottom
                     updateNodeInTree(
                         node = currentNode,
@@ -318,27 +357,81 @@ internal class TreeRouterImpl(
     }
 
     override fun backChild() {
-        TODO("Not yet implemented")
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = currentNode?.childComponents()?.last()?.key.orEmpty()
+            ),
+            preAction = {
+                currentNode?.run {
+                    if (childComponents().isNotEmpty()) {
+                        val component = childComponents().last()
+                        dropLastChildComponent()
+                        destroyChildRouters(component.key)
+                        component.onDestroy()
+                        keyManager.remove(component.key)
+                        fetchNode()
+                    }
+                }
+            }
+        )
     }
 
     override fun backToChild(key: String) {
         TODO("Not yet implemented")
     }
 
-    override fun addChild(component: Component<*>) {
-        TODO("Not yet implemented")
+    override fun addChild(component: Component<*>) = addChildNode(component, null)
+
+    override fun <A> addChild(component: Component<*>, argument: A) =
+        addChildNode(component, argument)
+
+    private fun <A> addChildNode(component: Component<*>, argument: A?) {
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = component.key
+            ),
+            preAction = {
+                currentNode?.let {
+                    if (keyManager.add(component.key)) {
+                        currentNode?.let { node ->
+                            node.addChildComponent(component)
+                            component.onCreate(argument)
+                        }
+                        fetchNode()
+                    }
+                }
+            }
+        )
     }
 
-    override fun <A> addChild(component: Component<*>, argument: A) {
-        TODO("Not yet implemented")
-    }
+    override fun replaceChild(component: Component<*>) = replaceChildNode(component, null)
 
-    override fun replaceChild(component: Component<*>) {
-        TODO("Not yet implemented")
-    }
+    override fun <A> replaceChild(component: Component<*>, argument: A) =
+        replaceChildNode(component, argument)
 
-    override fun <A> replaceChild(component: Component<*>, argument: A) {
-        TODO("Not yet implemented")
+    private fun <A> replaceChildNode(component: Component<*>, argument: A?) {
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = component.key
+            ),
+            preAction = {
+                currentNode?.run {
+                    if (childComponents().isNotEmpty()) {
+                        val oldChildComponent = childComponents().last()
+                        if (keyManager.replaceKey(oldChildComponent.key, component.key)) {
+                            destroyChildRouters(oldChildComponent.key)
+                            oldChildComponent.onDestroy()
+                            component.onCreate(argument)
+                            replaceLastChildComponent(component)
+                        }
+                        fetchNode()
+                    }
+                }
+            }
+        )
     }
 
     override fun attachCompositeComponent(component: Component<*>) {
@@ -390,35 +483,22 @@ internal class TreeRouterImpl(
     private inline fun fetchNode() {
         topComponentKey.value = currentNode?.key
         isRouterEmpty.value = currentNode == null
-        mainComponent.value = lastDefaultNode(currentNode)?.component
-        childComponents.value =
-            lastDefaultNode(currentNode)?.childComponents() ?: persistentListOf()
-        compositions.value = lastDefaultNode(currentNode)?.compositions() ?: persistentMapOf()
-        keepAliveNodes.value = keepAliveNodes(currentNode).toImmutableList()
-        println("keepAliveNodes=${keepAliveNodes.value.size}")
+        nodes.value = getNodesList(currentNode).toImmutableList()
     }
 
-    private fun lastDefaultNode(node: NodeNew?): NodeNew? = when {
-        node == null -> null
-        node.component.descriptor is Descriptor.Main.Default -> node
-        else -> lastDefaultNode(node.bottom)
-    }
-
-    private fun keepAliveNodes(node: NodeNew?): List<KeepAliveNode> {
+    private fun getNodesList(node: NodeNew?): List<Node> {
         if (node == null) return emptyList()
 
-        val nodes = mutableListOf<KeepAliveNode>()
-        if (node.component.descriptor is Descriptor.Main.RetainUi) {
-            nodes.add(
-                index = 0,
-                element = KeepAliveNode(
-                    mainComponent = node.component,
-                    childComponentsList = node.childComponents(),
-                    compositions = node.compositions()
-                )
+        val nodes = mutableListOf<Node>()
+        nodes.add(
+            index = 0,
+            element = Node(
+                mainComponent = node.component,
+                childComponentsList = node.childComponents(),
+                compositions = node.compositions()
             )
-        }
-        nodes.addAll(index = 0, elements = keepAliveNodes(node.bottom))
+        )
+        nodes.addAll(index = 0, elements = getNodesList(node.bottom))
         return nodes
     }
 

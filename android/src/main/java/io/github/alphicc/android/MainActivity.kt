@@ -14,14 +14,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import io.github.alphicc.android.childSample.ChildSampleActivity
+import io.github.alphicc.android.childSample.childSampleRouter
 import io.github.alphicc.android.compositeSample.CompositeSampleActivity
 import io.github.alphicc.android.compositeSample.compositeSampleRouter
 import io.github.alphicc.android.largeSample.LargeSampleActivity
 import io.github.alphicc.android.largeSample.largeSampleRouter
 import io.github.alphicc.android.overlaySample.OverlaySampleActivity
 import io.github.alphicc.android.overlaySample.overlaySampleRouter
-import io.github.alphicc.android.smallSample.SmallSampleActivity
-import io.github.alphicc.android.smallSample.smallSampleRouter
+import io.github.alphicc.android.stackSample.StackSampleActivity
+import io.github.alphicc.android.stackSample.stackSampleRouter
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
@@ -37,10 +39,17 @@ class MainActivity : ComponentActivity() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(onClick = {
-                    smallSampleRouter.cleanRouter()
-                    context.startActivity(Intent(context, SmallSampleActivity::class.java))
+                    stackSampleRouter.cleanRouter()
+                    context.startActivity(Intent(context, StackSampleActivity::class.java))
                 }) {
                     Text(text = "Stack navigation")
+                }
+
+                Button(modifier = Modifier.padding(top = 16.dp), onClick = {
+                    childSampleRouter.cleanRouter()
+                    context.startActivity(Intent(context, ChildSampleActivity::class.java))
+                }) {
+                    Text(text = "Child navigation")
                 }
 
                 Button(modifier = Modifier.padding(top = 16.dp), onClick = {

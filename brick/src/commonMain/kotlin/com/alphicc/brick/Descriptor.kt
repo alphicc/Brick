@@ -6,13 +6,13 @@ sealed class Descriptor(
 
     sealed class Main(val retain: Boolean) : Descriptor(ComponentType.MAIN) {
 
-        sealed class RetainUi(private val navigateAnimation: NavigateAnimation) : Main(true) {
+        sealed class Animated(private val navigateAnimation: NavigateAnimation) : Main(true) {
 
-            data object SwipeBack : RetainUi(NavigateAnimation.SWIPE_BACK)
+            data object SwipeBack : Animated(NavigateAnimation.SWIPE_BACK)
 
-            data object SwipeDown : RetainUi(NavigateAnimation.SWIPE_DOWN)
+//            data object SwipeDown : RetainUi(NavigateAnimation.SWIPE_DOWN)
 
-            data object CrossFade : RetainUi(NavigateAnimation.CROSS_FADE)
+            data object CrossFade : Animated(NavigateAnimation.CROSS_FADE)
         }
 
         data object Default: Main(false)

@@ -23,10 +23,12 @@
 
         <activity android:name="io.github.alphicc.android.compositeSample.CompositeSampleActivity"/>
 
-        <activity android:name="io.github.alphicc.android.smallSample.SmallSampleActivity"/>
+        <activity android:name="io.github.alphicc.android.childSample.ChildSampleActivity"/>
 
         <activity android:name="io.github.alphicc.android.largeSample.LargeSampleActivity"/>
 
         <activity android:name="io.github.alphicc.android.overlaySample.OverlaySampleActivity"/>
+
+        <activity android:name="io.github.alphicc.android.stackSample.StackSampleActivity"/>
     </application>
 </manifest>

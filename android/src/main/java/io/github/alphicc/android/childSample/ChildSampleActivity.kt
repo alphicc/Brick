@@ -1,4 +1,4 @@
-package io.github.alphicc.android.smallSample
+package io.github.alphicc.android.childSample
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -24,82 +24,82 @@ import com.alphicc.brick.ui.ComponentsContainer
 import kotlinx.coroutines.flow.filterIsInstance
 import java.util.*
 
-val smallSampleRouter: TreeRouter = TreeRouter.new()
+val childSampleRouter: TreeRouter = TreeRouter.new()
 
 val screen1: Component<Unit> = Component(
     key = "1",
-    descriptor = Descriptor.Main.RetainUi.CrossFade,
+    descriptor = Descriptor.Main.Default,
     onCreate = { _, _ -> println("OnCreate screen1") },
     onDestroy = { _ -> println("onDestroy screen1") },
     content = { _, _ ->
         SimpleScreen(1, "add") {
-            smallSampleRouter.broadcastArgumentsFlow.filterIsInstance<String>()
-            smallSampleRouter.addComponent(screen2)
+            childSampleRouter.broadcastArgumentsFlow.filterIsInstance<String>()
+            childSampleRouter.addComponent(screen2)
         }
     })
 
 val screen2: Component<Unit> = Component(
     key = "2",
-    descriptor = Descriptor.Main.RetainUi.CrossFade,
+    descriptor = Descriptor.Main.Animated.CrossFade,
     onCreate = { _, _ -> println("OnCreate Screen2") },
     onDestroy = { _ -> println("onDestroy Screen2") },
     content = { _, _ ->
-        SimpleScreen(2, "replace") { smallSampleRouter.replaceComponent(screen3) }
+        SimpleScreen(2, "add") { childSampleRouter.addComponent(screen3) }
     })
 
-val screen3: Component<Unit>  = Component<Unit>(
+val screen3: Component<Unit>  = Component(
     key = "3",
-    descriptor = Descriptor.Main.RetainUi.CrossFade,
+    descriptor = Descriptor.Main.Default,
     onCreate = { _, _ -> println("OnCreate screen3") },
     onDestroy = { _ -> println("onDestroy screen3") },
     content = { _, _ ->
-        SimpleScreen(3, "newRoot") { smallSampleRouter.newRootComponent(screen4) }
+        SimpleScreen(3, "replace") { childSampleRouter.replaceComponent(screen4) }
     })
 
-val screen4: Component<Unit>  = Component<Unit>(
+val screen4: Component<Unit>  = Component(
     key = "4",
-    descriptor = Descriptor.Main.RetainUi.CrossFade,
+    descriptor = Descriptor.Main.Animated.CrossFade,
     onCreate = { _, _ -> println("OnCreate screen4") },
     onDestroy = { _ -> println("onDestroy screen4") },
     content = { _, _ ->
-        SimpleScreen(4, "add") { smallSampleRouter.addComponent(screen5) }
+        SimpleScreen(4, "newRoot") { childSampleRouter.newRootComponent(screen5) }
     })
 
-val screen5: Component<Unit>  = Component<Unit>(
+val screen5: Component<Unit>  = Component(
     key = "5",
-    descriptor = Descriptor.Main.RetainUi.CrossFade,
+    descriptor = Descriptor.Main.Animated.CrossFade,
     onCreate = { _, _ -> println("OnCreate screen5") },
     onDestroy = { _ -> println("onDestroy screen5") },
     content = { _, _ ->
-        SimpleScreen(5, "backTO") { smallSampleRouter.backToComponent(screen4.key) }
+        SimpleScreen(5, "addChild") { childSampleRouter.addChild(screenChild1) }
     })
 
 val screenChild1 = Component<Unit>(
     key = "C1",
     descriptor = Descriptor.Child,
     content = { _, _ ->
-        Child(10, "newChild") { smallSampleRouter.addChild(screenChild2) }
+        Child(10, "addChild") { childSampleRouter.addChild(screenChild2) }
     })
 
 val screenChild2 = Component<Unit>(
     key = "C2",
     descriptor = Descriptor.Child,
     content = { _, _ ->
-        Child(20, "newChild") { smallSampleRouter.addChild(screenChild3) }
+        Child(20, "addChild") { childSampleRouter.addChild(screenChild3) }
     })
 
 val screenChild3 = Component<Unit>(
     key = "C3",
     descriptor = Descriptor.Child,
     content = { _, _ ->
-        Child(30, "newChild") { smallSampleRouter.addChild(screenChild4) }
+        Child(30, "addChild") { childSampleRouter.addChild(screenChild4) }
     })
 
 val screenChild4 = Component<Unit>(
     key = "C4",
     descriptor = Descriptor.Child,
     content = { _, _ ->
-        Child(40, "replaceChild") { smallSampleRouter.replaceChild(screenChild5) }
+        Child(40, "replaceChild") { childSampleRouter.replaceChild(screenChild5) }
     })
 
 val screenChild5 = Component<Unit>(
@@ -110,19 +110,19 @@ val screenChild5 = Component<Unit>(
     })
 
 @ExperimentalAnimationApi
-class SmallSampleActivity : ComponentActivity() {
+class ChildSampleActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         setContent {
-            ComponentsContainer(smallSampleRouter) {
-//                finish()
+            ComponentsContainer(childSampleRouter) {
+                finish()
             }
         }
 
         if (savedInstanceState == null) {
-            smallSampleRouter.addComponent(screen1)
+            childSampleRouter.addComponent(screen1)
         }
     }
 }

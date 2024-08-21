@@ -1,21 +1,17 @@
 package com.alphicc.brick.ui
 
-import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.Stable
 import com.alphicc.brick.AnimState
 import com.alphicc.brick.Component
 import com.alphicc.brick.InternalApi
-import com.alphicc.brick.KeepAliveNode
+import com.alphicc.brick.Node
 import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.StateFlow
 
-@Immutable
+@Stable
 interface ContainerConnector {
     val overlay: StateFlow<Component<*>?>
-    val mainComponent: StateFlow<Component<*>?>
-    val childComponents: StateFlow<ImmutableList<Component<*>>>
-    val compositions: StateFlow<ImmutableMap<String, Component<*>>>
-    val keepAliveNodes: StateFlow<ImmutableList<KeepAliveNode>>
+    val nodes: StateFlow<ImmutableList<Node>>
     val isRouterEmpty: StateFlow<Boolean>
 
     @InternalApi
@@ -24,5 +20,5 @@ interface ContainerConnector {
     @InternalApi
     val animState: StateFlow<AnimState>
 
-    fun onBackClicked()
+    fun onBackClicked(immediately: Boolean = false)
 }
