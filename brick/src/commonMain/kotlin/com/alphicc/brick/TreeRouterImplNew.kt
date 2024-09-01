@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
+private const val EMPTY = ""
+
 internal class TreeRouterImpl(
     override val parentRouter: TreeRouter? = null,
     config: RouterConfig
@@ -37,39 +39,88 @@ internal class TreeRouterImpl(
     override val animState: StateFlow<AnimState> = navBus.animState
 
     override fun getRootRouter(): TreeRouter {
-        TODO("Not yet implemented")
+        return parentRouter?.getRootRouter() ?: this
     }
 
     override fun cleanRouter() {
-//        TODO("Not yet implemented")
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = EMPTY
+            ),
+            preAction = {
+                cleanGraph()
+                removeOverlay()
+                fetchNode()
+                println("=========fetchNode")
+            }
+        )
     }
 
-    override fun setOverlay(component: Component<*>) {
-        TODO("Not yet implemented")
-    }
+    override fun setOverlay(component: Component<*>) = setOverlay(component, null)
 
     override fun <A> setOverlay(component: Component<*>, argument: A) {
-        TODO("Not yet implemented")
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = EMPTY
+            ),
+            preAction = {
+                val isSuccess = keyManager.add(component.key)
+                if (isSuccess) {
+                    component.onCreate(argument)
+                    overlay.value = component
+                    fetchNode()
+                }
+            }
+        )
     }
 
     override fun removeOverlay() {
-        TODO("Not yet implemented")
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = EMPTY
+            ),
+            preAction = {
+                val rootRouter = getRootRouter()
+                if (rootRouter === this) {
+                    overlay.value?.let { component ->
+                        keyManager.remove(component.key)
+                        component.onDestroy()
+                        overlay.value = null
+                    }
+                }
+                fetchNode()
+            }
+        )
     }
 
-    override suspend fun branch(containerComponentKey: String): TreeRouter {
-        TODO("Not yet implemented")
-    }
+    override suspend fun branch(containerComponentKey: String): TreeRouter =
+        branch(containerComponentKey, RouterConfig.default())
 
     override suspend fun branch(containerComponentKey: String, config: RouterConfig): TreeRouter {
-        TODO("Not yet implemented")
+        return navBus.proceedWithResult(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = EMPTY
+            ),
+            preAction = {
+                val newRouter = TreeRouterImpl(this, config)
+                val mutedChildRouters = childRouters.value.toMutableList()
+                mutedChildRouters.add(containerComponentKey to newRouter)
+                childRouters.value = mutedChildRouters
+                newRouter
+            }
+        )
     }
 
     override suspend fun <A> passArgument(componentKey: String, argument: A) {
-        TODO("Not yet implemented")
+        redirectArgument(this, componentKey, argument)
     }
 
     override suspend fun <A> passBroadcastArgument(argument: A) {
-        TODO("Not yet implemented")
+        broadcastArgumentsFlow.emit(argument as Any)
     }
 
     override fun onBackClicked(immediately: Boolean) {
@@ -79,6 +130,7 @@ internal class TreeRouterImpl(
                 if (immediately) backComponentNow()
                 else backComponent()
             }
+
             else -> {
                 if (immediately) backComponentNow()
                 else backComponent()
@@ -86,9 +138,7 @@ internal class TreeRouterImpl(
         }
     }
 
-    override fun lastComponentKey(): String? {
-        TODO("Not yet implemented")
-    }
+    override fun lastComponentKey(): String? = currentNode?.key
 
     override fun backComponentNow() {
         navBus.proceed(
@@ -306,6 +356,16 @@ internal class TreeRouterImpl(
     override fun <A> newRootComponent(component: Component<*>, argument: A) =
         newRootComponentNode(component, argument)
 
+    override fun proceedAction(action: suspend () -> Unit) {
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = EMPTY
+            ),
+            preAction = action
+        )
+    }
+
     private fun <A> newRootComponentNode(component: Component<*>, argument: A?) {
         val isSuccess = keyManager.add(component.key)
         if (isSuccess) {
@@ -352,9 +412,7 @@ internal class TreeRouterImpl(
         }
     }
 
-    override fun lastChildKey(): String? {
-        TODO("Not yet implemented")
-    }
+    override fun lastChildKey(): String? = currentNode?.childComponents()?.lastOrNull()?.key
 
     override fun backChild() {
         navBus.proceed(
@@ -378,7 +436,24 @@ internal class TreeRouterImpl(
     }
 
     override fun backToChild(key: String) {
-        TODO("Not yet implemented")
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = currentNode?.childComponents()?.last()?.key.orEmpty()
+            ),
+            preAction = {
+                currentNode?.run {
+                    childComponents().reversed().forEach { component ->
+                        if (component.key != key) {
+                            keyManager.remove(component.key)
+                            destroyChildRouters(component.key)
+                            component.onDestroy()
+                        }
+                    }
+                    fetchNode()
+                }
+            }
+        )
     }
 
     override fun addChild(component: Component<*>) = addChildNode(component, null)
@@ -434,16 +509,44 @@ internal class TreeRouterImpl(
         )
     }
 
-    override fun attachCompositeComponent(component: Component<*>) {
-        TODO("Not yet implemented")
-    }
+    override fun attachCompositeComponent(component: Component<*>) =
+        attachCompositeComponent(component, null)
 
     override fun <A> attachCompositeComponent(component: Component<*>, argument: A) {
-        TODO("Not yet implemented")
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = EMPTY
+            ),
+            preAction = {
+                currentNode?.run {
+                    val isSuccess = keyManager.add(component.key)
+                    if (isSuccess) {
+                        component.onCreate(argument)
+                        addComposition(component)
+                    }
+                }
+            }
+        )
     }
 
     override fun detachCompositeComponent(key: String) {
-        TODO("Not yet implemented")
+        navBus.proceed(
+            animState = AnimState.Executing(
+                direction = AnimDirection.NONE,
+                newKey = EMPTY
+            ),
+            preAction = {
+                currentNode?.run {
+                    keyManager.remove(key)
+                    val composition = compositions()[key]
+                    if (composition != null) {
+                        composition.onDestroy()
+                        removeComposition(key)
+                    }
+                }
+            }
+        )
     }
 
     @InternalApi
@@ -528,7 +631,7 @@ internal class TreeRouterImpl(
             keyManager.remove(node.component.key)
         }
         tree.clear()
-        removeOverlay()
+        currentNode = null
     }
 
     private suspend fun <A> emitArguments(componentKey: String, argument: A): Boolean {

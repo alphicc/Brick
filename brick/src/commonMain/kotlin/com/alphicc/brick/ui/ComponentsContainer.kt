@@ -4,11 +4,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.graphics.Color
 import kotlinx.collections.immutable.persistentMapOf
 
 @Composable
 fun ComponentsContainer(
     containerConnector: ContainerConnector,
+    backgroundColor: Color = Color.White,
     onRouterEmpty: () -> Unit = {}
 ) {
 
@@ -28,6 +30,7 @@ fun ComponentsContainer(
     RootAnimator(
         nodes = nodes,
         animState = animState,
+        backgroundColor = backgroundColor,
         navigateBack = { immediately: Boolean ->
             containerConnector.onBackClicked(immediately)
         }

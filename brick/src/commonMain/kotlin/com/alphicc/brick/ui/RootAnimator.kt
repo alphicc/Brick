@@ -1,9 +1,12 @@
 package com.alphicc.brick.ui
 
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import com.alphicc.brick.AnimDirection
 import com.alphicc.brick.AnimState
 import com.alphicc.brick.Descriptor
@@ -20,6 +23,7 @@ import kotlin.native.HiddenFromObjC
 internal fun RootAnimator(
     nodes: ImmutableList<Node>,
     animState: AnimState,
+    backgroundColor: Color,
     navigateBack: (immediately: Boolean) -> Unit
 ) {
 
@@ -80,28 +84,30 @@ internal fun RootAnimator(
 
 //                println("FrameAnimator call=${keepAliveNode.mainComponent.key} ${keepAliveNode.mainComponent.descriptor}")
                 FrameAnimator(
+                    modifier = Modifier.background(backgroundColor),
                     key = keepAliveNode.mainComponent.key,
                     index = index,
                     descriptor = keepAliveNode.mainComponent.descriptor,
                     gestureCommunicator = communicator,
                     navigateBack = navigateBack,
-                    requestKey = { index -> nodes.getOrNull(index)?.mainComponent?.key }
-                ) {
-                    keepAliveNode.mainComponent.run {
-                        showContent(
-                            dataContainer = dependency
-                                ?: throw IllegalArgumentException("Dependency can not be null"),
-                            compositions = keepAliveNode.compositions
-                        )
+                    requestKey = { index -> nodes.getOrNull(index)?.mainComponent?.key },
+                    content = {
+                        keepAliveNode.mainComponent.run {
+                            showContent(
+                                dataContainer = dependency
+                                    ?: throw IllegalArgumentException("Dependency can not be null"),
+                                compositions = keepAliveNode.compositions
+                            )
+                        }
+                        keepAliveNode.childComponentsList.forEach { childScreen ->
+                            childScreen.showContent(
+                                dataContainer = childScreen.dependency
+                                    ?: throw IllegalArgumentException("Dependency can not be null"),
+                                compositions = keepAliveNode.compositions
+                            )
+                        }
                     }
-                    keepAliveNode.childComponentsList.forEach { childScreen ->
-                        childScreen.showContent(
-                            dataContainer = childScreen.dependency
-                                ?: throw IllegalArgumentException("Dependency can not be null"),
-                            compositions = keepAliveNode.compositions
-                        )
-                    }
-                }
+                )
             }
         }
     }

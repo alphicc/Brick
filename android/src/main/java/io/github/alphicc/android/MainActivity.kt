@@ -14,16 +14,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.lifecycleScope
 import io.github.alphicc.android.childSample.ChildSampleActivity
 import io.github.alphicc.android.childSample.childSampleRouter
 import io.github.alphicc.android.compositeSample.CompositeSampleActivity
+import io.github.alphicc.android.compositeSample.component1
+import io.github.alphicc.android.compositeSample.component2
+import io.github.alphicc.android.compositeSample.component3
 import io.github.alphicc.android.compositeSample.compositeSampleRouter
+import io.github.alphicc.android.compositeSample.compositeScreen
 import io.github.alphicc.android.largeSample.LargeSampleActivity
 import io.github.alphicc.android.largeSample.largeSampleRouter
+import io.github.alphicc.android.largeSample.screens.Screens
 import io.github.alphicc.android.overlaySample.OverlaySampleActivity
+import io.github.alphicc.android.overlaySample.listScreen.listScreen
 import io.github.alphicc.android.overlaySample.overlaySampleRouter
 import io.github.alphicc.android.stackSample.StackSampleActivity
+import io.github.alphicc.android.stackSample.screen1
 import io.github.alphicc.android.stackSample.stackSampleRouter
+import kotlinx.coroutines.launch
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
@@ -40,35 +49,53 @@ class MainActivity : ComponentActivity() {
             ) {
                 Button(onClick = {
                     stackSampleRouter.cleanRouter()
-                    context.startActivity(Intent(context, StackSampleActivity::class.java))
+                    stackSampleRouter.addComponent(screen1)
+                    stackSampleRouter.proceedAction {
+                        context.startActivity(Intent(context, StackSampleActivity::class.java))
+                    }
                 }) {
                     Text(text = "Stack navigation")
                 }
 
                 Button(modifier = Modifier.padding(top = 16.dp), onClick = {
                     childSampleRouter.cleanRouter()
-                    context.startActivity(Intent(context, ChildSampleActivity::class.java))
+                    childSampleRouter.addComponent(io.github.alphicc.android.childSample.screen1)
+                    childSampleRouter.proceedAction {
+                        context.startActivity(Intent(context, ChildSampleActivity::class.java))
+                    }
                 }) {
                     Text(text = "Child navigation")
                 }
 
                 Button(modifier = Modifier.padding(top = 16.dp), onClick = {
                     largeSampleRouter.cleanRouter()
-                    context.startActivity(Intent(context, LargeSampleActivity::class.java))
+                    largeSampleRouter.addComponent(Screens.welcomeScreen, largeSampleRouter)
+                    largeSampleRouter.proceedAction {
+                        context.startActivity(Intent(context, LargeSampleActivity::class.java))
+                    }
                 }) {
                     Text(text = "Nested navigation")
                 }
 
                 Button(modifier = Modifier.padding(top = 16.dp), onClick = {
                     overlaySampleRouter.cleanRouter()
-                    context.startActivity(Intent(context, OverlaySampleActivity::class.java))
+                    overlaySampleRouter.addComponent(listScreen, overlaySampleRouter)
+                    overlaySampleRouter.proceedAction {
+                        context.startActivity(Intent(context, OverlaySampleActivity::class.java))
+                    }
                 }) {
                     Text(text = "Overlay")
                 }
 
                 Button(modifier = Modifier.padding(top = 16.dp), onClick = {
                     compositeSampleRouter.cleanRouter()
-                    context.startActivity(Intent(context, CompositeSampleActivity::class.java))
+                    compositeSampleRouter.addComponent(compositeScreen)
+                    compositeSampleRouter.attachCompositeComponent(component1, "321")
+                    compositeSampleRouter.attachCompositeComponent(component2)
+                    compositeSampleRouter.attachCompositeComponent(component3)
+                    compositeSampleRouter.proceedAction {
+                        context.startActivity(Intent(context, CompositeSampleActivity::class.java))
+                    }
                 }) {
                     Text(text = "Composite navigation")
                 }

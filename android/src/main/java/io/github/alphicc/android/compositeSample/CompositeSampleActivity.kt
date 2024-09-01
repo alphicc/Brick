@@ -71,12 +71,5 @@ class CompositeSampleActivity : ComponentActivity() {
                 finish()
             }
         }
-
-        if (savedInstanceState == null) {
-            compositeSampleRouter.addComponent(compositeScreen)
-            compositeSampleRouter.attachCompositeComponent(component1, "321")
-            compositeSampleRouter.attachCompositeComponent(component2)
-            compositeSampleRouter.attachCompositeComponent(component3)
-        }
     }
 }

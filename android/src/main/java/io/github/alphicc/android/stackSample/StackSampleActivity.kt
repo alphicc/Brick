@@ -18,7 +18,6 @@ import com.alphicc.brick.Component
 import com.alphicc.brick.Descriptor
 import com.alphicc.brick.TreeRouter
 import com.alphicc.brick.ui.ComponentsContainer
-import kotlinx.coroutines.flow.filterIsInstance
 import java.util.Random
 
 val stackSampleRouter: TreeRouter = TreeRouter.new()
@@ -80,10 +79,6 @@ class StackSampleActivity : ComponentActivity() {
             ComponentsContainer(stackSampleRouter) {
                 finish()
             }
-        }
-
-        if (savedInstanceState == null) {
-            stackSampleRouter.addComponent(screen1)
         }
     }
 }

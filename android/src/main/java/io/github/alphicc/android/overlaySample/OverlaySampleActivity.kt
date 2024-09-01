@@ -19,9 +19,5 @@ class OverlaySampleActivity : ComponentActivity() {
                 finish()
             }
         }
-
-        if (savedInstanceState == null) {
-            overlaySampleRouter.addComponent(listScreen, overlaySampleRouter)
-        }
     }
 }

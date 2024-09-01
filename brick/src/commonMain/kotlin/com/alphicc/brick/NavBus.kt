@@ -1,11 +1,17 @@
+@file:OptIn(FlowPreview::class)
+
 package com.alphicc.brick
 
+import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
@@ -40,14 +46,14 @@ internal interface NavBus {
         animState: AnimState.Executing,
         preAction: suspend () -> T,
         postAction: (suspend () -> Unit)? = null,
-    ): T?
+    ): T
 
     companion object {
-        fun create(scope: CoroutineScope, animDelay: Long): NavBus = NavBusImpl(scope, animDelay)
+        fun create(scope: CoroutineScope, animDelay: Long): NavBus = NavBusImpl(scope)
     }
 }
 
-private class NavBusImpl(private val scope: CoroutineScope, private val animDelay: Long) : NavBus {
+private class NavBusImpl(scope: CoroutineScope) : NavBus {
 
     override val animState: MutableStateFlow<AnimState> =
         MutableStateFlow(AnimState.Idle)
@@ -102,7 +108,7 @@ private class NavBusImpl(private val scope: CoroutineScope, private val animDela
         animState: AnimState.Executing,
         preAction: suspend () -> T,
         postAction: (suspend () -> Unit)?
-    ): T? {
+    ): T {
         println("proceedWithResult")
         val navAction =
             NavAction(animState = animState, preAction = preAction, postAction = postAction)
@@ -112,7 +118,7 @@ private class NavBusImpl(private val scope: CoroutineScope, private val animDela
         }
     }
 
-    private suspend fun <T> updateAnimState(navAction: NavAction<T>): T? = statefulNavigation {
+    private suspend fun <T> updateAnimState(navAction: NavAction<T>): T = statefulNavigation {
         navAction.preAction().apply {
             delay(50)//wait until new nodes subscribe on flow data
             animState.value = navAction.animState

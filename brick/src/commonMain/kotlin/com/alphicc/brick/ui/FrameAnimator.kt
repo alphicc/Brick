@@ -27,8 +27,6 @@ import kotlinx.coroutines.withContext
 import kotlin.experimental.ExperimentalObjCRefinement
 import kotlin.math.roundToInt
 import kotlin.native.HiddenFromObjC
-import kotlin.time.Duration.Companion.microseconds
-import kotlin.time.Duration.Companion.nanoseconds
 
 //заход в экран контроллится rememberSaveable
 //заход в экран и выход сопровождается публикацией иветов в шину, подписчики по индексу получают необходимые данные
@@ -42,7 +40,8 @@ internal fun FrameAnimator(
     gestureCommunicator: GestureCommunicator,
     navigateBack: (immediately: Boolean) -> Unit,
     requestKey: (index: Int) -> String?,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
+    modifier: Modifier = Modifier
 ) {
 
     val frameState = rememberSaveable { mutableStateOf(0) }
@@ -51,10 +50,12 @@ internal fun FrameAnimator(
     var screenWidth by mutableStateOf(0)
     var minimumXOffset by mutableStateOf(0f)
     var offsetX by remember { mutableStateOf(0f) }
-    var alpha by remember { mutableStateOf(0f) }
+    val initialAlpha =
+        remember(descriptor) { if (descriptor is Descriptor.Main.Default) 1f else 0f }
+    var alpha by remember { mutableStateOf(initialAlpha) }
 
     DisposableEffect(key) {
-        println("DisposableEffect $key")
+        println("DisposableEffect $key descriptor=$descriptor")
         onDispose {
             println("onDispose $key")
         }
@@ -131,7 +132,7 @@ internal fun FrameAnimator(
     var draggableEnabled by remember { mutableStateOf(true) }
 
     Box(
-        modifier = Modifier
+        modifier = modifier
             .onGloballyPositioned { layoutCoordinates ->
                 screenWidth = layoutCoordinates.size.width
                 minimumXOffset =
@@ -145,6 +146,7 @@ internal fun FrameAnimator(
                 orientation = Orientation.Horizontal,
                 state = rememberDraggableState {
                     if (descriptor is Descriptor.Main.Animated.SwipeBack) {
+                        println("key=$key descriptor=$descriptor")
                         val offset = offsetX + it
                         if (offset > 0) offsetX = offset
                         val backdropKey = requestKey(index - 1)

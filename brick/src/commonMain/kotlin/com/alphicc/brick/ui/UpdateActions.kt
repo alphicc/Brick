@@ -148,7 +148,7 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
                     oldKeys: ImmutableList<String>,
                 ): List<SwipeBack> = withContext(Dispatchers.Default) {
                     val actions = mutableListOf<SwipeBack>()
-                    val offsetStep = 1f / (270f / (oldKeys.size + 1))
+                    val offsetStep = 1f / (150f / (oldKeys.size + 1))
                     println("==offsetStep=$offsetStep")
                     oldKeys.forEach { oldKey ->
                         var offsetX = 0f

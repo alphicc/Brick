@@ -12,4 +12,5 @@ interface ComponentRouter {
     fun <A> addComponent(component: Component<*>, argument: A)
     fun newRootComponent(component: Component<*>)
     fun <A> newRootComponent(component: Component<*>, argument: A)
+    fun proceedAction(action: suspend () -> Unit)
 }
