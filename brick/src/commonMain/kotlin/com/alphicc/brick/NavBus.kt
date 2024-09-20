@@ -2,16 +2,13 @@
 
 package com.alphicc.brick
 
-import androidx.compose.runtime.collectAsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.sync.Mutex
@@ -123,6 +120,10 @@ private class NavBusImpl(scope: CoroutineScope) : NavBus {
             delay(50)//wait until new nodes subscribe on flow data
             animState.value = navAction.animState
             delay(300)
+            /**
+             *             val duration = if (navAction.animState.direction == AnimDirection.NONE) 0L else 300L
+             *             delay(duration)
+             */
             navAction.postAction?.invoke()
         }
     }

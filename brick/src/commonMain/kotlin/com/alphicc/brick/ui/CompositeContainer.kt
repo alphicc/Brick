@@ -1,9 +1,11 @@
 package com.alphicc.brick.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import com.alphicc.brick.Component
 import kotlinx.collections.immutable.ImmutableMap
 
+@Immutable
 class CompositeContainer(private val compositions: ImmutableMap<String, Component<*>>) {
 
     @Composable

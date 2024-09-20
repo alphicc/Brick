@@ -30,7 +30,7 @@ object Screens {
 
     val welcomeScreen = Component(
         key = "Welcome",
-        descriptor = Descriptor.Main.Default,
+        descriptor = Descriptor.Screen.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             return@Component WelcomeViewModel(router)
@@ -43,7 +43,7 @@ object Screens {
 
     val bottomMenuScreen = Component(
         key = "BottomMenuScreen",
-        descriptor = Descriptor.Main.Default,
+        descriptor = Descriptor.Screen.Default,
         onCreate = { _, _ -> BottomMenuViewModel() },
         content = { dataContainer, _ ->
             val viewModel = dataContainer.get<BottomMenuViewModel>()
@@ -62,7 +62,7 @@ object Screens {
 
     val innerNavigationScreen = Component(
         key = "InnerNavigationContent",
-        descriptor = Descriptor.Main.Default,
+        descriptor = Descriptor.Screen.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             InnerNavigationViewModel(router)
@@ -75,7 +75,7 @@ object Screens {
 
     val channelArgumentReceiveScreen = Component(
         key = "ChannelArgumentReceiveContent",
-        descriptor = Descriptor.Main.Default,
+        descriptor = Descriptor.Screen.Default,
         onCreate = { channel, _ -> return@Component ChannelArgumentReceiveViewModel(channel) },
         onDestroy = {
             val viewModel = it.get<ChannelArgumentReceiveViewModel>()
@@ -90,7 +90,7 @@ object Screens {
 
     val channelArgumentSendScreen = Component(
         key = "ChannelArgumentSendContent",
-        descriptor = Descriptor.Main.Default,
+        descriptor = Descriptor.Screen.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             ChannelArgumentSendViewModel(router)
@@ -107,7 +107,7 @@ object Screens {
 
     val somethingDetailsScreen = Component(
         key = "SomethingDetailsContent",
-        descriptor = Descriptor.Main.Default,
+        descriptor = Descriptor.Screen.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             SomethingDetailsViewModel(router)
@@ -120,7 +120,7 @@ object Screens {
 
     val childNavigationContentScreen = Component(
         key = "ChildNavigationContent",
-        descriptor = Descriptor.Main.Default,
+        descriptor = Descriptor.Screen.Default,
         onCreate = { _, argument ->
             val router = argument.get<TreeRouter>()
             ChildNavigationViewModel(router)

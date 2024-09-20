@@ -250,26 +250,26 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
         keys: ImmutableList<String>
     ) : UpdateActions(keys) {
 
-        abstract suspend fun getActionsByTrigger(descriptor: Descriptor.Main): List<Animations>
+        abstract suspend fun getActionsByTrigger(descriptor: Descriptor.Screen): List<Animations>
 
         data class ForwardAction(
             val newKey: String,
             val oldKey: ImmutableList<String>
         ) : Triggers(persistentListOf(newKey)) {
 
-            override suspend fun getActionsByTrigger(descriptor: Descriptor.Main): List<Animations> =
+            override suspend fun getActionsByTrigger(descriptor: Descriptor.Screen): List<Animations> =
                 when (descriptor) {
-                    is Descriptor.Main.Animated.CrossFade -> {
+                    is Descriptor.Screen.Animated.CrossFade -> {
                         println("getActionsByTrigger FORWARD")
                         Animations.CrossFade.getShowActions(newKey, oldKey)
                     }
 
-                    is Descriptor.Main.Animated.SwipeBack -> {
+                    is Descriptor.Screen.Animated.SwipeBack -> {
                         println("getActionsByTrigger SwipeBack")
                         Animations.SwipeBack.getShowActions(newKey, oldKey)
                     }
 
-                    is Descriptor.Main.Default -> {
+                    is Descriptor.Screen.Default -> {
                         println("getActionsByTrigger Default_Forward $newKey")
                         Animations.CrossFade.getShowAction(newKey)
                     }
@@ -281,19 +281,19 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
             val oldKey: ImmutableList<String>
         ) : Triggers(oldKey) {
 
-            override suspend fun getActionsByTrigger(descriptor: Descriptor.Main): List<Animations> =
+            override suspend fun getActionsByTrigger(descriptor: Descriptor.Screen): List<Animations> =
                 when (descriptor) {
-                    is Descriptor.Main.Animated.CrossFade -> {
+                    is Descriptor.Screen.Animated.CrossFade -> {
                         println("getActionsByTrigger CrossFade")
                         Animations.CrossFade.getHideActions(newKey, oldKey)
                     }
 
-                    is Descriptor.Main.Animated.SwipeBack -> {
+                    is Descriptor.Screen.Animated.SwipeBack -> {
                         println("getActionsByTrigger SwipeBack")
                         Animations.SwipeBack.getHideActions(newKey, oldKey)
                     }
 
-                    is Descriptor.Main.Default -> {
+                    is Descriptor.Screen.Default -> {
                         println("getActionsByTrigger Default_Back $newKey")
                         Animations.CrossFade.getShowAction(newKey)
                     }

@@ -25,7 +25,7 @@ private val router: TreeRouter by lazy {
 
 val screen1: Component<Unit> = Component(
     key = "1",
-    descriptor = Descriptor.Main.Animated.SwipeBack,
+    descriptor = Descriptor.Screen.Animated.SwipeBack,
     onCreate = { _, _ -> println("OnCreate screen1") },
     onDestroy = { _ -> println("onDestroy screen1") },
     content = { _, _ ->
@@ -37,7 +37,7 @@ val screen1: Component<Unit> = Component(
 
 val screen2: Component<Unit> = Component(
     key = "2",
-    descriptor = Descriptor.Main.Animated.SwipeBack,
+    descriptor = Descriptor.Screen.Animated.SwipeBack,
     onCreate = { _, _ -> println("OnCreate Screen2") },
     onDestroy = { _ -> println("onDestroy Screen2") },
     content = { _, _ ->
@@ -46,7 +46,7 @@ val screen2: Component<Unit> = Component(
 
 val screen3: Component<Unit> = Component(
     key = "3",
-    descriptor = Descriptor.Main.Animated.CrossFade,
+    descriptor = Descriptor.Screen.Animated.CrossFade,
     onCreate = { _, _ -> println("OnCreate screen3") },
     onDestroy = { _ -> println("onDestroy screen3") },
     content = { _, _ ->
@@ -55,7 +55,7 @@ val screen3: Component<Unit> = Component(
 
 val screen4: Component<Unit> = Component(
     key = "4",
-    descriptor = Descriptor.Main.Animated.CrossFade,
+    descriptor = Descriptor.Screen.Animated.CrossFade,
     onCreate = { _, _ -> println("OnCreate screen4") },
     onDestroy = { _ -> println("onDestroy screen4") },
     content = { _, _ ->
@@ -64,7 +64,7 @@ val screen4: Component<Unit> = Component(
 
 val screen5: Component<Unit> = Component(
     key = "5",
-    descriptor = Descriptor.Main.Animated.CrossFade,
+    descriptor = Descriptor.Screen.Animated.CrossFade,
     onCreate = { _, _ -> println("OnCreate screen5") },
     onDestroy = { _ -> println("onDestroy screen5") },
     content = { _, _ ->

@@ -41,7 +41,7 @@ val component3 = Component<Unit>(
 
 val compositeScreen = Component<Unit>(
     key = "CompositeScreen",
-    descriptor = Descriptor.Main.Default,
+    descriptor = Descriptor.Screen.Default,
     content = { _, compositeContainer ->
         Box(modifier = Modifier.fillMaxSize()) {
             Box(modifier = Modifier.align(Alignment.TopCenter)) {

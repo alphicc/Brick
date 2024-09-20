@@ -1,6 +1,7 @@
 package com.alphicc.brick
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.Immutable
 import com.alphicc.brick.ui.CompositeContainer
 import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -45,7 +46,8 @@ open class BaseComponent<D>(
     }
 }
 
-class DataContainer(val rawData: Any?) {
+@Immutable
+data class DataContainer(val rawData: Any?) {
     inline fun <reified C> get(): C {
         if (rawData is C) return rawData
         else throw IllegalArgumentException("Argument type incorrect")

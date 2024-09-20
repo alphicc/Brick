@@ -20,7 +20,7 @@ import com.alphicc.brick.TreeRouter
 
 val listScreen = Component(
     key = "listScreen",
-    descriptor = Descriptor.Main.Default,
+    descriptor = Descriptor.Screen.Default,
     onCreate = { _, argument ->
         val router = argument.get<TreeRouter>()
         return@Component ListViewModel(router)

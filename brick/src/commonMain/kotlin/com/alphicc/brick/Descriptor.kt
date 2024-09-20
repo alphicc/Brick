@@ -4,9 +4,9 @@ sealed class Descriptor(
     val componentType: ComponentType
 ) {
 
-    sealed class Main(val retain: Boolean) : Descriptor(ComponentType.MAIN) {
+    sealed class Screen(val retain: Boolean) : Descriptor(ComponentType.MAIN) {
 
-        sealed class Animated(private val navigateAnimation: NavigateAnimation) : Main(true) {
+        sealed class Animated(private val navigateAnimation: NavigateAnimation) : Screen(true) {
 
             data object SwipeBack : Animated(NavigateAnimation.SWIPE_BACK)
 
@@ -15,7 +15,7 @@ sealed class Descriptor(
             data object CrossFade : Animated(NavigateAnimation.CROSS_FADE)
         }
 
-        data object Default: Main(false)
+        data object Default: Screen(false)
     }
 
     data object Child : Descriptor(ComponentType.CHILD)

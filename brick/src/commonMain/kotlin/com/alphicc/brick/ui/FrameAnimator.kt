@@ -36,7 +36,7 @@ import kotlin.native.HiddenFromObjC
 internal fun FrameAnimator(
     key: String,
     index: Int,
-    descriptor: Descriptor.Main,
+    descriptor: Descriptor.Screen,
     gestureCommunicator: GestureCommunicator,
     navigateBack: (immediately: Boolean) -> Unit,
     requestKey: (index: Int) -> String?,
@@ -51,7 +51,7 @@ internal fun FrameAnimator(
     var minimumXOffset by mutableStateOf(0f)
     var offsetX by remember { mutableStateOf(0f) }
     val initialAlpha =
-        remember(descriptor) { if (descriptor is Descriptor.Main.Default) 1f else 0f }
+        remember(descriptor) { if (descriptor is Descriptor.Screen.Default) 1f else 0f }
     var alpha by remember { mutableStateOf(initialAlpha) }
 
     DisposableEffect(key) {
@@ -145,7 +145,7 @@ internal fun FrameAnimator(
                 enabled = draggableEnabled,
                 orientation = Orientation.Horizontal,
                 state = rememberDraggableState {
-                    if (descriptor is Descriptor.Main.Animated.SwipeBack) {
+                    if (descriptor is Descriptor.Screen.Animated.SwipeBack) {
                         println("key=$key descriptor=$descriptor")
                         val offset = offsetX + it
                         if (offset > 0) offsetX = offset
@@ -162,7 +162,7 @@ internal fun FrameAnimator(
                     }
                 },
                 onDragStopped = { velocity: Float ->
-                    if (descriptor is Descriptor.Main.Animated.SwipeBack) {
+                    if (descriptor is Descriptor.Screen.Animated.SwipeBack) {
                         val backdropKey = requestKey(index - 1)
                         draggableEnabled = false
                         val speed = when {

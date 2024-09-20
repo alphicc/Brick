@@ -1,11 +1,9 @@
 package com.alphicc.brick.ui
 
-import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.alphicc.brick.AnimDirection
 import com.alphicc.brick.AnimState
@@ -59,7 +57,7 @@ internal fun RootAnimator(
 //        }
         key(keepAliveNode.mainComponent.key) {
 
-            if (keepAliveNode.mainComponent.descriptor is Descriptor.Main) {
+            if (keepAliveNode.mainComponent.descriptor is Descriptor.Screen) {
                 val communicator = remember(keepAliveNode.mainComponent.key) {
 //                    println("remember call=${keepAliveNode.mainComponent.key}")
                     val filteredBus = bus.filter { updateAction ->
@@ -84,7 +82,6 @@ internal fun RootAnimator(
 
 //                println("FrameAnimator call=${keepAliveNode.mainComponent.key} ${keepAliveNode.mainComponent.descriptor}")
                 FrameAnimator(
-                    modifier = Modifier.background(backgroundColor),
                     key = keepAliveNode.mainComponent.key,
                     index = index,
                     descriptor = keepAliveNode.mainComponent.descriptor,

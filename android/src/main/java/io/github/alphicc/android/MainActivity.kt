@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import io.github.alphicc.android.childSample.ChildSampleActivity
 import io.github.alphicc.android.childSample.childSampleRouter
 import io.github.alphicc.android.compositeSample.CompositeSampleActivity
@@ -30,9 +29,8 @@ import io.github.alphicc.android.overlaySample.OverlaySampleActivity
 import io.github.alphicc.android.overlaySample.listScreen.listScreen
 import io.github.alphicc.android.overlaySample.overlaySampleRouter
 import io.github.alphicc.android.stackSample.StackSampleActivity
-import io.github.alphicc.android.stackSample.screen1
+import io.github.alphicc.android.stackSample.productsScreen.productsScreenComponent
 import io.github.alphicc.android.stackSample.stackSampleRouter
-import kotlinx.coroutines.launch
 
 @ExperimentalAnimationApi
 class MainActivity : ComponentActivity() {
@@ -49,7 +47,7 @@ class MainActivity : ComponentActivity() {
             ) {
                 Button(onClick = {
                     stackSampleRouter.cleanRouter()
-                    stackSampleRouter.addComponent(screen1)
+                    stackSampleRouter.addComponent(productsScreenComponent, stackSampleRouter)
                     stackSampleRouter.proceedAction {
                         context.startActivity(Intent(context, StackSampleActivity::class.java))
                     }
