@@ -106,7 +106,6 @@ private class NavBusImpl(scope: CoroutineScope) : NavBus {
         preAction: suspend () -> T,
         postAction: (suspend () -> Unit)?
     ): T {
-        println("proceedWithResult")
         val navAction =
             NavAction(animState = animState, preAction = preAction, postAction = postAction)
         return navActionsMutex.withLock {

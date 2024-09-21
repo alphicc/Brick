@@ -67,7 +67,7 @@ fun ProductDetailsScreen(
                 .fillMaxWidth(),
             onClick = onBuyProductClicked
         ) {
-            Text(text = "Buy product")
+            Text(text = "Add to cart")
         }
     }
 }
@@ -95,7 +95,7 @@ private fun ProductLogo(
             modifier = Modifier
                 .padding(24.dp)
                 .align(Alignment.TopStart)
-                .clickable { onBlackClicked() },
+                .clickable(onClick = onBlackClicked),
             text = "Back"
         )
     }

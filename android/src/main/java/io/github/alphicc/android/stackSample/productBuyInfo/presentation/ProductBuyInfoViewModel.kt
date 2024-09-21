@@ -1,0 +1,21 @@
+package io.github.alphicc.android.stackSample.productBuyInfo.presentation
+
+import io.github.alphicc.android.stackSample.productBuyInfo.ProductBuyInfoScreenArguments
+import io.github.alphicc.android.stackSample.productBuySuccess.productBuySuccessComponent
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+
+class ProductBuyInfoViewModel(arguments: ProductBuyInfoScreenArguments) {
+
+    private val router = arguments.router
+    private val _productIndex: MutableStateFlow<Int> = MutableStateFlow(arguments.productIndex)
+    val productIndex: StateFlow<Int> = _productIndex
+
+    fun onBackClicked() {
+        router.backComponent()
+    }
+
+    fun onBuyProductClicked() {
+        router.addChild(productBuySuccessComponent, router)
+    }
+}
