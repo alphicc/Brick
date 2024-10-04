@@ -12,7 +12,7 @@ sealed class AnimState(
     data class Executing(
         override val direction: AnimDirection,
         override val newKey: String,
-        override val oldKeys: ImmutableList<String> = persistentListOf()
+        override val oldKeys: ImmutableList<String> = persistentListOf(),
     ) : AnimState(direction, newKey, oldKeys)
 
     data object Idle : AnimState(AnimDirection.NONE, "", persistentListOf())

@@ -29,7 +29,7 @@ class ProductBuySuccessViewModel(private val router: TreeRouter) {
         viewModelScope.launch {
             _dialogShowed.value = false
             delay(300)
-            router.backToComponent(productsScreenComponent.key)
+            router.startTransaction { backToComponent(productsScreenComponent.key) }
         }
     }
 

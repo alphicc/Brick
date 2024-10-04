@@ -13,11 +13,11 @@ class ProductDetailsScreenViewModel(arguments: ProductDetailsScreenArguments) {
     private val router = arguments.router
 
     fun onBackClicked() {
-        router.backComponent()
+        router.startTransaction { backComponent() }
     }
 
     fun onBuyProductClicked() {
         val productBuyInfoArgument = ProductBuyInfoScreenArguments(router, _productIndex.value)
-        router.addComponent(productBuyInfoComponent, productBuyInfoArgument)
+        router.startTransaction { addComponent(productBuyInfoComponent, productBuyInfoArgument) }
     }
 }

@@ -1,24 +1,34 @@
 package com.alphicc.brick
 
+import com.alphicc.brick.entities.TransactionScope
 import com.alphicc.brick.ui.ContainerConnector
 import kotlinx.coroutines.flow.SharedFlow
 
 interface TreeRouter : ContainerConnector, ComponentRouter, ChildComponentRouter,
-    CompositeComponentRouter,
-    ArgumentTranslator {
+    CompositeComponentRouter, ArgumentTranslator {
 
     val parentRouter: TreeRouter?
     val broadcastArgumentsFlow: SharedFlow<Any>
 
     fun getRootRouter(): TreeRouter
 
-    fun cleanRouter()
+    fun startTransaction(
+        transactionSettings: TransactionSettings = TransactionSettings.default(),
+        action: TransactionScope.() -> Unit
+    )
 
-    fun setOverlay(component: Component<*>)
+    fun proceedAction(
+        transactionSettings: TransactionSettings = TransactionSettings.immediately(),
+        action: () -> Unit
+    )
 
-    fun <A> setOverlay(component: Component<*>, argument: A)
+    fun TransactionScope.cleanRouter()
 
-    fun removeOverlay()
+    fun TransactionScope.setOverlay(component: Component<*>)
+
+    fun <A> TransactionScope.setOverlay(component: Component<*>, argument: A)
+
+    fun TransactionScope.removeOverlay()
 
     suspend fun branch(containerComponentKey: String): TreeRouter
 

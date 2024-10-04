@@ -18,6 +18,6 @@ class DrawerViewModel(private val treeRouter: TreeRouter) {
     }
 
     fun onShowOverlayClicked() {
-        treeRouter.setOverlay(overlayScreen, treeRouter)
+//        treeRouter.setOverlay(overlayScreen, treeRouter)
     }
 }

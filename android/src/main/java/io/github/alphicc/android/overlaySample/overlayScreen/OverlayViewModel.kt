@@ -14,6 +14,6 @@ class OverlayViewModel(private val treeRouter: TreeRouter) {
     }
 
     fun onOverlayHidden() {
-        treeRouter.removeOverlay()
+//        treeRouter.removeOverlay()
     }
 }

@@ -53,6 +53,7 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${coroutines_version}")
                 implementation("org.jetbrains.kotlinx:atomicfu:${atomicfu_version}")
                 implementation("org.jetbrains.kotlinx:kotlinx-collections-immutable:${immutable_collections_version}")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.1")
 
 //                implementation(compose.runtime)
 //                implementation(compose.foundation)

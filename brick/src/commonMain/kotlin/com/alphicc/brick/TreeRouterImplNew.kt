@@ -1,5 +1,9 @@
 package com.alphicc.brick
 
+import com.alphicc.brick.dataBuses.NavigationBus
+import com.alphicc.brick.dataBuses.TransactionBus
+import com.alphicc.brick.entities.NavAction
+import com.alphicc.brick.entities.TransactionScope
 import kotlinx.atomicfu.AtomicRef
 import kotlinx.atomicfu.atomic
 import kotlinx.collections.immutable.ImmutableList
@@ -18,7 +22,8 @@ internal class TreeRouterImpl(
 
     private val childRouters: AtomicRef<List<Pair<String, TreeRouter>>> = atomic(emptyList())
     private val keyManager: KeyManager = KeyManager()
-    private val navBus: NavBus = NavBus.create(config.scope, config.navAnimDelay)
+    private val navigationBus: NavigationBus = NavigationBus.create(config.scope)
+    private val transactionBus: TransactionBus = TransactionBus.create(config.scope, navigationBus)
     private val tree: HashMap<String, NodeNew> = hashMapOf()
 
     override val broadcastArgumentsFlow: MutableSharedFlow<Any> = MutableSharedFlow(
@@ -36,63 +41,115 @@ internal class TreeRouterImpl(
     override val topComponentKey: MutableStateFlow<String?> = MutableStateFlow(null)
 
     @InternalApi
-    override val animState: StateFlow<AnimState> = navBus.animState
+    override val animState: StateFlow<AnimState> = navigationBus.animState
+
+    override fun startTransaction(
+        transactionSettings: TransactionSettings,
+        action: TransactionScope.() -> Unit
+    ) = transactionBus.startTransaction(
+        router = this,
+        transactionSettings = transactionSettings,
+        action = action
+    )
+
+    override fun proceedAction(
+        transactionSettings: TransactionSettings,
+        action: () -> Unit
+    ) = transactionBus.startTransaction(
+        router = this,
+        transactionSettings = transactionSettings,
+        action = {
+            transactionBus.publishMicroTransaction(
+                id = id,
+                navAction = NavAction(
+                    settings = settings,
+                    animState = {
+                        AnimState.Executing(
+                            direction = AnimDirection.NONE,
+                            newKey = EMPTY,
+                        )
+                    },
+                    preAction = { action() }
+                )
+            )
+        }
+    )
 
     override fun getRootRouter(): TreeRouter {
         return parentRouter?.getRootRouter() ?: this
     }
 
-    override fun cleanRouter() {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = EMPTY
-            ),
-            preAction = {
-                cleanGraph()
-                removeOverlay()
-                fetchNode()
-                println("=========fetchNode")
-            }
-        )
-    }
-
-    override fun setOverlay(component: Component<*>) = setOverlay(component, null)
-
-    override fun <A> setOverlay(component: Component<*>, argument: A) {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = EMPTY
-            ),
-            preAction = {
-                val isSuccess = keyManager.add(component.key)
-                if (isSuccess) {
-                    component.onCreate(argument)
-                    overlay.value = component
+    override fun TransactionScope.cleanRouter() {
+        transactionBus.publishMicroTransaction(
+            id = id,
+            navAction = NavAction(
+                settings = settings,
+                animState = {
+                    AnimState.Executing(
+                        direction = AnimDirection.NONE,
+                        newKey = EMPTY,
+                    )
+                },
+                preAction = {
+                    cleanGraph()
+                    removeOverlay()
                     fetchNode()
                 }
-            }
+            )
         )
     }
 
-    override fun removeOverlay() {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = EMPTY
-            ),
-            preAction = {
-                val rootRouter = getRootRouter()
-                if (rootRouter === this) {
-                    overlay.value?.let { component ->
-                        keyManager.remove(component.key)
-                        component.onDestroy()
-                        overlay.value = null
+    override fun TransactionScope.setOverlay(component: Component<*>) = setOverlay(component, null)
+
+    override fun <A> TransactionScope.setOverlay(
+        component: Component<*>,
+        argument: A
+    ) {//todo check overlay only for root router
+        transactionBus.publishMicroTransaction(
+            id = id,
+            navAction = NavAction(
+                settings = settings,
+                animState = {
+                    AnimState.Executing(
+                        direction = AnimDirection.NONE,
+                        newKey = EMPTY,
+                    )
+                },
+                preAction = {
+                    val isSuccess = keyManager.add(component.key)
+                    if (isSuccess) {
+                        component.onCreate(argument)
+                        this@TreeRouterImpl.overlay.value = component
+                        fetchNode()
                     }
                 }
-                fetchNode()
-            }
+            )
+        )
+    }
+
+    override fun TransactionScope.removeOverlay() {
+        transactionBus.publishMicroTransaction(
+            id = id,
+            navAction = NavAction(
+                settings = settings,
+                animState = {
+                    AnimState.Executing(
+                        direction = AnimDirection.NONE,
+                        newKey = EMPTY
+                    )
+                },
+                preAction = {
+                    val rootRouter = getRootRouter()
+                    if (rootRouter === this@TreeRouterImpl) {
+                        overlay.value?.let { component ->
+                            keyManager.remove(component.key)
+                            component.onDestroy()
+                            this@TreeRouterImpl.overlay.value = null
+                        }
+                    }
+                    fetchNode()
+                }
+            )
         )
     }
 
@@ -100,18 +157,23 @@ internal class TreeRouterImpl(
         branch(containerComponentKey, RouterConfig.default())
 
     override suspend fun branch(containerComponentKey: String, config: RouterConfig): TreeRouter {
-        return navBus.proceedWithResult(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = EMPTY
-            ),
-            preAction = {
-                val newRouter = TreeRouterImpl(this, config)
-                val mutedChildRouters = childRouters.value.toMutableList()
-                mutedChildRouters.add(containerComponentKey to newRouter)
-                childRouters.value = mutedChildRouters
-                newRouter
-            }
+        return navigationBus.proceedWithResult(
+            navAction = NavAction(
+                settings = TransactionSettings.immediately(),
+                animState = {
+                    AnimState.Executing(
+                        direction = AnimDirection.NONE,
+                        newKey = EMPTY
+                    )
+                },
+                preAction = {
+                    val newRouter = TreeRouterImpl(this, config)
+                    val mutedChildRouters = childRouters.value.toMutableList()
+                    mutedChildRouters.add(containerComponentKey to newRouter)
+                    childRouters.value = mutedChildRouters
+                    newRouter
+                }
+            )
         )
     }
 
@@ -124,133 +186,141 @@ internal class TreeRouterImpl(
     }
 
     override fun onBackClicked(immediately: Boolean) {
-        when {
-            currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
-            currentNode?.bottom != null -> {
-                if (immediately) backComponentNow()
-                else backComponent()
-            }
-
-            else -> {
-                if (immediately) backComponentNow()
-                else backComponent()
+        val transactionSettings = if (immediately) {
+            TransactionSettings.immediately()
+        } else TransactionSettings.default()
+        transactionBus.startTransaction(router = this, transactionSettings = transactionSettings) {
+            when {
+                currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
+                currentNode?.bottom != null -> backComponent()
+                else -> backComponent()
             }
         }
     }
 
     override fun lastComponentKey(): String? = currentNode?.key
 
-    override fun backComponentNow() {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.BACK,
-                newKey = currentNode?.bottom?.key.orEmpty(),
-                oldKeys = persistentListOf(currentNode?.key.orEmpty())
-            ),
-            preAction = {
-                currentNode?.run {
-                    childComponents().forEach { childComponent ->
-                        destroyChildRouters(childComponent.key)
-                        childComponent.onDestroy()
-                        keyManager.remove(childComponent.key)
-                    }
-                    compositions().forEach { entry ->
-                        destroyChildRouters(entry.key)
-                        entry.value.onDestroy()
-                        keyManager.remove(entry.key)
-                    }
-                    destroyChildRouters(component.key)
-                    component.onDestroy()
-                    keyManager.remove(component.key)
-                    updateNodeInTree(
-                        node = this.bottom,
-                        transform = { transformNode -> transformNode.copy(top = null) },
-                        afterTransform = {
-                            updateNodeInTree(this, { null })
-                            currentNode = this.bottom
-                        }
+//    override fun TransactionScope.backComponentNow() {
+//        navigationBus.proceed(
+//            animState = AnimState.Executing(
+//                direction = AnimDirection.BACK,
+//                newKey = currentNode?.bottom?.key.orEmpty(),
+//                oldKeys = persistentListOf(currentNode?.key.orEmpty())
+//            ),
+//            preAction = {
+//                currentNode?.run {
+//                    childComponents().forEach { childComponent ->
+//                        destroyChildRouters(childComponent.key)
+//                        childComponent.onDestroy()
+//                        keyManager.remove(childComponent.key)
+//                    }
+//                    compositions().forEach { entry ->
+//                        destroyChildRouters(entry.key)
+//                        entry.value.onDestroy()
+//                        keyManager.remove(entry.key)
+//                    }
+//                    destroyChildRouters(component.key)
+//                    component.onDestroy()
+//                    keyManager.remove(component.key)
+//                    updateNodeInTree(
+//                        node = this.bottom,
+//                        transform = { transformNode -> transformNode.copy(top = null) },
+//                        afterTransform = {
+//                            updateNodeInTree(this, { null })
+//                            currentNode = this.bottom
+//                        }
+//                    )
+//                }
+//                fetchNode()
+//            },
+//            postAction = {
+//            }
+//        )
+//    }
+
+    override fun TransactionScope.backComponent() {
+        transactionBus.publishMicroTransaction(
+            id = id,
+            navAction = NavAction(
+                settings = settings,
+                animState = {
+                    AnimState.Executing(
+                        direction = AnimDirection.BACK,
+                        newKey = currentNode?.bottom?.key.orEmpty(),
+                        oldKeys = persistentListOf(currentNode?.key.orEmpty())
                     )
+                },
+                preAction = {},
+                postAction = {
+                    currentNode?.run {
+                        childComponents().forEach { childComponent ->
+                            destroyChildRouters(childComponent.key)
+                            childComponent.onDestroy()
+                            keyManager.remove(childComponent.key)
+                        }
+                        compositions().forEach { entry ->
+                            destroyChildRouters(entry.key)
+                            entry.value.onDestroy()
+                            keyManager.remove(entry.key)
+                        }
+                        destroyChildRouters(component.key)
+                        component.onDestroy()
+                        keyManager.remove(component.key)
+                        updateNodeInTree(
+                            node = this.bottom,
+                            transform = { transformNode -> transformNode.copy(top = null) },
+                            afterTransform = {
+                                updateNodeInTree(this, { null })
+                                currentNode = this.bottom
+                            }
+                        )
+                    }
+                    fetchNode()
                 }
-                fetchNode()
-            },
-            postAction = {
-            }
+            )
         )
     }
 
-    override fun backComponent() {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.BACK,
-                newKey = currentNode?.bottom?.key.orEmpty(),
-                oldKeys = persistentListOf(currentNode?.key.orEmpty())
-            ),
-            preAction = {},
-            postAction = {
-                currentNode?.run {
-                    childComponents().forEach { childComponent ->
-                        destroyChildRouters(childComponent.key)
-                        childComponent.onDestroy()
-                        keyManager.remove(childComponent.key)
-                    }
-                    compositions().forEach { entry ->
-                        destroyChildRouters(entry.key)
-                        entry.value.onDestroy()
-                        keyManager.remove(entry.key)
-                    }
-                    destroyChildRouters(component.key)
-                    component.onDestroy()
-                    keyManager.remove(component.key)
-                    updateNodeInTree(
-                        node = this.bottom,
-                        transform = { transformNode -> transformNode.copy(top = null) },
-                        afterTransform = {
-                            updateNodeInTree(this, { null })
-                            currentNode = this.bottom
+    override fun TransactionScope.backToComponent(key: String) {
+        transactionBus.publishMicroTransaction(
+            id = id,
+            navAction = NavAction(
+                settings = settings,
+                animState = {
+                    val droppedNodes = nodesUntilFoundKey(currentNode, key)
+                    AnimState.Executing(
+                        direction = AnimDirection.BACK,
+                        newKey = key,
+                        oldKeys = droppedNodes.map { node -> node.key }.toImmutableList()
+                    )
+                },
+                preAction = {},
+                postAction = {
+                    val droppedNodes = nodesUntilFoundKey(currentNode, key)
+                    droppedNodes.forEach { node ->
+                        node.childComponents().forEach { childComponent ->
+                            destroyChildRouters(childComponent.key)
+                            childComponent.onDestroy()
+                            keyManager.remove(childComponent.key)
                         }
-                    )
-                }
-                fetchNode()
-            }
-        )
-    }
-
-    override fun backToComponent(key: String) {
-        navBus.proceed(
-            animState = {
-                val droppedNodes = nodesUntilFoundKey(currentNode, key)
-                AnimState.Executing(
-                    direction = AnimDirection.BACK,
-                    newKey = key,
-                    oldKeys = droppedNodes.map { node -> node.key }.toImmutableList()
-                )
-            },
-            preAction = {},
-            postAction = {
-                val droppedNodes = nodesUntilFoundKey(currentNode, key)
-                droppedNodes.forEach { node ->
-                    node.childComponents().forEach { childComponent ->
-                        destroyChildRouters(childComponent.key)
-                        childComponent.onDestroy()
-                        keyManager.remove(childComponent.key)
+                        node.compositions().forEach { entry ->
+                            destroyChildRouters(entry.key)
+                            entry.value.onDestroy()
+                            keyManager.remove(entry.key)
+                        }
+                        destroyChildRouters(node.key)
+                        node.component.onDestroy()
+                        keyManager.remove(node.key)
+                        tree.remove(key)
+                        updateNodeInTree(
+                            node = node.bottom,
+                            transform = { it.copy(top = null) },
+                            afterTransform = { currentNode = node.bottom }
+                        )
                     }
-                    node.compositions().forEach { entry ->
-                        destroyChildRouters(entry.key)
-                        entry.value.onDestroy()
-                        keyManager.remove(entry.key)
-                    }
-                    destroyChildRouters(node.key)
-                    node.component.onDestroy()
-                    keyManager.remove(node.key)
-                    tree.remove(key)
-                    updateNodeInTree(
-                        node = node.bottom,
-                        transform = { it.copy(top = null) },
-                        afterTransform = { currentNode = node.bottom }
-                    )
+                    fetchNode()
                 }
-                fetchNode()
-            }
+            )
         )
     }
 
@@ -264,21 +334,28 @@ internal class TreeRouterImpl(
         return droppedNodes
     }
 
-    override fun replaceComponent(component: Component<*>) =
+    override fun TransactionScope.replaceComponent(component: Component<*>) =
         replaceComponentFromNode(component, null)
 
-    override fun <A> replaceComponent(component: Component<*>, argument: A) =
+    override fun <A> TransactionScope.replaceComponent(component: Component<*>, argument: A) =
         replaceComponentFromNode(component, argument)
 
-    private fun <A> replaceComponentFromNode(component: Component<*>, argument: A?) {
-        val isSuccess = keyManager.add(component.key)
-        if (isSuccess) {
-            navBus.proceed(
-                animState = AnimState.Executing(
-                    direction = AnimDirection.FORWARD,
-                    newKey = component.key,
-                    oldKeys = persistentListOf(currentNode?.key.orEmpty())
-                ),
+    private fun <A> TransactionScope.replaceComponentFromNode(
+        component: Component<*>,
+        argument: A?
+    ) {
+        transactionBus.publishMicroTransaction(
+            id = id,
+            navAction = NavAction(
+                settings = settings,
+                filter = { keyManager.add(component.key) },
+                animState = {
+                    AnimState.Executing(
+                        direction = AnimDirection.FORWARD,
+                        newKey = component.key,
+                        oldKeys = persistentListOf(currentNode?.key.orEmpty())
+                    )
+                },
                 preAction = {
                     println("preAction keepAliveNodes = ${nodes.value.size}")
                     component.onCreate(argument)
@@ -317,109 +394,110 @@ internal class TreeRouterImpl(
                     fetchNode()
                 }
             )
-        }
-    }
-
-    override fun addComponent(component: Component<*>) = addComponentNode(component, null)
-
-    override fun <A> addComponent(component: Component<*>, argument: A) =
-        addComponentNode(component, argument)
-
-    private fun <A> addComponentNode(component: Component<*>, argument: A?) {
-        val isSuccess = keyManager.add(component.key)
-        if (isSuccess) {
-            navBus.proceed(
-                animState = AnimState.Executing(
-                    direction = AnimDirection.FORWARD,
-                    newKey = component.key,
-                    oldKeys = persistentListOf(currentNode?.key.orEmpty())
-                ),
-                preAction = {
-                    component.onCreate(argument)
-                    val newNode = NodeNew(component = component, bottom = currentNode)
-                    updateNodeInTree(
-                        node = currentNode,
-                        transform = { transformNode -> transformNode.copy(top = newNode) },
-                        afterTransform = {
-                            tree[newNode.key] = newNode
-                            currentNode = newNode
-                        }
-                    )
-                    fetchNode()
-                }
-            )
-        }
-    }
-
-    override fun newRootComponent(component: Component<*>) = newRootComponentNode(component, null)
-
-    override fun <A> newRootComponent(component: Component<*>, argument: A) =
-        newRootComponentNode(component, argument)
-
-    override fun proceedAction(action: suspend () -> Unit) {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = EMPTY
-            ),
-            preAction = action
         )
     }
 
-    private fun <A> newRootComponentNode(component: Component<*>, argument: A?) {
-        val isSuccess = keyManager.add(component.key)
-        if (isSuccess) {
-            navBus.proceed(
-                animState = AnimState.Executing(
+    override fun TransactionScope.addComponent(component: Component<*>) =
+        addComponentNode(component, null)
+
+    override fun <A> TransactionScope.addComponent(component: Component<*>, argument: A) =
+        addComponentNode(component, argument)
+
+    private fun <A> TransactionScope.addComponentNode(component: Component<*>, argument: A?) {
+        println("===? settings=${settings.animDurationDelay}")
+        val navAction = NavAction(
+            settings = settings,
+            filter = { keyManager.add(component.key) },
+            animState = {
+                println("===? oldKeys=${currentNode?.key.orEmpty()}")
+                AnimState.Executing(
+                    direction = AnimDirection.FORWARD,
+                    newKey = component.key,
+                    oldKeys = persistentListOf(currentNode?.key.orEmpty()),
+                )
+            },
+            preAction = {
+                component.onCreate(argument)
+                val newNode = NodeNew(component = component, bottom = currentNode)
+                updateNodeInTree(
+                    node = currentNode,
+                    transform = { transformNode -> transformNode.copy(top = newNode) },
+                    afterTransform = {
+                        tree[newNode.key] = newNode
+                        currentNode = newNode
+                    }
+                )
+                fetchNode()
+            }
+        )
+        transactionBus.publishMicroTransaction(id = id, navAction = navAction)
+    }
+
+    override fun TransactionScope.newRootComponent(component: Component<*>) =
+        newRootComponentNode(component, null)
+
+    override fun <A> TransactionScope.newRootComponent(component: Component<*>, argument: A) =
+        newRootComponentNode(component, argument)
+
+    private fun <A> TransactionScope.newRootComponentNode(component: Component<*>, argument: A?) {
+        val navAction = NavAction(
+            filter = { keyManager.add(component.key) },
+            settings = settings,
+            animState = {
+                AnimState.Executing(
                     direction = AnimDirection.FORWARD,
                     newKey = component.key,
                     oldKeys = persistentListOf(currentNode?.key.orEmpty())
-                ),
-                preAction = {
-                    component.onCreate(argument)
-                    val newNode = NodeNew(component = component, bottom = currentNode)
-                    tree[newNode.key] = newNode
-                    currentNode = newNode
-                    fetchNode()
-                },
-                postAction = {
-                    updateNodeInTree(
-                        node = currentNode,
-                        transform = { transformNode -> transformNode.copy(bottom = null) },
-                        afterTransform = { currentNode = tree[currentNode?.key] }
-                    )
-                    val removedNodes: MutableList<String> = mutableListOf()
-                    tree.values.forEach { node ->
-                        if (node.key != currentNode?.key) {
-                            node.childComponents()
-                                .forEach { childComponent ->//destroy compositions ?
-                                    destroyChildRouters(childComponent.key)
-                                    childComponent.onDestroy()
-                                    keyManager.remove(childComponent.key)
-                                }
-                            destroyChildRouters(node.component.key)
-                            node.component.onDestroy()
-                            removedNodes.add(node.key)
-                        }
+                )
+            },
+            preAction = {
+                component.onCreate(argument)
+                val newNode = NodeNew(component = component, bottom = currentNode)
+                tree[newNode.key] = newNode
+                currentNode = newNode
+                fetchNode()
+            },
+            postAction = {
+                updateNodeInTree(
+                    node = currentNode,
+                    transform = { transformNode -> transformNode.copy(bottom = null) },
+                    afterTransform = { currentNode = tree[currentNode?.key] }
+                )
+                val removedNodes: MutableList<String> = mutableListOf()
+                tree.values.forEach { node ->
+                    if (node.key != currentNode?.key) {
+                        node.childComponents()
+                            .forEach { childComponent ->//destroy compositions ?
+                                destroyChildRouters(childComponent.key)
+                                childComponent.onDestroy()
+                                keyManager.remove(childComponent.key)
+                            }
+                        destroyChildRouters(node.component.key)
+                        node.component.onDestroy()
+                        removedNodes.add(node.key)
                     }
-                    removedNodes.forEach { key ->
-                        keyManager.remove(key)
-                        tree.remove(key)
-                    }
-                    fetchNode()
                 }
-            )
-        }
+                removedNodes.forEach { key ->
+                    keyManager.remove(key)
+                    tree.remove(key)
+                }
+                fetchNode()
+            }
+        )
+        transactionBus.publishMicroTransaction(id = id, navAction = navAction)
     }
 
     override fun lastChildKey(): String? = currentNode?.childComponents()?.lastOrNull()?.key
 
-    override fun backChild() {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = currentNode?.childComponents()?.last()?.key.orEmpty()
-            ),
+    override fun TransactionScope.backChild() {
+        val navAction = NavAction(
+            settings = settings,
+            animState = {
+                AnimState.Executing(
+                    direction = AnimDirection.NONE,
+                    newKey = currentNode?.childComponents()?.last()?.key.orEmpty()
+                )
+            },
             preAction = {
                 currentNode?.run {
                     if (childComponents().isNotEmpty()) {
@@ -433,14 +511,18 @@ internal class TreeRouterImpl(
                 }
             }
         )
+        transactionBus.publishMicroTransaction(id = id, navAction = navAction)
     }
 
-    override fun backToChild(key: String) {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = currentNode?.childComponents()?.last()?.key.orEmpty()
-            ),
+    override fun TransactionScope.backToChild(key: String) {
+        val navAction = NavAction(
+            settings = settings,
+            animState = {
+                AnimState.Executing(
+                    direction = AnimDirection.NONE,
+                    newKey = currentNode?.childComponents()?.last()?.key.orEmpty()
+                )
+            },
             preAction = {
                 currentNode?.run {
                     childComponents().reversed().forEach { component ->
@@ -454,19 +536,23 @@ internal class TreeRouterImpl(
                 }
             }
         )
+        transactionBus.publishMicroTransaction(id, navAction)
     }
 
-    override fun addChild(component: Component<*>) = addChildNode(component, null)
+    override fun TransactionScope.addChild(component: Component<*>) = addChildNode(component, null)
 
-    override fun <A> addChild(component: Component<*>, argument: A) =
+    override fun <A> TransactionScope.addChild(component: Component<*>, argument: A) =
         addChildNode(component, argument)
 
-    private fun <A> addChildNode(component: Component<*>, argument: A?) {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = component.key
-            ),
+    private fun <A> TransactionScope.addChildNode(component: Component<*>, argument: A?) {
+        val navAction = NavAction(
+            settings = settings,
+            animState = {
+                AnimState.Executing(
+                    direction = AnimDirection.NONE,
+                    newKey = component.key
+                )
+            },
             preAction = {
                 currentNode?.let {
                     if (keyManager.add(component.key)) {
@@ -479,19 +565,24 @@ internal class TreeRouterImpl(
                 }
             }
         )
+        transactionBus.publishMicroTransaction(id, navAction)
     }
 
-    override fun replaceChild(component: Component<*>) = replaceChildNode(component, null)
+    override fun TransactionScope.replaceChild(component: Component<*>) =
+        replaceChildNode(component, null)
 
-    override fun <A> replaceChild(component: Component<*>, argument: A) =
+    override fun <A> TransactionScope.replaceChild(component: Component<*>, argument: A) =
         replaceChildNode(component, argument)
 
-    private fun <A> replaceChildNode(component: Component<*>, argument: A?) {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = component.key
-            ),
+    private fun <A> TransactionScope.replaceChildNode(component: Component<*>, argument: A?) {
+        val navAction = NavAction(
+            settings = settings,
+            animState = {
+                AnimState.Executing(
+                    direction = AnimDirection.NONE,
+                    newKey = component.key
+                )
+            },
             preAction = {
                 currentNode?.run {
                     if (childComponents().isNotEmpty()) {
@@ -507,17 +598,24 @@ internal class TreeRouterImpl(
                 }
             }
         )
+        transactionBus.publishMicroTransaction(id, navAction)
     }
 
-    override fun attachCompositeComponent(component: Component<*>) =
+    override fun TransactionScope.attachCompositeComponent(component: Component<*>) =
         attachCompositeComponent(component, null)
 
-    override fun <A> attachCompositeComponent(component: Component<*>, argument: A) {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = EMPTY
-            ),
+    override fun <A> TransactionScope.attachCompositeComponent(
+        component: Component<*>,
+        argument: A
+    ) {
+        val navAction = NavAction(
+            settings = settings,
+            animState = {
+                AnimState.Executing(
+                    direction = AnimDirection.NONE,
+                    newKey = EMPTY
+                )
+            },
             preAction = {
                 currentNode?.run {
                     val isSuccess = keyManager.add(component.key)
@@ -528,14 +626,18 @@ internal class TreeRouterImpl(
                 }
             }
         )
+        transactionBus.publishMicroTransaction(id, navAction)
     }
 
-    override fun detachCompositeComponent(key: String) {
-        navBus.proceed(
-            animState = AnimState.Executing(
-                direction = AnimDirection.NONE,
-                newKey = EMPTY
-            ),
+    override fun TransactionScope.detachCompositeComponent(key: String) {
+        val navAction = NavAction(
+            settings = settings,
+            animState = {
+                AnimState.Executing(
+                    direction = AnimDirection.NONE,
+                    newKey = EMPTY
+                )
+            },
             preAction = {
                 currentNode?.run {
                     keyManager.remove(key)
@@ -547,6 +649,7 @@ internal class TreeRouterImpl(
                 }
             }
         )
+        transactionBus.publishMicroTransaction(id, navAction)
     }
 
     @InternalApi
@@ -605,7 +708,7 @@ internal class TreeRouterImpl(
         return nodes
     }
 
-    private fun destroyChildRouters(key: String) {
+    private fun TransactionScope.destroyChildRouters(key: String) {
         val childRouters = childRouters.value.toMutableList()
         childRouters.removeAll {
             if (it.first == key) {
@@ -616,10 +719,10 @@ internal class TreeRouterImpl(
                 true
             } else false
         }
-        this.childRouters.value = childRouters
+        this@TreeRouterImpl.childRouters.value = childRouters
     }
 
-    private fun cleanGraph() {
+    private fun TransactionScope.cleanGraph() {
         tree.values.forEach { node ->
             node.childComponents().forEach { childComponent ->
                 destroyChildRouters(childComponent.key)

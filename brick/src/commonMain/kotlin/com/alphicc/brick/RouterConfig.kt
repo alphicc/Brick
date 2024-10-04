@@ -8,14 +8,12 @@ data class RouterConfig(
     val scope: CoroutineScope,
     val broadcastFlowReplay: Int,
     val broadcastFlowExtraBufferCapacity: Int,
-    val navAnimDelay: Long
 ) {
     companion object {
         fun default(): RouterConfig = RouterConfig(
             scope = CoroutineScope(Dispatchers.Default + SupervisorJob()),
             broadcastFlowReplay = 1,
             broadcastFlowExtraBufferCapacity = 10,
-            navAnimDelay = 300
         )
     }
 }

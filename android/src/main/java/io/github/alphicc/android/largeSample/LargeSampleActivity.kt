@@ -37,7 +37,7 @@ class LargeSampleActivity : ComponentActivity() {
                 onClick = {
                     lifecycleScope.launch {
                         println("cleanRouter NOW")
-                        largeSampleRouter.cleanRouter()
+//                        largeSampleRouter.cleanRouter()
                     }
                 }
             ) {

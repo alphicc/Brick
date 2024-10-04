@@ -33,8 +33,8 @@ val screen1: Component<Unit> = Component(
     onDestroy = { _ -> println("onDestroy screen1") },
     content = { _, _ ->
         SimpleScreen(1, "add") {
-            childSampleRouter.broadcastArgumentsFlow.filterIsInstance<String>()
-            childSampleRouter.addComponent(screen2)
+//            childSampleRouter.broadcastArgumentsFlow.filterIsInstance<String>()
+//            childSampleRouter.addComponent(screen2)
         }
     })
 
@@ -44,7 +44,7 @@ val screen2: Component<Unit> = Component(
     onCreate = { _, _ -> println("OnCreate Screen2") },
     onDestroy = { _ -> println("onDestroy Screen2") },
     content = { _, _ ->
-        SimpleScreen(2, "add") { childSampleRouter.addComponent(screen3) }
+//        SimpleScreen(2, "add") { childSampleRouter.addComponent(screen3) }
     })
 
 val screen3: Component<Unit>  = Component(
@@ -53,7 +53,7 @@ val screen3: Component<Unit>  = Component(
     onCreate = { _, _ -> println("OnCreate screen3") },
     onDestroy = { _ -> println("onDestroy screen3") },
     content = { _, _ ->
-        SimpleScreen(3, "replace") { childSampleRouter.replaceComponent(screen4) }
+//        SimpleScreen(3, "replace") { childSampleRouter.replaceComponent(screen4) }
     })
 
 val screen4: Component<Unit>  = Component(
@@ -62,7 +62,7 @@ val screen4: Component<Unit>  = Component(
     onCreate = { _, _ -> println("OnCreate screen4") },
     onDestroy = { _ -> println("onDestroy screen4") },
     content = { _, _ ->
-        SimpleScreen(4, "newRoot") { childSampleRouter.newRootComponent(screen5) }
+//        SimpleScreen(4, "newRoot") { childSampleRouter.newRootComponent(screen5) }
     })
 
 val screen5: Component<Unit>  = Component(
@@ -71,35 +71,35 @@ val screen5: Component<Unit>  = Component(
     onCreate = { _, _ -> println("OnCreate screen5") },
     onDestroy = { _ -> println("onDestroy screen5") },
     content = { _, _ ->
-        SimpleScreen(5, "addChild") { childSampleRouter.addChild(screenChild1) }
+//        SimpleScreen(5, "addChild") { childSampleRouter.addChild(screenChild1) }
     })
 
 val screenChild1 = Component<Unit>(
     key = "C1",
     descriptor = Descriptor.Child,
     content = { _, _ ->
-        Child(10, "addChild") { childSampleRouter.addChild(screenChild2) }
+//        Child(10, "addChild") { childSampleRouter.addChild(screenChild2) }
     })
 
 val screenChild2 = Component<Unit>(
     key = "C2",
     descriptor = Descriptor.Child,
     content = { _, _ ->
-        Child(20, "addChild") { childSampleRouter.addChild(screenChild3) }
+//        Child(20, "addChild") { childSampleRouter.addChild(screenChild3) }
     })
 
 val screenChild3 = Component<Unit>(
     key = "C3",
     descriptor = Descriptor.Child,
     content = { _, _ ->
-        Child(30, "addChild") { childSampleRouter.addChild(screenChild4) }
+//        Child(30, "addChild") { childSampleRouter.addChild(screenChild4) }
     })
 
 val screenChild4 = Component<Unit>(
     key = "C4",
     descriptor = Descriptor.Child,
     content = { _, _ ->
-        Child(40, "replaceChild") { childSampleRouter.replaceChild(screenChild5) }
+//        Child(40, "replaceChild") { childSampleRouter.replaceChild(screenChild5) }
     })
 
 val screenChild5 = Component<Unit>(
@@ -122,7 +122,7 @@ class ChildSampleActivity : ComponentActivity() {
         }
 
         if (savedInstanceState == null) {
-            childSampleRouter.addComponent(screen1)
+//            childSampleRouter.addComponent(screen1)
         }
     }
 }

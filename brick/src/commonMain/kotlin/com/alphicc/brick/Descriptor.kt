@@ -5,17 +5,14 @@ sealed class Descriptor(
 ) {
 
     sealed class Screen(val retain: Boolean) : Descriptor(ComponentType.MAIN) {
+        sealed class Animated : Screen(retain = true) {
 
-        sealed class Animated(private val navigateAnimation: NavigateAnimation) : Screen(true) {
+            data object SwipeBack : Animated()
 
-            data object SwipeBack : Animated(NavigateAnimation.SWIPE_BACK)
-
-//            data object SwipeDown : RetainUi(NavigateAnimation.SWIPE_DOWN)
-
-            data object CrossFade : Animated(NavigateAnimation.CROSS_FADE)
+            data object CrossFade : Animated()
         }
 
-        data object Default: Screen(false)
+        data object Default : Screen(retain = false)
     }
 
     data object Child : Descriptor(ComponentType.CHILD)
@@ -25,8 +22,4 @@ sealed class Descriptor(
 
 enum class ComponentType {
     MAIN, CHILD, COMPOSITE, OVERLAY
-}
-
-private enum class NavigateAnimation {
-    SWIPE_BACK, SWIPE_DOWN, CROSS_FADE
 }

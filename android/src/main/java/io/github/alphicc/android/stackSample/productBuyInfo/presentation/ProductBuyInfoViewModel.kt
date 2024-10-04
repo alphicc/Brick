@@ -12,10 +12,10 @@ class ProductBuyInfoViewModel(arguments: ProductBuyInfoScreenArguments) {
     val productIndex: StateFlow<Int> = _productIndex
 
     fun onBackClicked() {
-        router.backComponent()
+        router.startTransaction { backComponent() }
     }
 
     fun onBuyProductClicked() {
-        router.addChild(productBuySuccessComponent, router)
+        router.startTransaction { addChild(productBuySuccessComponent, router) }
     }
 }

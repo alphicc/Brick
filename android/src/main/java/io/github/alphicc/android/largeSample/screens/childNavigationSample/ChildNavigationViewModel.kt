@@ -6,14 +6,14 @@ import io.github.alphicc.android.largeSample.screens.Screens
 class ChildNavigationViewModel(private val router: TreeRouter) {
 
     fun onBackClicked() {
-        router.backComponent()
+//        router.backComponent()
     }
 
     fun onForwardClicked() {
-        router.addChild(Screens.redSquareScreen, router)
+//        router.addChild(Screens.redSquareScreen, router)
     }
 
     fun onForwardTwoClicked() {
-        router.addChild(Screens.blueSquareScreen, router)
+//        router.addChild(Screens.blueSquareScreen, router)
     }
 }

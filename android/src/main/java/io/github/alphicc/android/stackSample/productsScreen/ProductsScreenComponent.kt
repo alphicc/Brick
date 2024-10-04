@@ -3,6 +3,7 @@ package io.github.alphicc.android.stackSample.productsScreen
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.alphicc.brick.TransactionSettings
 import com.alphicc.brick.Component
 import com.alphicc.brick.Descriptor
 import com.alphicc.brick.TreeRouter

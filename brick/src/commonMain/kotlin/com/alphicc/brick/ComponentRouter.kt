@@ -1,16 +1,15 @@
 package com.alphicc.brick
 
+import com.alphicc.brick.entities.TransactionScope
+
 interface ComponentRouter {
     fun lastComponentKey(): String?
-
-    fun backComponentNow()
-    fun backComponent()
-    fun backToComponent(key: String)
-    fun replaceComponent(component: Component<*>)
-    fun <A> replaceComponent(component: Component<*>, argument: A)
-    fun addComponent(component: Component<*>)
-    fun <A> addComponent(component: Component<*>, argument: A)
-    fun newRootComponent(component: Component<*>)
-    fun <A> newRootComponent(component: Component<*>, argument: A)
-    fun proceedAction(action: suspend () -> Unit)
+    fun TransactionScope.backComponent()
+    fun TransactionScope.backToComponent(key: String)
+    fun TransactionScope.replaceComponent(component: Component<*>)
+    fun <A> TransactionScope.replaceComponent(component: Component<*>, argument: A)
+    fun TransactionScope.addComponent(component: Component<*>)
+    fun <A> TransactionScope.addComponent(component: Component<*>, argument: A)
+    fun TransactionScope.newRootComponent(component: Component<*>)
+    fun <A> TransactionScope.newRootComponent(component: Component<*>, argument: A)
 }

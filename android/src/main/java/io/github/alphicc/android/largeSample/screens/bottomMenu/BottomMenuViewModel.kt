@@ -22,15 +22,15 @@ class BottomMenuViewModel {
     init {
         viewModelScope.launch {
             firstMenuRouter = largeSampleRouter.branch(Screens.bottomMenuScreen.key).apply {
-                addComponent(Screens.innerNavigationScreen, this)
+//                addComponent(Screens.innerNavigationScreen, this)
             }
             containerRouter.value = firstMenuRouter
             startScreenIndex.value = 0
             secondMenuRouter = largeSampleRouter.branch(Screens.bottomMenuScreen.key).apply {
-                addComponent(Screens.channelArgumentReceiveScreen)
+//                addComponent(Screens.channelArgumentReceiveScreen)
             }
             thirdMenuRouter = largeSampleRouter.branch(Screens.bottomMenuScreen.key).apply {
-                addComponent(Screens.channelArgumentSendScreen, this)
+//                addComponent(Screens.channelArgumentSendScreen, this)
             }
         }
     }

@@ -3,6 +3,7 @@ package io.github.alphicc.android.stackSample.productsScreen.presentation
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.android.stackSample.productDetails.ProductDetailsScreenArguments
 import io.github.alphicc.android.stackSample.productDetails.productDetailsComponent
+import io.github.alphicc.android.stackSample.productsScreen.productsScreenComponent
 
 class ProductsScreenViewModel(val router: TreeRouter) {
 
@@ -11,6 +12,6 @@ class ProductsScreenViewModel(val router: TreeRouter) {
             router = router,
             productIndex = index
         )
-        router.addComponent(productDetailsComponent, arguments)
+        router.startTransaction { addComponent(productDetailsComponent, arguments) }
     }
 }
