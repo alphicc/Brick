@@ -40,7 +40,7 @@ val screen1: Component<Unit> = Component(
 
 val screen2: Component<Unit> = Component(
     key = "2",
-    descriptor = Descriptor.Screen.Animated.CrossFade,
+    descriptor = Descriptor.Screen.Animated.CrossFade(),
     onCreate = { _, _ -> println("OnCreate Screen2") },
     onDestroy = { _ -> println("onDestroy Screen2") },
     content = { _, _ ->
@@ -58,7 +58,7 @@ val screen3: Component<Unit>  = Component(
 
 val screen4: Component<Unit>  = Component(
     key = "4",
-    descriptor = Descriptor.Screen.Animated.CrossFade,
+    descriptor = Descriptor.Screen.Animated.CrossFade(),
     onCreate = { _, _ -> println("OnCreate screen4") },
     onDestroy = { _ -> println("onDestroy screen4") },
     content = { _, _ ->
@@ -67,7 +67,7 @@ val screen4: Component<Unit>  = Component(
 
 val screen5: Component<Unit>  = Component(
     key = "5",
-    descriptor = Descriptor.Screen.Animated.CrossFade,
+    descriptor = Descriptor.Screen.Animated.CrossFade(),
     onCreate = { _, _ -> println("OnCreate screen5") },
     onDestroy = { _ -> println("onDestroy screen5") },
     content = { _, _ ->

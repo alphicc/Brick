@@ -1,15 +1,21 @@
 package com.alphicc.brick
 
+private const val DEFAULT_ANIM_DURATION = 300L
+
 sealed class Descriptor(
     val componentType: ComponentType
 ) {
 
     sealed class Screen(val retain: Boolean) : Descriptor(ComponentType.MAIN) {
-        sealed class Animated : Screen(retain = true) {
+        sealed class Animated(open val duration: Long) : Screen(retain = true) {
 
-            data object SwipeBack : Animated()
+            data class SwipeBack(
+                override val duration: Long = DEFAULT_ANIM_DURATION
+            ) : Animated(duration)
 
-            data object CrossFade : Animated()
+            data class CrossFade(
+                override val duration: Long = DEFAULT_ANIM_DURATION
+            ) : Animated(duration)
         }
 
         data object Default : Screen(retain = false)

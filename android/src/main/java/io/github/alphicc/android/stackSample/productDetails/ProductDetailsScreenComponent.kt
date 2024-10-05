@@ -12,7 +12,7 @@ import io.github.alphicc.android.stackSample.productDetails.presentation.Product
 
 val productDetailsComponent = Component(
     key = "productDetailsScreenComponent",
-    descriptor = Descriptor.Screen.Animated.SwipeBack,
+    descriptor = Descriptor.Screen.Animated.SwipeBack(),
     onCreate = { _, argument ->
         val arguments = argument.get<ProductDetailsScreenArguments>()
         return@Component ProductDetailsScreenViewModel(arguments)

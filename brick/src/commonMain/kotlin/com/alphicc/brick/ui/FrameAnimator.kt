@@ -65,11 +65,11 @@ internal fun FrameAnimator(
         gestureCommunicator.bus
             .onEach { updateAction ->
                 withContext(Dispatchers.Default) {
-                    println("RECEIVE $updateAction key=$key")
+                    println("===? RECEIVE $updateAction key=$key")
                     when (updateAction) {
                         is UpdateActions.Animations.Shift.ShiftScene -> {
                             offsetX = screenWidth * updateAction.percent
-                            delay(1)
+//                            delay(1)
                             if (updateAction.finish) {
                                 navigateBack(true)
                             }
@@ -78,8 +78,7 @@ internal fun FrameAnimator(
                         is UpdateActions.Animations.Shift.ShiftBackdrop -> {
 //                            val percent = 1 - (updateAction.offsetX / screenWidth)
                             offsetX = minimumXOffset * updateAction.percent
-                            delay(1)
-//                            println("percent=${updateAction.percent}")
+//                            delay(1)
                         }
 
                         is UpdateActions.Animations.SwipeBack -> {
@@ -176,7 +175,8 @@ internal fun FrameAnimator(
                                 backdropKey.orEmpty(),
                                 offsetX,
                                 speed,
-                                screenWidth.toFloat()
+                                screenWidth.toFloat(),
+                                descriptor.duration
                             )
                         gestureCommunicator.publishAll(actions)
                         draggableEnabled = true
