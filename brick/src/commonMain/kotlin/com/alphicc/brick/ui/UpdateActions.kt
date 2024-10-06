@@ -5,7 +5,6 @@ import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlin.time.Duration.Companion.seconds
 
 sealed class UpdateActions(open val keys: ImmutableList<String>) {
 
@@ -13,7 +12,7 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
         sealed class Shift(
             open val key: String,
             open val percent: Float,
-            open val finish: Boolean
+            open val finish: Boolean,
         ) : Animations(key) {
 
             data class ShiftScene(
@@ -23,17 +22,14 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
             ) : Shift(key, percent, finish) {
 
                 companion object {
-                    private const val ANIM_DURATION = 100
-                    private const val FRAME = 16
-                    private fun getStep(screenWidth: Float, duration: Long) = screenWidth / (duration.toFloat() / FRAME)
-
                     suspend fun getActionsByVelocity(
                         key: String,
-                        backdropKey: String,
+                        belowKey: String,
                         currentOffsetX: Float,
                         velocity: Float,
                         screenWidth: Float,
                         duration: Long,
+                        frameRate: Int
                     ): List<Shift> = withContext(Dispatchers.Default) {
                         val actions = mutableListOf<Shift>()
                         var offsetX = currentOffsetX
@@ -41,68 +37,38 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
 
                         actions.add(
                             ShiftBackdrop.getBackdropAction(
-                                backdropKey,
+                                belowKey,
                                 offsetX,
                                 screenWidth
                             )
                         )
-//                        val speed = velocity / 16
-//                        val remainDuration = duration - ((offsetX / screenWidth) * duration)
-//                        val stepX = if ((speed * remainDuration/*ANIM_DURATION*/) + currentOffsetX < screenWidth) {
-//                            (screenWidth - currentOffsetX) / remainDuration//ANIM_DURATION
-//                        } else {
-//                            speed
-//                        }
-
-                        val remainDuration = duration * (offsetX / screenWidth).coerceIn(0f, 1f)
-                        println("===? remainDuration ${duration * (offsetX / screenWidth).coerceIn(0f, 1f)}")
-                        val stepX = (screenWidth - offsetX) / duration * FRAME
-
-                        println("===? stepX=${stepX} offsetX=$offsetX currentOffsetX=$currentOffsetX screenWidth=$screenWidth ")
+                        val stepX = (screenWidth - offsetX) / duration * frameRate
                         if (velocity > 0) {
                             while (offsetX < screenWidth) {
                                 offsetX += stepX
                                 val percent = (offsetX / screenWidth).coerceIn(0f, 1f)
-                                println("===? add ShiftScene $percent")
                                 actions.add(ShiftScene(key, percent, percent == 1f))
                                 actions.add(
                                     ShiftBackdrop.getBackdropAction(
-                                        backdropKey,
+                                        belowKey,
                                         offsetX.coerceIn(0f, screenWidth),
                                         screenWidth
                                     )
                                 )
                             }
-//                            actions.add(//!!!
-//                                ShiftBackdrop.getBackdropAction(
-//                                    backdropKey,
-//                                    offsetX,
-//                                    screenWidth
-//                                )
-//                            )
                         } else {
                             while (offsetX > 0) {
                                 offsetX -= stepX
-//                                println("UPDATE ACTIONS ELSE stepX=$stepX offsetX=$offsetX screenWidth=$screenWidth $key")
                                 val percent = (offsetX / screenWidth).coerceIn(0f, 1f)
-                                println("===? add ShiftScene $percent")
                                 actions.add(ShiftScene(key, percent, false))
                                 actions.add(
                                     ShiftBackdrop.getBackdropAction(
-                                        backdropKey,
+                                        belowKey,
                                         offsetX.coerceIn(0f, screenWidth),
                                         screenWidth
                                     )
                                 )
                             }
-//                            actions.add(ShiftScene(key, 0f, true))
-//                            actions.add(//!!!!
-//                                ShiftBackdrop.getBackdropAction(
-//                                    backdropKey,
-//                                    offsetX,
-//                                    screenWidth
-//                                )
-//                            )
                         }
                         return@withContext actions
                     }
@@ -126,27 +92,28 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
             }
         }
 
-        data class SwipeBack(val key: String, val offsetX: Float, val alpha: Float) :
-            Animations(key) {
+        data class SwipeBack(
+            val key: String,
+            val offsetX: Float,
+            val alpha: Float
+        ) : Animations(key) {
             companion object {
 
                 const val SHIFT_THRESHOLD: Float = -.3f
-                private const val OFFSET_STEP: Float = .008f
-                private const val FRAME = 16
-                private fun getStep(duration: Long) = 1f / (duration / FRAME)
 
                 suspend fun getShowActions(
                     newKey: String,
                     oldKeys: ImmutableList<String>,
                     duration: Long,
+                    frameRate: Int
                 ): List<SwipeBack> = withContext(Dispatchers.Default) {
                     val actions = mutableListOf<SwipeBack>()
                     var offsetX = 1f
                     actions.add(SwipeBack(newKey, offsetX, 0f))
                     actions.add(SwipeBack(newKey, offsetX, 1f))
-                    val step = getStep(duration)
+                    val step = 1f / (duration / frameRate)
                     while (offsetX > 0) {
-                        offsetX -= step//OFFSET_STEP
+                        offsetX -= step
                         if (offsetX < 0) {
                             offsetX = 0f
                         }
@@ -162,10 +129,10 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
                     newKey: String,
                     oldKeys: ImmutableList<String>,
                     duration: Long,
+                    frameRate: Int
                 ): List<SwipeBack> = withContext(Dispatchers.Default) {
                     val actions = mutableListOf<SwipeBack>()
-                    val offsetStep = getStep(duration)//1f / (150f / (oldKeys.size + 1))
-                    println("==offsetStep=$offsetStep")
+                    val offsetStep = 1f / (duration / frameRate)
                     oldKeys.forEach { oldKey ->
                         var offsetX = 0f
                         actions.add(SwipeBack(oldKey, offsetX, 1f))
@@ -176,8 +143,6 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
                             }
                             actions.add(SwipeBack(oldKey, offsetX, 1f))
                         }
-//                        actions.add(IdleFrame(newKey))
-//                        actions.add(SwipeBack("DEBUG", offsetX, 1f))
                     }
                     var offsetX = 0f
                     while (offsetX < 1) {
@@ -187,19 +152,6 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
                         }
                         actions.add(SwipeBack(newKey, (1 - offsetX) * SHIFT_THRESHOLD, 1f))
                     }
-                    println("actionsSize=${actions.size}")
-//                    val actions = mutableListOf<SwipeBack>()
-//                    var offsetX = 0f
-//                    val oldKey = oldKeys.lastOrNull()
-//                    actions.add(SwipeBack(oldKey.orEmpty(), offsetX, 1f))
-//                    while (offsetX < 1) {
-//                        offsetX += OFFSET_STEP
-//                        if (offsetX > 1) {
-//                            offsetX = 1f
-//                        }
-//                        actions.add(SwipeBack(oldKey.orEmpty(), offsetX, 1f))
-//                        actions.add(SwipeBack(newKey, (1 - offsetX) * SHIFT_THRESHOLD, 1f))
-//                    }
                     return@withContext actions
                 }
             }
@@ -210,19 +162,17 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
             companion object {
 
                 private const val ALPHA_STEP: Float = .05f
-                private const val FRAME = 16
-
-                private fun getStep(duration: Long) = 1f / (duration / FRAME)
 
                 suspend fun getShowActions(
                     newKey: String,
                     oldKeys: ImmutableList<String>,
                     duration: Long,
+                    frameRate: Int,
                 ): List<CrossFade> = withContext(Dispatchers.Default) {
                     val actions = mutableListOf<CrossFade>()
                     oldKeys.forEach { key -> actions.add(CrossFade(key, 1f)) }
                     var alpha = 0f
-                    val step = getStep(duration)
+                    val step = 1f / (duration / frameRate)
                     while (alpha < 1) {
                         alpha += step//ALPHA_STEP
                         actions.add(CrossFade(newKey, alpha))
@@ -233,7 +183,8 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
                 suspend fun getHideActions(
                     newKey: String,
                     oldKeys: ImmutableList<String>,
-                    duration: Long
+                    duration: Long,
+                    frameRate: Int
                 ): List<CrossFade> = withContext(Dispatchers.Default) {
                     val actions = mutableListOf<CrossFade>()
                     actions.add(CrossFade(newKey, 1f))
@@ -241,7 +192,7 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
                         if (index != 0) actions.add(CrossFade(s, 0f))
                     }
                     var alpha = 1f
-                    val step = getStep(duration)
+                    val step = 1f / (duration / frameRate)
                     while (alpha > 0) {
                         alpha -= step
                         actions.add(CrossFade(oldKeys.firstOrNull().orEmpty(), alpha))
@@ -250,18 +201,6 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
                 }
 
                 fun getShowAction(newKey: String): List<CrossFade> = listOf(CrossFade(newKey, 1f))
-
-                suspend fun getCrossFadeActions(newKey: String, oldKey: String): List<CrossFade> =
-                    withContext(Dispatchers.Default) {
-                        val actions = mutableListOf<CrossFade>()
-                        var initialValue = 0f
-                        while (initialValue < 1) {
-                            initialValue += ALPHA_STEP
-                            actions.add(CrossFade(newKey, initialValue))
-                            actions.add(CrossFade(oldKey, 1 - initialValue))
-                        }
-                        return@withContext actions
-                    }
             }
         }
     }
@@ -270,27 +209,40 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
         keys: ImmutableList<String>
     ) : UpdateActions(keys) {
 
-        abstract suspend fun getActionsByTrigger(descriptor: Descriptor.Screen): List<Animations>
+        abstract suspend fun getActionsByTrigger(
+            descriptor: Descriptor.Screen,
+            frameRate: Int
+        ): List<Animations>
 
         data class ForwardAction(
             val newKey: String,
             val oldKey: ImmutableList<String>
         ) : Triggers(persistentListOf(newKey)) {
 
-            override suspend fun getActionsByTrigger(descriptor: Descriptor.Screen): List<Animations> =
+            override suspend fun getActionsByTrigger(
+                descriptor: Descriptor.Screen,
+                frameRate: Int
+            ): List<Animations> =
                 when (descriptor) {
                     is Descriptor.Screen.Animated.CrossFade -> {
-                        println("getActionsByTrigger FORWARD")
-                        Animations.CrossFade.getShowActions(newKey, oldKey, descriptor.duration)
+                        Animations.CrossFade.getShowActions(
+                            newKey,
+                            oldKey,
+                            descriptor.duration,
+                            frameRate
+                        )
                     }
 
                     is Descriptor.Screen.Animated.SwipeBack -> {
-                        println("getActionsByTrigger SwipeBack")
-                        Animations.SwipeBack.getShowActions(newKey, oldKey, descriptor.duration)
+                        Animations.SwipeBack.getShowActions(
+                            newKey,
+                            oldKey,
+                            descriptor.duration,
+                            frameRate
+                        )
                     }
 
                     is Descriptor.Screen.Default -> {
-                        println("getActionsByTrigger Default_Forward $newKey")
                         Animations.CrossFade.getShowAction(newKey)
                     }
                 }
@@ -301,20 +253,30 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
             val oldKey: ImmutableList<String>
         ) : Triggers(oldKey) {
 
-            override suspend fun getActionsByTrigger(descriptor: Descriptor.Screen): List<Animations> =
+            override suspend fun getActionsByTrigger(
+                descriptor: Descriptor.Screen,
+                frameRate: Int
+            ): List<Animations> =
                 when (descriptor) {
                     is Descriptor.Screen.Animated.CrossFade -> {
-                        println("getActionsByTrigger CrossFade")
-                        Animations.CrossFade.getHideActions(newKey, oldKey, descriptor.duration)
+                        Animations.CrossFade.getHideActions(
+                            newKey,
+                            oldKey,
+                            descriptor.duration,
+                            frameRate
+                        )
                     }
 
                     is Descriptor.Screen.Animated.SwipeBack -> {
-                        println("getActionsByTrigger SwipeBack")
-                        Animations.SwipeBack.getHideActions(newKey, oldKey, descriptor.duration)
+                        Animations.SwipeBack.getHideActions(
+                            newKey,
+                            oldKey,
+                            descriptor.duration,
+                            frameRate
+                        )
                     }
 
                     is Descriptor.Screen.Default -> {
-                        println("getActionsByTrigger Default_Back $newKey")
                         Animations.CrossFade.getShowAction(newKey)
                     }
                 }

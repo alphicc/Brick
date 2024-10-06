@@ -38,6 +38,7 @@ internal fun FrameAnimator(
     index: Int,
     descriptor: Descriptor.Screen,
     gestureCommunicator: GestureCommunicator,
+    frameRate: Int,
     navigateBack: (immediately: Boolean) -> Unit,
     requestKey: (index: Int) -> String?,
     content: @Composable () -> Unit,
@@ -98,14 +99,14 @@ internal fun FrameAnimator(
                         }
 
                         is UpdateActions.Triggers.BackAction -> {
-                            val actions = updateAction.getActionsByTrigger(descriptor)
+                            val actions = updateAction.getActionsByTrigger(descriptor, frameRate)
 //                            println("receive BackAction start ${actions.size} key=$key")
                             gestureCommunicator.publishAll(actions)
 //                            println("receive BackAction end")
                         }
 
                         is UpdateActions.Triggers.ForwardAction -> {
-                            val actions = updateAction.getActionsByTrigger(descriptor)
+                            val actions = updateAction.getActionsByTrigger(descriptor, frameRate)
 //                            println("receive ForwardAction start ${actions.size}")
                             gestureCommunicator.publishAll(actions)
 //                            println("receive ForwardAction end")
@@ -131,7 +132,7 @@ internal fun FrameAnimator(
     var draggableEnabled by remember { mutableStateOf(true) }
 
     Box(
-        modifier = modifier
+        modifier = Modifier
             .onGloballyPositioned { layoutCoordinates ->
                 screenWidth = layoutCoordinates.size.width
                 minimumXOffset =
@@ -176,7 +177,8 @@ internal fun FrameAnimator(
                                 offsetX,
                                 speed,
                                 screenWidth.toFloat(),
-                                descriptor.duration
+                                descriptor.duration,
+                                frameRate
                             )
                         gestureCommunicator.publishAll(actions)
                         draggableEnabled = true
@@ -187,6 +189,8 @@ internal fun FrameAnimator(
             )
             .alpha(alpha)
     ) {
-        content.invoke()
+        Box(modifier = modifier) {
+            content.invoke()
+        }
     }
 }

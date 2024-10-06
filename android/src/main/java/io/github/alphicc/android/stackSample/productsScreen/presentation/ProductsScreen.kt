@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun ProductsScreen(modifier: Modifier = Modifier, onProductClicked: (Int) -> Unit) {
-    Box(modifier = modifier.background(color = Color.White)) {
+    Box(modifier = modifier) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             items(100) { index ->
                 ProductItem(

@@ -7,10 +7,13 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import kotlinx.collections.immutable.persistentMapOf
 
+private const val DEFAULT_ANIM_FRAME_RATE = 8
+
 @Composable
 fun ComponentsContainer(
     containerConnector: ContainerConnector,
     backgroundColor: Color = Color.White,
+    frameRate: Int = DEFAULT_ANIM_FRAME_RATE,
     onRouterEmpty: () -> Unit = {}
 ) {
 
@@ -30,6 +33,7 @@ fun ComponentsContainer(
     RootAnimator(
         nodes = nodes,
         animState = animState,
+        frameRate = frameRate,
         backgroundColor = backgroundColor,
         navigateBack = { immediately: Boolean ->
             containerConnector.onBackClicked(immediately)

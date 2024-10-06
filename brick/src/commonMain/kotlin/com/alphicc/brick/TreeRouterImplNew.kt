@@ -193,50 +193,12 @@ internal class TreeRouterImpl(
             when {
                 currentNode?.childComponents()?.isNotEmpty() == true -> backChild()
                 currentNode?.bottom != null -> backComponent()
-                else -> backComponent()
+                else -> with(copy(settings = TransactionSettings.immediately())) { backComponent() }
             }
         }
     }
 
     override fun lastComponentKey(): String? = currentNode?.key
-
-//    override fun TransactionScope.backComponentNow() {
-//        navigationBus.proceed(
-//            animState = AnimState.Executing(
-//                direction = AnimDirection.BACK,
-//                newKey = currentNode?.bottom?.key.orEmpty(),
-//                oldKeys = persistentListOf(currentNode?.key.orEmpty())
-//            ),
-//            preAction = {
-//                currentNode?.run {
-//                    childComponents().forEach { childComponent ->
-//                        destroyChildRouters(childComponent.key)
-//                        childComponent.onDestroy()
-//                        keyManager.remove(childComponent.key)
-//                    }
-//                    compositions().forEach { entry ->
-//                        destroyChildRouters(entry.key)
-//                        entry.value.onDestroy()
-//                        keyManager.remove(entry.key)
-//                    }
-//                    destroyChildRouters(component.key)
-//                    component.onDestroy()
-//                    keyManager.remove(component.key)
-//                    updateNodeInTree(
-//                        node = this.bottom,
-//                        transform = { transformNode -> transformNode.copy(top = null) },
-//                        afterTransform = {
-//                            updateNodeInTree(this, { null })
-//                            currentNode = this.bottom
-//                        }
-//                    )
-//                }
-//                fetchNode()
-//            },
-//            postAction = {
-//            }
-//        )
-//    }
 
     override fun TransactionScope.backComponent() {
         transactionBus.publishMicroTransaction(

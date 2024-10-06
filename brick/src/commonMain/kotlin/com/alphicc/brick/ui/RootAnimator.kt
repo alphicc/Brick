@@ -1,9 +1,12 @@
 package com.alphicc.brick.ui
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.key
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.alphicc.brick.AnimDirection
 import com.alphicc.brick.AnimState
@@ -22,12 +25,12 @@ internal fun RootAnimator(
     nodes: ImmutableList<Node>,
     animState: AnimState,
     backgroundColor: Color,
+    frameRate: Int,
     navigateBack: (immediately: Boolean) -> Unit
 ) {
 
     val bus = remember { MutableSharedFlow<UpdateActions>(extraBufferCapacity = Int.MAX_VALUE) }
     LaunchedEffect(animState) {
-        println("new animState=${animState.direction} ${animState}")
         val action = when (animState.direction) {
             AnimDirection.FORWARD -> UpdateActions.Triggers.ForwardAction(
                 animState.newKey,
@@ -41,28 +44,15 @@ internal fun RootAnimator(
 
             AnimDirection.NONE -> UpdateActions.None
         }
-        println("new Action=$action ${bus.subscriptionCount.value}")
         bus.emit(action)
     }
 
     nodes.forEachIndexed { index, keepAliveNode ->
-//        DisposableEffect("31") {
-//            println("DisposableEffect == ${keepAliveNode.mainComponent.key} index=$index size=${nodes.size}")
-//            nodes.forEach {
-//                println("keepAliveNode ==${it.mainComponent.key}")
-//            }
-//            onDispose {
-//                println("onDispose == ${keepAliveNode.mainComponent.key} index=$index size=${nodes.size}")
-//            }
-//        }
         key(keepAliveNode.mainComponent.key) {
 
             if (keepAliveNode.mainComponent.descriptor is Descriptor.Screen) {
                 val communicator = remember(keepAliveNode.mainComponent.key) {
-//                    println("remember call=${keepAliveNode.mainComponent.key}")
                     val filteredBus = bus.filter { updateAction ->
-//                        println("bus filter $updateAction ${updateAction.keys} ${keepAliveNode.mainComponent.key}")
-//                        println("filter 1=${updateAction.keys} 2=${keepAliveNode.mainComponent.key}")
                         if (updateAction is UpdateActions.Triggers.BackAction) {
                             updateAction.oldKey.firstOrNull() == keepAliveNode.mainComponent.key
                         } else updateAction.keys.contains(keepAliveNode.mainComponent.key)
@@ -80,11 +70,12 @@ internal fun RootAnimator(
                     )
                 }
 
-//                println("FrameAnimator call=${keepAliveNode.mainComponent.key} ${keepAliveNode.mainComponent.descriptor}")
                 FrameAnimator(
+                    modifier = Modifier.fillMaxSize().background(backgroundColor),
                     key = keepAliveNode.mainComponent.key,
                     index = index,
                     descriptor = keepAliveNode.mainComponent.descriptor,
+                    frameRate = frameRate,
                     gestureCommunicator = communicator,
                     navigateBack = navigateBack,
                     requestKey = { index -> nodes.getOrNull(index)?.mainComponent?.key },

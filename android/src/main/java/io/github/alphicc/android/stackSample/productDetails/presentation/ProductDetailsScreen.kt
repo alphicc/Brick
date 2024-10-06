@@ -26,7 +26,7 @@ fun ProductDetailsScreen(
     onBuyProductClicked: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Box(modifier = modifier.background(color = Color.White)) {
+    Box(modifier = modifier) {
         Column(modifier = Modifier.fillMaxSize()) {
             ProductLogo(
                 modifier = Modifier

@@ -21,12 +21,4 @@ internal class KeyManager {
         remove(oldKey)
         return add(newKey)
     }
-
-    fun clear() = keys.clear()
-
-    fun printKeys() {
-        println("=======KEYS START========")
-        keys.forEach { println(it) }
-        println("=======KEYS END========")
-    }
 }
