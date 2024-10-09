@@ -50,6 +50,6 @@ open class BaseComponent<D>(
 data class DataContainer(val rawData: Any?) {
     inline fun <reified C> get(): C {
         if (rawData is C) return rawData
-        else throw IllegalArgumentException("Argument type incorrect")
+        else throw IllegalArgumentException("Argument type incorrect. Expected ${C::class} but actual $rawData")
     }
 }

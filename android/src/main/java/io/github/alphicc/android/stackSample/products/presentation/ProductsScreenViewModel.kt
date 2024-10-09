@@ -1,9 +1,8 @@
-package io.github.alphicc.android.stackSample.productsScreen.presentation
+package io.github.alphicc.android.stackSample.products.presentation
 
 import com.alphicc.brick.TreeRouter
 import io.github.alphicc.android.stackSample.productDetails.ProductDetailsScreenArguments
 import io.github.alphicc.android.stackSample.productDetails.productDetailsComponent
-import io.github.alphicc.android.stackSample.productsScreen.productsScreenComponent
 
 class ProductsScreenViewModel(val router: TreeRouter) {
 

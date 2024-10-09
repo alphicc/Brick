@@ -31,7 +31,7 @@ import io.github.alphicc.android.overlaySample.OverlaySampleActivity
 import io.github.alphicc.android.overlaySample.listScreen.listScreen
 import io.github.alphicc.android.overlaySample.overlaySampleRouter
 import io.github.alphicc.android.stackSample.StackSampleActivity
-import io.github.alphicc.android.stackSample.productsScreen.productsScreenComponent
+import io.github.alphicc.android.stackSample.login.loginScreenComponent
 import io.github.alphicc.android.stackSample.stackSampleRouter
 
 @ExperimentalAnimationApi
@@ -50,7 +50,7 @@ class MainActivity : ComponentActivity() {
                 Button(onClick = {
                     stackSampleRouter.startTransaction(transactionSettings = TransactionSettings.immediately()) {
                         cleanRouter()
-                        addComponent(productsScreenComponent, stackSampleRouter)
+                        addComponent(loginScreenComponent, stackSampleRouter)
                     }
                     stackSampleRouter.proceedAction {
                         context.startActivity(Intent(context, StackSampleActivity::class.java))

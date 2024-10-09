@@ -1,7 +1,7 @@
 package io.github.alphicc.android.stackSample.productBuySuccess.presentation
 
 import com.alphicc.brick.TreeRouter
-import io.github.alphicc.android.stackSample.productsScreen.productsScreenComponent
+import io.github.alphicc.android.stackSample.products.productsScreenComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

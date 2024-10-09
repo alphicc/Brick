@@ -1,4 +1,4 @@
-package io.github.alphicc.android.stackSample.productsScreen
+package io.github.alphicc.android.stackSample.products
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.remember
@@ -6,8 +6,8 @@ import androidx.compose.ui.Modifier
 import com.alphicc.brick.Component
 import com.alphicc.brick.Descriptor
 import com.alphicc.brick.TreeRouter
-import io.github.alphicc.android.stackSample.productsScreen.presentation.ProductsScreen
-import io.github.alphicc.android.stackSample.productsScreen.presentation.ProductsScreenViewModel
+import io.github.alphicc.android.stackSample.products.presentation.ProductsScreen
+import io.github.alphicc.android.stackSample.products.presentation.ProductsScreenViewModel
 
 val productsScreenComponent = Component(
     key = "productsScreenComponent",

@@ -1,4 +1,4 @@
-package io.github.alphicc.android.stackSample.productsScreen.presentation
+package io.github.alphicc.android.stackSample.products.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
