@@ -22,7 +22,7 @@ internal interface TransactionBus {
         action: TransactionScope.() -> Unit
     )
 
-    fun publishMicroTransaction(id: String, navAction: NavAction<*>)
+    fun publishMicroTransaction(transactionId: String, navAction: NavAction<*>)
 
     companion object {
         fun create(
@@ -69,10 +69,10 @@ private class TransactionBusImpl(
     }
 
     override fun publishMicroTransaction(
-        id: String,
+        transactionId: String,
         navAction: NavAction<*>
     ) {
-        val command = TransactionCommands.MicroTransaction(id, navAction)
+        val command = TransactionCommands.MicroTransaction(transactionId, navAction)
         commandsFlow.tryEmit(command)
     }
 
@@ -84,7 +84,7 @@ private class TransactionBusImpl(
     }
 
     private fun handleOpenTransactionCommand(command: TransactionCommands.OpenTransaction) {
-        transactionsMap[command.scope.id] = Transaction(
+        transactionsMap[command.scope.transactionId] = Transaction(
             scope = command.scope,
             navActions = emptyList()
         )

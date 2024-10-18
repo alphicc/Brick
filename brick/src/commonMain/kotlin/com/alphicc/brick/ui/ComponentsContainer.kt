@@ -23,6 +23,7 @@ fun ComponentsContainer(
 
     val isRouterEmpty by containerConnector.isRouterEmpty.collectAsState()
     val animState by containerConnector.animState.collectAsState()
+    val componentsUiState by containerConnector.componentUiState.collectAsState()
 
     LaunchedEffect(isRouterEmpty) {
         if (isRouterEmpty) {
@@ -35,6 +36,7 @@ fun ComponentsContainer(
         animState = animState,
         frameRate = frameRate,
         backgroundColor = backgroundColor,
+        componentsUiState = componentsUiState,
         navigateBack = { immediately: Boolean ->
             containerConnector.onBackClicked(immediately)
         }

@@ -1,7 +1,7 @@
 package io.github.alphicc.android.stackSample.login.presentation
 
 import com.alphicc.brick.TreeRouter
-import io.github.alphicc.android.stackSample.main.MainScreenArguments
+import io.github.alphicc.android.stackSample.main.MainScreenDependencies
 import io.github.alphicc.android.stackSample.main.mainScreenComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -17,7 +17,7 @@ class LoginViewModel(val router: TreeRouter) {
             val ordersRouter = router.branch(mainScreenComponent.key)
             val profileRouter = router.branch(mainScreenComponent.key)
             router.startTransaction {
-                val argument = MainScreenArguments(login, router, ordersRouter, profileRouter)
+                val argument = MainScreenDependencies(login, router, ordersRouter, profileRouter)
                 newRootComponent(mainScreenComponent, argument)
             }
         }

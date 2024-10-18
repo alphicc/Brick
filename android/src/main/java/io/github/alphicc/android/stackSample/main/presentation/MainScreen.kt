@@ -1,5 +1,6 @@
 package io.github.alphicc.android.stackSample.main.presentation
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,6 +40,8 @@ fun MainScreen(
     indexMenu: Int,
     login: String,
     containerConnector: ContainerConnector?,
+    onBackClicked: () -> Unit,
+    onMenuClicked: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
 
@@ -73,7 +76,7 @@ fun MainScreen(
                     color = Color.Red,
                     title = "Orders",
                     isSelected = indexMenu == 0,
-                    onClick = {}
+                    onClick = { onMenuClicked(0) }
                 )
 
                 ButtonMenu(
@@ -93,10 +96,14 @@ fun MainScreen(
                     color = Color.Blue,
                     title = login,
                     isSelected = indexMenu == 2,
-                    onClick = {}
+                    onClick = { onMenuClicked(2) }
                 )
             }
         }
+    }
+
+    BackHandler {
+        onBackClicked()
     }
 }
 

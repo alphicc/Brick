@@ -9,15 +9,21 @@ import com.alphicc.brick.Component
 import com.alphicc.brick.Descriptor
 import io.github.alphicc.android.stackSample.productDetails.presentation.ProductDetailsScreen
 import io.github.alphicc.android.stackSample.productDetails.presentation.ProductDetailsScreenViewModel
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.mapNotNull
 
 val productDetailsComponent = Component(
     key = "productDetailsScreenComponent",
     descriptor = Descriptor.Screen.Animated.SwipeBack(),
-    onCreate = { _, argument ->
-        val arguments = argument.get<ProductDetailsScreenArguments>()
-        return@Component ProductDetailsScreenViewModel(arguments)
+    onCreate = { arguments, dependencies ->
+        val dependency = dependencies.get<ProductDetailsScreenDependencies>()
+        val argumentsFlow = arguments.mapNotNull { data -> data.getOrNull<ProductDetailsArguments>() }
+        return@Component ProductDetailsScreenViewModel(dependency, argumentsFlow)
     },
-    onDestroy = { _ -> },
+    onDestroy = { dependencies ->
+        val viewModel = dependencies.get<ProductDetailsScreenViewModel>()
+        viewModel.onCleared()
+    },
     content = { dataContainer, _ ->
         val viewModel = dataContainer.get<ProductDetailsScreenViewModel>()
         val productIndex by viewModel.productIndex.collectAsState()

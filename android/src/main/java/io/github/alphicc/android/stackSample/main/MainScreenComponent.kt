@@ -8,13 +8,16 @@ import com.alphicc.brick.Component
 import com.alphicc.brick.Descriptor
 import io.github.alphicc.android.stackSample.main.presentation.MainScreen
 import io.github.alphicc.android.stackSample.main.presentation.MainViewModel
+import kotlinx.coroutines.flow.mapNotNull
 
 val mainScreenComponent = Component(
     key = "mainScreenComponent",
     descriptor = Descriptor.Screen.Animated.CrossFade(),
-    onCreate = { _, argument ->
-        val arguments = argument.get<MainScreenArguments>()
-        return@Component MainViewModel(arguments)
+    onCreate = { arguments, dependencies ->
+        val dependency = dependencies.get<MainScreenDependencies>()
+        val argumentFlow =
+            arguments.mapNotNull { argument -> argument.getOrNull<MainScreenArgument>() }
+        return@Component MainViewModel(dependency, argumentFlow)
     },
     onDestroy = { argument ->
         val viewModel = argument.get<MainViewModel>()
@@ -29,6 +32,8 @@ val mainScreenComponent = Component(
             modifier = Modifier.fillMaxSize(),
             login = login,
             indexMenu = indexMenu,
+            onBackClicked = viewModel::onBackClicked,
+            onMenuClicked = viewModel::onMenuClicked,
             containerConnector = childRouter,
         )
     })

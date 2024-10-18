@@ -1,7 +1,9 @@
 package io.github.alphicc.android.stackSample.productBuySuccess.presentation
 
 import com.alphicc.brick.TreeRouter
-import io.github.alphicc.android.stackSample.products.productsScreenComponent
+import io.github.alphicc.android.stackSample.main.mainScreenComponent
+import io.github.alphicc.android.stackSample.productDetails.ProductDetailsArguments
+import io.github.alphicc.android.stackSample.productDetails.productDetailsComponent
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -29,7 +31,8 @@ class ProductBuySuccessViewModel(private val router: TreeRouter) {
         viewModelScope.launch {
             _dialogShowed.value = false
             delay(300)
-            router.startTransaction { backToComponent(productsScreenComponent.key) }
+            router.startTransaction { backToComponent(mainScreenComponent.key) }
+            router.passArgument(productDetailsComponent.key, ProductDetailsArguments.CloseScreen)
         }
     }
 

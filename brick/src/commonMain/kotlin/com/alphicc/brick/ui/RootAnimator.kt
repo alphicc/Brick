@@ -12,7 +12,9 @@ import com.alphicc.brick.AnimDirection
 import com.alphicc.brick.AnimState
 import com.alphicc.brick.Descriptor
 import com.alphicc.brick.Node
+import com.alphicc.brick.entities.ComponentUiState
 import kotlinx.collections.immutable.ImmutableList
+import kotlinx.collections.immutable.ImmutableMap
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.filter
 import kotlin.experimental.ExperimentalObjCRefinement
@@ -26,6 +28,7 @@ internal fun RootAnimator(
     animState: AnimState,
     backgroundColor: Color,
     frameRate: Int,
+    componentsUiState: ImmutableMap<String, ComponentUiState>,
     navigateBack: (immediately: Boolean) -> Unit
 ) {
 
@@ -42,7 +45,7 @@ internal fun RootAnimator(
                 animState.oldKeys
             )
 
-            AnimDirection.NONE -> UpdateActions.None
+            AnimDirection.ON_PLACE -> UpdateActions.None
         }
         bus.emit(action)
     }
@@ -72,6 +75,7 @@ internal fun RootAnimator(
 
                 FrameAnimator(
                     modifier = Modifier.fillMaxSize().background(backgroundColor),
+                    componentUiState = remember(keepAliveNode.mainComponent.key) { componentsUiState[keepAliveNode.mainComponent.key] },
                     key = keepAliveNode.mainComponent.key,
                     index = index,
                     descriptor = keepAliveNode.mainComponent.descriptor,

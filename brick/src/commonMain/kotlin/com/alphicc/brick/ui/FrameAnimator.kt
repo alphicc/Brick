@@ -8,17 +8,16 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.IntOffset
 import com.alphicc.brick.Descriptor
+import com.alphicc.brick.entities.ComponentUiState
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -36,6 +35,7 @@ import kotlin.native.HiddenFromObjC
 internal fun FrameAnimator(
     key: String,
     index: Int,
+    componentUiState: ComponentUiState?,
     descriptor: Descriptor.Screen,
     gestureCommunicator: GestureCommunicator,
     frameRate: Int,
@@ -45,20 +45,23 @@ internal fun FrameAnimator(
     modifier: Modifier = Modifier
 ) {
 
-    val frameState = rememberSaveable { mutableStateOf(0) }
-    val gestureEvent by gestureCommunicator.bus.collectAsState(UpdateActions.None)
-
-    var screenWidth by mutableStateOf(0)
-    var minimumXOffset by mutableStateOf(0f)
-    var offsetX by remember { mutableStateOf(0f) }
-    val initialAlpha =
-        remember(descriptor) { if (descriptor is Descriptor.Screen.Default) 1f else 0f }
-    var alpha by remember { mutableStateOf(initialAlpha) }
+    var screenWidth by remember(key) { mutableStateOf(0) }
+    var minimumXOffset by remember(key) { mutableStateOf(0f) }
+    var offsetX by remember(key) { mutableStateOf(0f) }
+    //Сейчас есть баг с восстановление стейта альфы. Поэтому не видно экран.
+    var alpha by remember(key) {
+        val initialAlpha = if (descriptor is Descriptor.Screen.Default || componentUiState?.showed == true) {
+            1f
+        } else {
+            0f
+        }
+        mutableStateOf(initialAlpha)
+    }
 
     DisposableEffect(key) {
-        println("DisposableEffect $key descriptor=$descriptor")
+        println("===?? DisposableEffect $key descriptor=$descriptor alpha= $alpha")
         onDispose {
-            println("onDispose $key")
+            println("===?? onDispose $key")
         }
     }
 
@@ -83,7 +86,7 @@ internal fun FrameAnimator(
                         }
 
                         is UpdateActions.Animations.SwipeBack -> {
-                            println("receive SwipeBack key=$key offsetX=${updateAction.offsetX} minimumXOffset=$minimumXOffset")
+                            println("===?? receive SwipeBack key=$key updateAction.alpha=${updateAction.alpha} offsetX=${updateAction.offsetX} minimumXOffset=$minimumXOffset")
                             delay(1)
                             alpha = updateAction.alpha
                             val newOffset = updateAction.offsetX * screenWidth
@@ -94,7 +97,6 @@ internal fun FrameAnimator(
 
                         is UpdateActions.Animations.CrossFade -> {
 //                            println("receive crossFade ${updateAction.alpha}")
-                            delay(8)
                             alpha = updateAction.alpha
                         }
 

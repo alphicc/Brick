@@ -160,9 +160,6 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
         data class CrossFade(val key: String, val alpha: Float) : Animations(key) {
 
             companion object {
-
-                private const val ALPHA_STEP: Float = .05f
-
                 suspend fun getShowActions(
                     newKey: String,
                     oldKeys: ImmutableList<String>,
@@ -174,7 +171,7 @@ sealed class UpdateActions(open val keys: ImmutableList<String>) {
                     var alpha = 0f
                     val step = 1f / (duration / frameRate)
                     while (alpha < 1) {
-                        alpha += step//ALPHA_STEP
+                        alpha += step
                         actions.add(CrossFade(newKey, alpha))
                     }
                     return@withContext actions

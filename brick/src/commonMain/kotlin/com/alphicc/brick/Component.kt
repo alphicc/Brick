@@ -48,8 +48,15 @@ open class BaseComponent<D>(
 
 @Immutable
 data class DataContainer(val rawData: Any?) {
+
+    //add getOrNull?
     inline fun <reified C> get(): C {
         if (rawData is C) return rawData
         else throw IllegalArgumentException("Argument type incorrect. Expected ${C::class} but actual $rawData")
+    }
+
+    inline fun <reified C> getOrNull(): C? {
+        return if (rawData is C) rawData
+        else null
     }
 }

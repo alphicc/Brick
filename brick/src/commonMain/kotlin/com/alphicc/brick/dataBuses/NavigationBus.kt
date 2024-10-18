@@ -30,8 +30,7 @@ internal interface NavigationBus {
 
 private class NavigationBusImpl(scope: CoroutineScope) : NavigationBus {
 
-    override val animState: MutableStateFlow<AnimState> =
-        MutableStateFlow(AnimState.Idle)
+    override val animState: MutableStateFlow<AnimState> = MutableStateFlow(AnimState.Idle)
 
     private val actionsMutex: Mutex = Mutex()
     private val actionsFlow: MutableSharedFlow<NavAction<*>> = MutableSharedFlow(
@@ -70,9 +69,7 @@ private class NavigationBusImpl(scope: CoroutineScope) : NavigationBus {
         }
     }
 
-    private suspend inline fun <T> statefulNavigation(
-        crossinline navigateAction: suspend () -> T
-    ): T {
+    private suspend inline fun <T> statefulNavigation(crossinline navigateAction: suspend () -> T): T {
         return try {
             navigateAction.invoke()
         } catch (exception: Exception) {
