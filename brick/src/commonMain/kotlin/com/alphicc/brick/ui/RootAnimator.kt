@@ -52,7 +52,7 @@ internal fun RootAnimator(
 
     nodes.forEachIndexed { index, keepAliveNode ->
         key(keepAliveNode.mainComponent.key) {
-
+            println("===? 6=${keepAliveNode.mainComponent.key}")
             if (keepAliveNode.mainComponent.descriptor is Descriptor.Screen) {
                 val communicator = remember(keepAliveNode.mainComponent.key) {
                     val filteredBus = bus.filter { updateAction ->

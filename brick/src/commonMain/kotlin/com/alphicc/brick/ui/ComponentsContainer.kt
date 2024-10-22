@@ -41,6 +41,7 @@ fun ComponentsContainer(
             containerConnector.onBackClicked(immediately)
         }
     )
+    println("===? 6-0=${nodes.hashCode()}")
 
     overlay?.run {
         showContent(

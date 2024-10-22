@@ -84,7 +84,7 @@ private class TransactionBusImpl(
     }
 
     private fun handleOpenTransactionCommand(command: TransactionCommands.OpenTransaction) {
-        transactionsMap[command.scope.transactionId] = Transaction(
+        transactionsMap[command.scope.scopeId] = Transaction(
             scope = command.scope,
             navActions = emptyList()
         )

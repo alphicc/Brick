@@ -1,10 +1,12 @@
 package io.github.alphicc.android.stackSample.profile.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,34 +22,45 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ProfileScreen(login: String, modifier: Modifier) {
+fun ProfileScreen(login: String, onLogoutClicked: () -> Unit, modifier: Modifier) {
 
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Spacer(modifier = Modifier.size(256.dp))
-
-        Box(
-            modifier = Modifier
-                .clip(CircleShape)
-                .size(128.dp)
-                .background(Color.Gray)
-        ) {
-
-            Text(text = "Avatar", modifier = Modifier.align(Alignment.Center))
-        }
-
-        Spacer(modifier = Modifier.size(24.dp))
+    Box(modifier = modifier) {
 
         Text(
-            text = "Hello, $login",
-            modifier = modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.W700
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+                .clickable { onLogoutClicked() },
+            text = "Logout"
         )
+
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Spacer(modifier = Modifier.size(256.dp))
+
+            Box(
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .size(128.dp)
+                    .background(Color.Gray)
+            ) {
+
+                Text(text = "Avatar", modifier = Modifier.align(Alignment.Center))
+            }
+
+            Spacer(modifier = Modifier.size(24.dp))
+
+            Text(
+                text = "Hello, $login",
+                modifier = modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.W700
+            )
+        }
     }
 }

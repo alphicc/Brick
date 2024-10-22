@@ -3,6 +3,7 @@ package io.github.alphicc.android.stackSample.profile
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import com.alphicc.brick.Component
 import com.alphicc.brick.Descriptor
@@ -22,6 +23,7 @@ val profileScreenComponent = Component(
         val login by viewModel.login.collectAsState()
         ProfileScreen(
             modifier = Modifier.fillMaxSize(),
+            onLogoutClicked = remember { { viewModel.onLogoutClicked() } },
             login = login
         )
     })

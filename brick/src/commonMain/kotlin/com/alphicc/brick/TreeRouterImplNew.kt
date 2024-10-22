@@ -67,7 +67,7 @@ internal class TreeRouterImpl(
         transactionSettings = transactionSettings,
         action = {
             transactionBus.publishMicroTransaction(
-                transactionId = transactionId,
+                transactionId = scopeId,
                 navAction = NavAction(
                     settings = settings,
                     animState = {
@@ -88,7 +88,7 @@ internal class TreeRouterImpl(
 
     override fun TransactionScope.cleanRouter() {
         transactionBus.publishMicroTransaction(
-            transactionId = transactionId,
+            transactionId = scopeId,
             navAction = NavAction(
                 settings = settings,
                 animState = {
@@ -113,7 +113,7 @@ internal class TreeRouterImpl(
         argument: A
     ) {//todo check overlay only for root router
         transactionBus.publishMicroTransaction(
-            transactionId = transactionId,
+            transactionId = scopeId,
             navAction = NavAction(
                 settings = settings,
                 animState = {
@@ -137,7 +137,7 @@ internal class TreeRouterImpl(
 
     override fun TransactionScope.removeOverlay() {
         transactionBus.publishMicroTransaction(
-            transactionId = transactionId,
+            transactionId = scopeId,
             navAction = NavAction(
                 settings = settings,
                 animState = {
@@ -211,7 +211,7 @@ internal class TreeRouterImpl(
 
     override fun TransactionScope.backComponent() {
         transactionBus.publishMicroTransaction(
-            transactionId = transactionId,
+            transactionId = scopeId,
             navAction = NavAction(
                 settings = settings,
                 animState = {
@@ -257,7 +257,7 @@ internal class TreeRouterImpl(
 
     override fun TransactionScope.backToComponent(key: String) {
         transactionBus.publishMicroTransaction(
-            transactionId = transactionId,
+            transactionId = scopeId,
             navAction = NavAction(
                 settings = settings,
                 animState = {
@@ -322,7 +322,7 @@ internal class TreeRouterImpl(
         argument: A?
     ) {
         transactionBus.publishMicroTransaction(
-            transactionId = transactionId,
+            transactionId = scopeId,
             navAction = NavAction(
                 settings = settings,
                 filter = { keyManager.add(component.key) },
@@ -408,7 +408,7 @@ internal class TreeRouterImpl(
             },
             postAction = { setComponentUiStateShowed(component.key) }
         )
-        transactionBus.publishMicroTransaction(transactionId = transactionId, navAction = navAction)
+        transactionBus.publishMicroTransaction(transactionId = scopeId, navAction = navAction)
     }
 
     override fun TransactionScope.newRootComponent(component: Component<*>) =
@@ -465,7 +465,7 @@ internal class TreeRouterImpl(
                 fetchNode()
             }
         )
-        transactionBus.publishMicroTransaction(transactionId = transactionId, navAction = navAction)
+        transactionBus.publishMicroTransaction(transactionId = scopeId, navAction = navAction)
     }
 
     override fun lastChildKey(): String? = currentNode?.childComponents()?.lastOrNull()?.key
@@ -493,7 +493,7 @@ internal class TreeRouterImpl(
                 }
             }
         )
-        transactionBus.publishMicroTransaction(transactionId = transactionId, navAction = navAction)
+        transactionBus.publishMicroTransaction(transactionId = scopeId, navAction = navAction)
     }
 
     override fun TransactionScope.backToChild(key: String) {
@@ -519,7 +519,7 @@ internal class TreeRouterImpl(
                 }
             }
         )
-        transactionBus.publishMicroTransaction(transactionId, navAction)
+        transactionBus.publishMicroTransaction(scopeId, navAction)
     }
 
     override fun TransactionScope.addChild(component: Component<*>) = addChildNode(component, null)
@@ -549,7 +549,7 @@ internal class TreeRouterImpl(
             },
             postAction = { setComponentUiStateShowed(component.key) }
         )
-        transactionBus.publishMicroTransaction(transactionId, navAction)
+        transactionBus.publishMicroTransaction(scopeId, navAction)
     }
 
     override fun TransactionScope.replaceChild(component: Component<*>) =
@@ -584,7 +584,7 @@ internal class TreeRouterImpl(
             },
             postAction = { setComponentUiStateShowed(component.key) }
         )
-        transactionBus.publishMicroTransaction(transactionId, navAction)
+        transactionBus.publishMicroTransaction(scopeId, navAction)
     }
 
     override fun TransactionScope.attachCompositeComponent(component: Component<*>) =
@@ -613,7 +613,7 @@ internal class TreeRouterImpl(
             },
             postAction = { setComponentUiStateShowed(component.key) }
         )
-        transactionBus.publishMicroTransaction(transactionId, navAction)
+        transactionBus.publishMicroTransaction(scopeId, navAction)
     }
 
     override fun TransactionScope.detachCompositeComponent(key: String) {
@@ -637,7 +637,7 @@ internal class TreeRouterImpl(
                 }
             }
         )
-        transactionBus.publishMicroTransaction(transactionId, navAction)
+        transactionBus.publishMicroTransaction(scopeId, navAction)
     }
 
     @InternalApi
